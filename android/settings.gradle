@@ -1,0 +1,3 @@
+rootProject.name = 'midnight_sun'
+
+include ':app'
