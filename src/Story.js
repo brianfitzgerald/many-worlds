@@ -1,4 +1,3 @@
-
 export default class Story {
     constructor(initialState, actions) {
         this.state = initialState
@@ -13,12 +12,17 @@ export default class Story {
 
     goToNextAction() {
         let nextStoryIndex = this.currentStoryIndex + 1
-        console.log('goToNextAction state', this.state)
-        console.log('next story filter', this.actions[nextStoryIndex].actionFilter(this.state))
-        while (this.actions[nextStoryIndex].actionFilter(this.state) !== true && nextStoryIndex < this.actions.length) {
+
+        if (this.actions[nextStoryIndex] === undefined) return
+        if (this.actions[nextStoryIndex].actionFilter === null || this.actions[nextStoryIndex].actionFilter === undefined) {
+            return this.actions[nextStoryIndex]
+        }
+
+        while (this.actions[nextStoryIndex] !== undefined && this.actions[nextStoryIndex].actionFilter(this.state) !== true) {
             nextStoryIndex++
         }
         this.currentStoryIndex = nextStoryIndex
+
         return this.actions[nextStoryIndex]
     }
 

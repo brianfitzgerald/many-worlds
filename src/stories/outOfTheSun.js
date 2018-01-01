@@ -1,6 +1,7 @@
 const defaultState = {
     applePickedUp: false,
     appleEaten: false,
+    voidApproached: true
 }
 
 // schema:
@@ -38,20 +39,26 @@ const actions = [
         ]
     },
     {
+        prompt: 'You live a happy and successful life.',
+        actionFilter: (state) => state.appleEaten === false,
+        actions: []
+    },
+    {
         prompt: 'You begin to feel ill. Your head hits the ground, and you being convulsing. A black void grows before you.',
         actionFilter: (state) => state.appleEaten === true,
         actions: [
             {
                 title: 'Approach the void',
                 action: {
-                    appleEaten: true
+                    voidApproached: true
                 },
             },
-            {
-                title: 'Drop apple',
-                action: null,
-            },
         ]
+    },
+    {
+        prompt: 'You are consumed. Game over.',
+        actionFilter: (state) => state.voidApproached === true,
+        actions: []
     }
 ]
 
