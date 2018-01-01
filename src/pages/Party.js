@@ -11,30 +11,53 @@ import commonStyles from '../styles/commonStyles';
 import HeroButton from '../components/HeroButton';
 import colors from '../styles/colors';
 
+import Story from '../Story'
+
+import outOfTheSun from '../stories/outOfTheSun'
+
 const pastPrompts = ["You see a chicken pecking by the road.", "You see some shriveled apple cores nearby."]
 const prompt = "You see some goblins approaching. They look angry."
 
 const choices = ["Run to the hills", "duck behind some bushes", "attempt to put on your invisibility cloak"]
 
 export default class Party extends Component {
-    playerSelectChoice() {
-        
+
+    constructor(props) {
+        super(props)
+
+        this.story = new Story(outOfTheSun.defaultState, outOfTheSun.actions)
+
+        this.state = {
+            currentAction: this.story.getCurrentAction()
+        }
     }
+
+    playerSelectChoice(action, prompt) {
+        this.story.doAction(action, prompt)
+        this.story.goToNextAction()
+        this.setState({
+            currentAction: this.story.getCurrentAction()
+        })
+    }
+
     render() {
-    return (
-        <View style={commonStyles.container}>
-        <StatusBar
-            backgroundColor={colors.black}
-            barStyle="light-content"
-        />
-        <ScrollView>
-            {pastPrompts.map((p, i) => <Text key={i} style={styles.promptText}>{p}</Text>)}
-            <Text style={styles.currentPromptText}>{prompt}</Text>
-        </ScrollView>
-        {choices.map((c, i) =>
-            <HeroButton key={i} title={c} onPress={this.playerSelectChoice.bind(this, c)} style={styles.promptButton} />)}
-        </View>
-    );
+
+        const currentAction = this.state.currentAction
+
+        return (
+            <View style={commonStyles.container}>
+            <StatusBar
+                backgroundColor={colors.black}
+                barStyle="light-content"
+            />
+            <ScrollView>
+                {this.story.history.map((p, i) => <Text key={i} style={styles.promptText}>{p}</Text>)}
+                <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
+            </ScrollView>
+            {currentAction.actions.map((a, i) =>
+                <HeroButton key={i} title={a.title} onPress={this.playerSelectChoice.bind(this, a)} style={styles.promptButton} />)}
+            </View>
+        );
     }
 }
 
