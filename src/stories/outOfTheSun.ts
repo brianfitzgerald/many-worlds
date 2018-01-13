@@ -35,8 +35,7 @@ const actions: Action[] = [
                 },
             },
             {
-                title: 'Drop apple',
-                action: null,
+                title: 'Drop apple'
             },
         ]
     },

@@ -25,7 +25,9 @@ type AppState = {
   playerName: string
 }
 
-export default class App extends React.Component<null,AppState>  {
+type AppProps = {}
+
+export default class App extends React.Component<AppProps,AppState>  {
 
   constructor(props: any) {
     super(props)

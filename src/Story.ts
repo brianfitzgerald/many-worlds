@@ -6,9 +6,7 @@ export type StoryState = {
 
 export type StoryOption = {
     title: string
-    action: {
-        [key: string]: string | boolean
-    } | null
+    action?: StoryState
     playerStateChange?: {
         allPlayers?: PlayerStateChange
         self?: PlayerStateChange
@@ -76,6 +74,11 @@ export default class StoryObject {
 
         const lastActionBeforeNewOne = this.getCurrentAction()
         this.history.push(lastActionBeforeNewOne)
-        this.state = { ...this.state, ...selectedOption.action }
+
+        if (selectedOption.action) {
+            const newState: StoryState = { ...this.state, ...selectedOption.action }
+            this.state = newState    
+        }
+
     }
 }
