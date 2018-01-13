@@ -14,8 +14,6 @@ import colors from '../styles/colors';
 import Story, { Action, StoryOption } from '../Story'
 import Player from '../Player'
 
-import outOfTheSun from '../stories/outOfTheSun'
-
 type PartyViewProps = {
     story: Story
     players: Player[],
