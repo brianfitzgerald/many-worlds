@@ -4,12 +4,21 @@ import {
     View,
     Button,
     TouchableOpacity,
+    StyleProp,
+    ViewProperties,
+    ViewStyle,
 } from 'react-native'
-import React, { Component } from 'react'
+import * as React from 'react'
 
 import commonStyles from '../styles/commonStyles'
 
-const HeroButton = ({ title, onPress, style }) => {
+type HeroButtonProps = {
+    title: string
+    onPress: () => void
+    style: StyleProp<ViewStyle>
+}
+
+const HeroButton: React.SFC<HeroButtonProps> = ({ title, onPress, style }) => {
     
     return (
         <TouchableOpacity style={style} onPress={onPress}>

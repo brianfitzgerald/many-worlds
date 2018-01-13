@@ -1,8 +1,8 @@
-import { StyleSheet, Platform } from 'react-native'
+import { StyleSheet, Platform, ViewStyle } from 'react-native'
 
 import colors from './colors'
 
-const styles = StyleSheet.create({
+const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',

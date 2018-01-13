@@ -1,3 +1,5 @@
+import { StoryState, Action } from "../Story";
+
 const defaultState = {
     applePickedUp: false,
     appleEaten: false,
@@ -9,11 +11,11 @@ const defaultState = {
 // actions act upon state, which 
 // once an action is hit, it cannot be hit again; there is a currentActionIndex which increments
 
-const actions = [
+const actions: Action[] = [
     {
         prompt: 'You see an apple on the floor.',
-        actionFilter: (state) => state.applePickedUp === true,
-        actions: [
+        actionFilter: (state: StoryState) => state.applePickedUp === true,
+        options: [
             {
                 title: 'Pick it up',
                 action: {
@@ -24,8 +26,8 @@ const actions = [
     },
     {
         prompt: 'The apple is covered in mold.',
-        actionFilter: (state) => state.applePickedUp === true,
-        actions: [
+        actionFilter: (state: StoryState) => state.applePickedUp === true,
+        options: [
             {
                 title: 'Eat apple',
                 action: {
@@ -40,18 +42,18 @@ const actions = [
     },
     {
         prompt: 'You live a happy and successful life.',
-        actionFilter: (state) => state.appleEaten === false,
-        actions: []
+        actionFilter: (state: StoryState) => state.appleEaten === false,
+        options: []
     },
     {
         prompt: 'You begin to feel ill. Your head hits the ground, and you being convulsing. A black void grows before you.',
-        actionFilter: (state) => state.appleEaten === true,
+        actionFilter: (state: StoryState) => state.appleEaten === true,
         playerStateChange: {
             all: {
                 newItems: [{ name: 'Apple', description: 'A suspicious fruit'}]
             }
         },
-        actions: [
+        options: [
             {
                 title: 'Approach the void',
                 action: {
@@ -62,8 +64,8 @@ const actions = [
     },
     {
         prompt: 'You are consumed. Game over.',
-        actionFilter: (state) => state.voidApproached === true,
-        actions: []
+        actionFilter: (state: StoryState) => state.voidApproached === true,
+        options: []
     }
 ]
 
