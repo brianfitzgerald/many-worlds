@@ -42,9 +42,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         const currentStoryIndex = this.state.currentStoryIndex
         this.props.story.doAction(currentStoryIndex, option, this.props.players)
         const nextStoryIndex = this.props.story.getNextActionIndex(currentStoryIndex)
-        this.setState({
-            currentStoryIndex: nextStoryIndex
-        })
+        this.setState({ currentStoryIndex: nextStoryIndex })
     }
 
     render() {

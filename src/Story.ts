@@ -47,7 +47,7 @@ export default class StoryObject {
 
     getNextActionIndex(currentStoryIndex: number): number {
         let nextStoryIndex = currentStoryIndex + 1
-
+        
         while (this.actions[nextStoryIndex] !== undefined && this.actions[nextStoryIndex].actionFilter(this.state) !== true) {
             nextStoryIndex++
             console.log(this.actions[nextStoryIndex]);
