@@ -8,6 +8,10 @@ export type StoryOption = {
     title: string
     action: {
         [key: string]: string | boolean
+    } | null
+    playerStateChange?: {
+        allPlayers?: PlayerStateChange
+        self?: PlayerStateChange
     }
 }
 
@@ -15,10 +19,6 @@ export type Action = {
     prompt: string
     actionFilter: (state: StoryState) => boolean
     options: StoryOption[]
-    playerStateChange?: {
-        allPlayers?: PlayerStateChange
-        self?: PlayerStateChange
-    }
 }
 
 type PlayerStateChange = {
@@ -64,18 +64,18 @@ export default class StoryObject {
         return this.actions[nextStoryIndex]
     }
 
-    doAction(newAction: Action, players: Player[]) {
+    doAction(selectedOption: StoryOption, players: Player[]) {
 
         players.forEach(player => {
-            if (newAction.playerStateChange) {
-                if (newAction.playerStateChange.allPlayers && newAction.playerStateChange.allPlayers.newItems) {
-                    player.inventory = player.inventory.concat(newAction.playerStateChange.allPlayers.newItems)
+            if (selectedOption.playerStateChange) {
+                if (selectedOption.playerStateChange.allPlayers && selectedOption.playerStateChange.allPlayers.newItems) {
+                    player.inventory = player.inventory.concat(selectedOption.playerStateChange.allPlayers.newItems)
                 }
             }
         })
 
         const lastActionBeforeNewOne = this.getCurrentAction()
         this.history.push(lastActionBeforeNewOne)
-        this.state = { ...this.state, ...newAction.options }
+        this.state = { ...this.state, ...selectedOption.action }
     }
 }

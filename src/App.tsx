@@ -17,16 +17,34 @@ import Party from './pages/Party'
 import Story from './Story'
 
 import outOfTheSun from './stories/outOfTheSun'
+import Player from './Player';
 
-export default class App extends React.Component {
+type AppState = {
+  story: Story
+  players: Player[],
+  playerName: string
+}
 
-  componentDidMount() {
-    const story = new Story(outOfTheSun.defaultState, outOfTheSun.actions)
-    const player = new Player('Mark')
+export default class App extends React.Component<null,AppState>  {
+
+  constructor(props: any) {
+    super(props)
+
+    const playerName = 'Mark'
+    const dummy = new Player(playerName)
+    const players = [dummy]
+    const story =  new Story(outOfTheSun.defaultState, outOfTheSun.actions)
+
+    this.state = {
+      playerName,
+      story,
+      players
+    }
+
   }
 
   render() {
-    return <Party />
+    return <Party currentPlayerName={this.state.playerName} players={this.state.players} story={this.state.story} />
   }
 }
 

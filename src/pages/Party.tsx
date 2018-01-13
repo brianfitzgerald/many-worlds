@@ -11,7 +11,7 @@ import commonStyles from '../styles/commonStyles';
 import HeroButton from '../components/HeroButton';
 import colors from '../styles/colors';
 
-import Story, { Action } from '../Story'
+import Story, { Action, StoryOption } from '../Story'
 import Player from '../Player'
 
 import outOfTheSun from '../stories/outOfTheSun'
@@ -40,8 +40,8 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
 
     }
 
-    playerSelectChoice(action: Action) {
-        this.props.story.doAction(action, this.props.players)
+    playerSelectChoice(option: StoryOption) {
+        this.props.story.doAction(option, this.props.players)
         this.props.story.goToNextAction()
         this.setState({
             currentAction: this.props.story.getCurrentAction()
