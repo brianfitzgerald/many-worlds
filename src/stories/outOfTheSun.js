@@ -46,6 +46,11 @@ const actions = [
     {
         prompt: 'You begin to feel ill. Your head hits the ground, and you being convulsing. A black void grows before you.',
         actionFilter: (state) => state.appleEaten === true,
+        playerStateChange: {
+            all: {
+                newItems: [{ name: 'Apple', description: 'A suspicious fruit'}]
+            }
+        },
         actions: [
             {
                 title: 'Approach the void',

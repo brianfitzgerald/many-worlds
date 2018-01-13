@@ -12,13 +12,9 @@ import HeroButton from '../components/HeroButton';
 import colors from '../styles/colors';
 
 import Story from '../Story'
+import Player from '../Player'
 
 import outOfTheSun from '../stories/outOfTheSun'
-
-const pastPrompts = ["You see a chicken pecking by the road.", "You see some shriveled apple cores nearby."]
-const prompt = "You see some goblins approaching. They look angry."
-
-const choices = ["Run to the hills", "duck behind some bushes", "attempt to put on your invisibility cloak"]
 
 export default class Party extends Component {
 
@@ -26,6 +22,7 @@ export default class Party extends Component {
         super(props)
 
         this.story = new Story(outOfTheSun.defaultState, outOfTheSun.actions)
+        this.player = new Player('Mark')
 
         this.state = {
             currentAction: this.story.getCurrentAction()
@@ -33,7 +30,7 @@ export default class Party extends Component {
     }
 
     playerSelectChoice(action, prompt) {
-        this.story.doAction(action, prompt)
+        this.story.doAction(action, this.player)
         this.story.goToNextAction()
         this.setState({
             currentAction: this.story.getCurrentAction()

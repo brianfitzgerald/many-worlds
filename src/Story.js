@@ -26,7 +26,17 @@ export default class Story {
         return this.actions[nextStoryIndex]
     }
 
-    doAction(newAction) {
+    doAction(newAction, player, allPlayers) {
+
+        if (newAction.playerStateChange) {
+            if (newAction.playerStateChange.all) {
+                allPlayers.forEach(player => {
+                    player.inventory = player.inventory.concat(newAction.playerStateChange.all.newItems)
+                    // add conditions and abilities here
+                })
+            }
+        }
+
         const currentPrompt = this.getCurrentAction().prompt
         this.history.push(currentPrompt)
         this.state = { ...this.state, ...newAction.action }
