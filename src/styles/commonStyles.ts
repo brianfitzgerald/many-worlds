@@ -10,7 +10,8 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
         backgroundColor: colors.black,
         paddingTop: 25,
         paddingLeft: 15,
-        paddingRight: 15
+        paddingRight: 15,
+        paddingBottom: 15
     },
     textInput: {
         height: 50,

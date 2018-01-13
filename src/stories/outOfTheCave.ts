@@ -2,13 +2,10 @@ import { StoryState, Action } from "../Story";
 
 const defaultState = {
     name: '',
-    wouldSteal: false
+    wouldSteal: false,
+    joinedCarl: false
 }
 
-// schema:
-// actions have a prompt and a filter, which is a function that determines if the prompt is hit
-// actions act upon state, which 
-// once an action is hit, it cannot be hit again; there is a currentActionIndex which increments
 
 const actions: Action[] = [
     {
@@ -82,19 +79,36 @@ Did you commit a crime? Maybe you got caught stealing something...
     {
         prompt: `
 It was, in fact, someone smashing down the wall with a hammer. He looks to be a giant blue orc.
-He screams, 'You! Come join revolution! Smash the system! Smash hierarchy! Smash castle! Join!
+He screams in your face, spittle flying everywhere, 'You! Come join revolution! Smash the system! Smash hierarchy! Smash castle! Join!'
 `,
         actionFilter: (state) => true,
         options: [
             {
                 title: `Attempt to run around the orc, out into the sunlight`,
-                action: { attemptedToEscapeCarl: true }
+                action: { joinedCarl: false }
             },
             {
                 title: `Join the revolution`,
-                action: { attemptedToEscapeCarl: false }
+                action: { joinedCarl: true }
             },
         ]
+    },
+    // If you joined Carl
+    {
+        prompt: `The orc says, 'Me name Carl. Me son of Barl, and father of Darl. Follow me, we don't have much time.`,
+        actionFilter: (state) => state.joinedCarl === true,
+        options: [{ title: '->' }]
+    },
+    // If you ran away
+    {
+        prompt: `The orc shouts after you, but once you get far enough away he starts mumbling about wishing he were more convincing.`,
+        actionFilter: (state) => state.joinedCarl === false,
+        options: [{ title: '->' }]
+    },
+    {
+        prompt: `You're back out in the fresh air. `,
+        actionFilter: (state) => !state.joinedCarl,
+        options: [{ title: '->' }]
     },
     {
         prompt: `The end.`,
