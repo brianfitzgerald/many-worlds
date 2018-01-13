@@ -31,48 +31,43 @@ type PlayerStateChange = {
 
 export default class StoryObject {
 
-    actions: Action[]
-    state: StoryState
-    currentStoryIndex: number
-    history: Action[]
+    private actions: Action[]
+    private state: StoryState
+    public history: Action[]
 
     constructor(initialState: StoryState, actions: Action[]) {
         this.state = initialState
         this.actions = actions
-        this.currentStoryIndex = 0
         this.history = []
     }
 
-    getCurrentAction(): Action {
-        return this.actions[this.currentStoryIndex]
+    getActionByIndex(index: number): Action {
+        return this.actions[index]
     }
 
-    goToNextAction(): Action {
-        let nextStoryIndex = this.currentStoryIndex + 1
-
-        if (this.actions[nextStoryIndex].actionFilter === null || this.actions[nextStoryIndex].actionFilter === undefined) {
-            return this.actions[nextStoryIndex]
-        }
+    getNextActionIndex(currentStoryIndex: number): number {
+        let nextStoryIndex = currentStoryIndex + 1
 
         while (this.actions[nextStoryIndex] !== undefined && this.actions[nextStoryIndex].actionFilter(this.state) !== true) {
             nextStoryIndex++
+            console.log(this.actions[nextStoryIndex]);
         }
-        this.currentStoryIndex = nextStoryIndex
 
-        return this.actions[nextStoryIndex]
+        return nextStoryIndex
     }
 
-    doAction(selectedOption: StoryOption, players: Player[]) {
+    doAction(currentStoryIndex: number, selectedOption: StoryOption, players: Player[]) {
 
         players.forEach(player => {
             if (selectedOption.playerStateChange) {
+                // add similar conditions and abilities logic here
                 if (selectedOption.playerStateChange.allPlayers && selectedOption.playerStateChange.allPlayers.newItems) {
                     player.inventory = player.inventory.concat(selectedOption.playerStateChange.allPlayers.newItems)
                 }
             }
         })
 
-        const lastActionBeforeNewOne = this.getCurrentAction()
+        const lastActionBeforeNewOne = this.getActionByIndex(currentStoryIndex)
         this.history.push(lastActionBeforeNewOne)
 
         if (selectedOption.action) {

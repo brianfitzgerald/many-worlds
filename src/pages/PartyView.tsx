@@ -21,7 +21,7 @@ type PartyViewProps = {
 }
 
 type PartyViewState = {
-    currentAction: Action
+    currentStoryIndex: number
 }
 
 export const getMe = (name: string, players: Player[]) => players.find((p) => p.name === name)
@@ -33,22 +33,23 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         super(props)
 
         this.state = {
-            currentAction: this.props.story.getCurrentAction()
+            currentStoryIndex: 0
         }
 
     }
 
     playerSelectChoice(option: StoryOption) {
-        this.props.story.doAction(option, this.props.players)
-        this.props.story.goToNextAction()
+        const currentStoryIndex = this.state.currentStoryIndex
+        this.props.story.doAction(currentStoryIndex, option, this.props.players)
+        const nextStoryIndex = this.props.story.getNextActionIndex(currentStoryIndex)
         this.setState({
-            currentAction: this.props.story.getCurrentAction()
+            currentStoryIndex: nextStoryIndex
         })
     }
 
     render() {
 
-        const currentAction = this.state.currentAction
+        const currentAction = this.props.story.getActionByIndex(this.state.currentStoryIndex)
 
         return (
             <View style={commonStyles.container}>
@@ -74,7 +75,8 @@ const styles = StyleSheet.create({
     },
     currentPromptText: {
         fontSize: 24,
-        color: colors.white
+        color: colors.white,
+        textAlign: 'left'
     },
     promptButton: {
         width: '100%'

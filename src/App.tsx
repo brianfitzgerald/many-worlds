@@ -16,7 +16,9 @@ import PartyView from './pages/PartyView'
 
 import Story from './Story'
 
+import outOfTheCave from './stories/outOfTheCave'
 import appleDisaster from './stories/appleDisaster'
+
 import Player from './Player';
 
 type AppState = {
@@ -33,9 +35,9 @@ export default class App extends React.Component<AppProps,AppState>  {
     super(props)
 
     const playerName = 'Mark'
-    const dummy = new Player(playerName)
-    const players = [dummy]
-    const story =  new Story(appleDisaster.defaultState, appleDisaster.actions)
+    const player = new Player(playerName)
+    const players = [player]
+    const story = new Story(outOfTheCave.defaultState, outOfTheCave.actions)
 
     this.state = {
       playerName,
