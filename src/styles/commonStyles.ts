@@ -1,8 +1,8 @@
-import { StyleSheet, Platform } from 'react-native'
+import { StyleSheet, Platform, ViewStyle } from 'react-native'
 
 import colors from './colors'
 
-const styles = StyleSheet.create({
+const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
@@ -10,7 +10,8 @@ const styles = StyleSheet.create({
         backgroundColor: colors.black,
         paddingTop: 25,
         paddingLeft: 15,
-        paddingRight: 15
+        paddingRight: 15,
+        paddingBottom: 15
     },
     textInput: {
         height: 50,
