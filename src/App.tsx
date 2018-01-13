@@ -12,7 +12,7 @@ import {
   View
 } from 'react-native';
 
-import Party from './pages/Party'
+import PartyView from './pages/PartyView'
 
 import Story from './Story'
 
@@ -46,7 +46,7 @@ export default class App extends React.Component<AppProps,AppState>  {
   }
 
   render() {
-    return <Party currentPlayerName={this.state.playerName} players={this.state.players} story={this.state.story} />
+    return <PartyView currentPlayerName={this.state.playerName} players={this.state.players} story={this.state.story} />
   }
 }
 

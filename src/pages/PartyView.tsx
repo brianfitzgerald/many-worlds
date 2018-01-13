@@ -59,7 +59,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                 barStyle="light-content"
             />
             <ScrollView>
-                {this.props.story.history.map((p, i) => <Text key={i} style={styles.promptText}>{p}</Text>)}
+                {this.props.story.history.map((p, i) => <Text key={i} style={styles.promptText}>{p.prompt}</Text>)}
                 <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
             </ScrollView>
             {currentAction.options.map((a, i) =>
