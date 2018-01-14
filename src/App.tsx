@@ -20,11 +20,20 @@ import outOfTheCave from './stories/outOfTheCave'
 import appleDisaster from './stories/appleDisaster'
 
 import Player from './Player';
+import commonStyles from './styles/commonStyles';
+
+import { Provider, connect } from 'react-redux'
+import thunk from 'redux-thunk'
+import { createStore, applyMiddleware } from 'redux'
+import Index from './reducers/Index';
+
+const store = createStore(Index, applyMiddleware(thunk))
 
 type AppState = {
   story: Story
-  players: Player[],
+  players: Player[]
   playerName: string
+  nameSet: boolean
 }
 
 type AppProps = {}
@@ -42,13 +51,28 @@ export default class App extends React.Component<AppProps,AppState>  {
     this.state = {
       playerName,
       story,
-      players
+      players,
+      nameSet: false
     }
 
   }
 
   render() {
-    return <PartyView currentPlayerName={this.state.playerName} players={this.state.players} story={this.state.story} />
+
+    if (!this.state.nameSet) {
+      return (
+        <View style={commonStyles.container}>
+          <Text style={commonStyles.headerText}>What is your name?</Text>
+          <Text style={commonStyles.headerText}>What is your name?</Text>
+        </View>
+      )
+    }
+    return (
+      <PartyView
+        currentPlayerName={this.state.playerName}
+        players={this.state.players}
+        story={this.state.story}
+        matchID={}/>
   }
 }
 

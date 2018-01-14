@@ -13,15 +13,25 @@ import colors from '../styles/colors';
 
 import Story, { Action, StoryOption } from '../Story'
 import Player from '../Player'
+import { dbInstance } from '../firebaseRef';
+import { updateRoom, RoomState } from '../firebaseFunctions';
 
 type PartyViewProps = {
     story: Story
     players: Player[],
     currentPlayerName: string
+    matchID: string
+    dispatch?: (func: ({ type: string; value: RoomState; })) => void
 }
 
 type PartyViewState = {
     currentStoryIndex: number
+}
+
+const emptyRoomState: RoomState = {
+    connectedPlayers: [],
+    storyState: {},
+    history: []
 }
 
 export const getMe = (name: string, players: Player[]) => players.find((p) => p.name === name)
@@ -36,6 +46,16 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
             currentStoryIndex: 0
         }
 
+    }
+
+    componentDidMount() {
+        const matchID = this.props.matchID
+        dbInstance.ref(`/rooms/${matchID}/`).on('value', (snap) => {
+            const updatedRoomState: RoomState = snap ? snap.val() as RoomState : emptyRoomState
+            if (this.props.dispatch) {
+                this.props.dispatch(updateRoom(updatedRoomState))
+            }
+        })
     }
 
     playerSelectChoice(option: StoryOption) {
