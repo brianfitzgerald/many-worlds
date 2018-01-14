@@ -5,10 +5,10 @@ export const types = {
     JOIN_ROOM_SUCCESS: 'JOIN_ROOM_SUCCESS'
 }
 
-const defaultState = {
-    roomData: {
-        players: {}
-    }
+const defaultState: RoomState = {
+    connectedPlayers: [],
+    storyState: {},
+    history: []
 }
 
 export type RoomAction = {
@@ -16,7 +16,7 @@ export type RoomAction = {
     value?: RoomState
 }
 
-const Room = (state = defaultState, action: RoomAction) => {
+const Room = (state: RoomState = defaultState, action: RoomAction) => {
 
     switch (action.type) {
 

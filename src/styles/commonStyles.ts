@@ -23,7 +23,6 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
     },
     headerText: {
         fontSize: 28,
-        fontFamily: 'edmondsans',
         fontWeight: 'bold',
         color: colors.white,
         textAlign: 'center'

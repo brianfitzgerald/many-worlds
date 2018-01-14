@@ -59,20 +59,28 @@ export default class App extends React.Component<AppProps,AppState>  {
 
   render() {
 
+    let page = null
+
     if (!this.state.nameSet) {
-      return (
+      page = (
         <View style={commonStyles.container}>
-          <Text style={commonStyles.headerText}>What is your name?</Text>
           <Text style={commonStyles.headerText}>What is your name?</Text>
         </View>
       )
     }
-    return (
+    page = (
       <PartyView
         currentPlayerName={this.state.playerName}
         players={this.state.players}
         story={this.state.story}
-        matchID={}/>
+      />
+    )
+
+    return (
+      <Provider store={store}>
+        {page}
+      </Provider>
+    )
   }
 }
 

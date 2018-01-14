@@ -36,7 +36,6 @@ export default class StoryObject {
     public history: Action[]
 
     constructor(initialState: StoryState, actions: Action[]) {
-        this.state = initialState
         this.actions = actions
         this.history = []
     }
@@ -45,10 +44,10 @@ export default class StoryObject {
         return this.actions[index]
     }
 
-    getNextActionIndex(currentStoryIndex: number): number {
+    getNextActionIndex(currentState: StoryState, currentStoryIndex: number): number {
         let nextStoryIndex = currentStoryIndex + 1
         
-        while (this.actions[nextStoryIndex] !== undefined && this.actions[nextStoryIndex].actionFilter(this.state) !== true) {
+        while (this.actions[nextStoryIndex] !== undefined && this.actions[nextStoryIndex].actionFilter(currentState) !== true) {
             nextStoryIndex++
             console.log(this.actions[nextStoryIndex]);
         }
@@ -56,7 +55,7 @@ export default class StoryObject {
         return nextStoryIndex
     }
 
-    doAction(currentStoryIndex: number, selectedOption: StoryOption, players: Player[]) {
+    doAction(currentState: StoryState, currentStoryIndex: number, selectedOption: StoryOption, players: Player[]): StoryState {
 
         players.forEach(player => {
             if (selectedOption.playerStateChange) {
@@ -72,8 +71,9 @@ export default class StoryObject {
 
         if (selectedOption.action) {
             const newState: StoryState = { ...this.state, ...selectedOption.action }
-            this.state = newState    
+            return newState
         }
 
+        return currentState
     }
 }

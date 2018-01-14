@@ -11,16 +11,19 @@ import commonStyles from '../styles/commonStyles';
 import HeroButton from '../components/HeroButton';
 import colors from '../styles/colors';
 
-import Story, { Action, StoryOption } from '../Story'
+import StoryObject, { Action, StoryOption } from '../Story'
 import Player from '../Player'
 import { dbInstance } from '../firebaseRef';
 import { updateRoom, RoomState } from '../firebaseFunctions';
+import { connect } from 'react-redux';
+import { IndexState } from '../reducers/Index';
 
 type PartyViewProps = {
-    story: Story
+    room: RoomState
+    story: StoryObject
     players: Player[],
     currentPlayerName: string
-    matchID: string
+    matchID?: string
     dispatch?: (func: ({ type: string; value: RoomState; })) => void
 }
 
@@ -36,7 +39,7 @@ const emptyRoomState: RoomState = {
 
 export const getMe = (name: string, players: Player[]) => players.find((p) => p.name === name)
 
-export default class PartyView extends React.Component<PartyViewProps, PartyViewState> {
+class PartyView extends React.Component<PartyViewProps, PartyViewState> {
 
     constructor(props: PartyViewProps) {
 
@@ -60,8 +63,8 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
 
     playerSelectChoice(option: StoryOption) {
         const currentStoryIndex = this.state.currentStoryIndex
-        this.props.story.doAction(currentStoryIndex, option, this.props.players)
-        const nextStoryIndex = this.props.story.getNextActionIndex(currentStoryIndex)
+        this.props.story.doAction(this.props.room.storyState, currentStoryIndex, option, this.props.players)
+        const nextStoryIndex = this.props.story.getNextActionIndex(this.props.room.storyState, currentStoryIndex)
         this.setState({ currentStoryIndex: nextStoryIndex })
     }
 
@@ -85,6 +88,10 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         );
     }
 }
+
+export default connect((state: IndexState) => ({
+    room: state.room
+}))
 
 const styles = StyleSheet.create({
     promptText: {
