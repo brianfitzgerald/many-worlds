@@ -99,6 +99,11 @@ He screams in your face, spittle flying everywhere, 'You! Come join revolution! 
         actionFilter: (state) => state.joinedCarl === true,
         options: [{ title: '->' }]
     },
+    {
+        prompt: `You follow Carl across a sunlit forest.`,
+        actionFilter: (state) => true,
+        options: [{ title: '->' }]
+    },
     // If you ran away
     {
         prompt: `The orc shouts after you, but once you get far enough away he starts mumbling about wishing he were more convincing.`,
@@ -107,7 +112,7 @@ He screams in your face, spittle flying everywhere, 'You! Come join revolution! 
     },
     {
         prompt: `You're back out in the fresh air. `,
-        actionFilter: (state) => !state.joinedCarl,
+        actionFilter: (state) => true,
         options: [{ title: '->' }]
     },
     {
