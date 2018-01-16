@@ -6,7 +6,7 @@ import { RoomState } from '../firebaseFunctions';
 const indexReducer = combineReducers({ room })
 
 export type IndexState = {
-    room: RoomState
+    roomState: RoomState
 }
 
 export default indexReducer

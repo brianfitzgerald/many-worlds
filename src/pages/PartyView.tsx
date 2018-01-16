@@ -19,9 +19,8 @@ import { connect } from 'react-redux';
 import { IndexState } from '../reducers/Index';
 
 type PartyViewProps = {
-    room: RoomState
+    roomState: RoomState
     story: StoryObject
-    players: Player[],
     currentPlayerName: string
     matchID?: string
     dispatch?: (func: ({ type: string; value: RoomState; })) => void
@@ -63,8 +62,8 @@ class PartyView extends React.Component<PartyViewProps, PartyViewState> {
 
     playerSelectChoice(option: StoryOption) {
         const currentStoryIndex = this.state.currentStoryIndex
-        this.props.story.doAction(this.props.room.storyState, currentStoryIndex, option, this.props.players)
-        const nextStoryIndex = this.props.story.getNextActionIndex(this.props.room.storyState, currentStoryIndex)
+        this.props.story.doAction(this.props.roomState.storyState, currentStoryIndex, option, this.props.roomState.connectedPlayers)
+        const nextStoryIndex = this.props.story.getNextActionIndex(this.props.roomState.storyState, currentStoryIndex)
         this.setState({ currentStoryIndex: nextStoryIndex })
     }
 
@@ -89,9 +88,15 @@ class PartyView extends React.Component<PartyViewProps, PartyViewState> {
     }
 }
 
-export default connect((state: IndexState) => ({
-    room: state.room
-}))
+interface StateFromProps {
+    roomState: RoomState
+}
+
+const ConnectedPartyView: React.SFC<StateFromProps> = (state: IndexState, props: PartyViewProps) => (
+    <PartyView roomState={state.roomState} {...props} />
+)
+
+export default connect<StateFromProps, void, void, PartyViewProps>((state) => state)(ConnectedPartyView)
 
 const styles = StyleSheet.create({
     promptText: {
