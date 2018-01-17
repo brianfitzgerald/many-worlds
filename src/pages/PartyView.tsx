@@ -13,7 +13,6 @@ import colors from '../styles/colors';
 
 import { dbInstance } from '../firebaseRef';
 import { connect, MapStateToProps } from 'react-redux';
-import { IndexState } from '../reducers/Index';
 import { Story, StoryOption } from '../types/Story';
 import { Player } from '../types/Player';
 import { getNextActionIndex, doAction, getActionByIndex } from '../actions/Story';
@@ -57,16 +56,13 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
 
     playerSelectChoice(option: StoryOption) {
         const currentStoryIndex = this.state.roomState.currentStoryIndex
-        const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
         const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
-        updateStoryState(this.props.roomID, newState, nextStoryIndex)
+        const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
+        newState.currentStoryIndex = nextStoryIndex
+        updateStoryState(this.props.roomID, newState)
     }
 
-    render() {
-
-        console.log(this.props.story);
-        if (!this.props.story) return <View />
-        
+    render() {        
         const currentAction = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex)
 
         return (

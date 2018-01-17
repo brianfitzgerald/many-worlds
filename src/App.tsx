@@ -9,7 +9,8 @@ import {
   Platform,
   StyleSheet,
   Text,
-  View
+  View,
+  TextInput
 } from 'react-native';
 
 import PartyView from './pages/PartyView'
@@ -24,19 +25,15 @@ import commonStyles from './styles/commonStyles';
 import { Provider, connect } from 'react-redux'
 import thunk from 'redux-thunk'
 import { createStore, applyMiddleware } from 'redux'
-import Index from './reducers/Index';
 import { Player } from './types/Player';
 import { Story } from './types/Story';
-
-const store = createStore(Index, applyMiddleware(thunk))
 
 type AppState = {
   story: Story
   players: Player[]
   playerName: string
-  nameSet: boolean
   roomID: string
-  inRoom: false
+  inRoom: boolean
 }
 
 type AppProps = {}
@@ -60,7 +57,6 @@ export default class App extends React.Component<AppProps,AppState>  {
       story,
       players: [player],
       roomID: '',
-      nameSet: false,
       inRoom: false
     }
 
@@ -70,10 +66,11 @@ export default class App extends React.Component<AppProps,AppState>  {
 
     let page = null
 
-    if (!this.state.nameSet || !this.state.inRoom) {
+    if (!this.state.inRoom) {
       page = (
         <View style={commonStyles.container}>
           <Text style={commonStyles.headerText}>What is your name?</Text>
+          <TextInput style={commonStyles.textInput} value={this.state.playerName} />
         </View>
       )
     }
@@ -86,11 +83,7 @@ export default class App extends React.Component<AppProps,AppState>  {
       />
     )
 
-    return (
-      <Provider store={store}>
-        {page}
-      </Provider>
-    )
+    return page
   }
 }
 

@@ -1,7 +1,6 @@
 import { dbInstance } from "./firebaseRef";
 import { Alert } from "react-native";
 import { Dispatch } from "redux";
-import { types } from './reducers/Room'
 import { StoryAction, StoryState } from "./types/Story";
 import { Player } from "./types/Player";
 import { RoomState } from "./types/Network";
@@ -51,9 +50,6 @@ export function createRoom(username: string) {
 }
 
 // update the remote state of the room
-export function updateStoryState(roomID: string, newState: RoomState, newActionIndex: number) {
-    const newRoom = 
-    dbInstance.ref(`/rooms/${roomID}`).update({
-        actionUsed: true
-    })
+export function updateStoryState(roomID: string, newState: RoomState) {
+    const newRoom =  dbInstance.ref(`/rooms/${roomID}`).update(newState)
 }
