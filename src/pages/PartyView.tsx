@@ -22,7 +22,7 @@ import { defaultRoomState, updateStoryState } from '../firebaseFunctions';
 type PartyViewProps = {
     story: Story
     currentPlayerName: string
-    roomID: string
+    roomCode: string
     dispatch?: (func: ({ type: string; value: RoomState; })) => void
 }
 
@@ -46,7 +46,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
     }
 
     componentDidMount() {
-        const matchID = this.props.roomID
+        const matchID = this.props.roomCode
         dbInstance.ref(`/rooms/${matchID}/`).on('value', (snap) => {
             const updatedRoomState: RoomState = snap ? snap.val() as RoomState : defaultRoomState
             // this should be the only place where room state is updated
@@ -59,7 +59,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
         const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
         newState.currentStoryIndex = nextStoryIndex
-        updateStoryState(this.props.roomID, newState)
+        updateStoryState(this.props.roomCode, newState)
     }
 
     render() {        

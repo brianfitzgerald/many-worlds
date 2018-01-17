@@ -13,8 +13,8 @@ export const defaultRoomState: RoomState = {
 }
 
 
-export const joinRoom = (matchID: string, username: string) => new Promise((resolve, reject) => {
-    return dbInstance.ref(`/rooms/${matchID}/`).once('value', (snapshot) => {
+export const joinRoom = (roomCode: string, username: string) => new Promise<string>((resolve, reject) => {
+    return dbInstance.ref(`/rooms/${roomCode}/`).once('value', (snapshot) => {
 
         const value = snapshot.val()
 
@@ -32,7 +32,7 @@ export const joinRoom = (matchID: string, username: string) => new Promise((reso
             abilities: []
         }
 
-        dbInstance.ref(`/rooms/${matchID}/players/${username}`).set(newPlayer).then(() => resolve())
+        dbInstance.ref(`/rooms/${roomCode}/players/${username}`).set(newPlayer).then(() => resolve())
     })
     .catch((error) => {
         reject(error)
@@ -40,16 +40,18 @@ export const joinRoom = (matchID: string, username: string) => new Promise((reso
 })
 
 
-export function createRoom(username: string) {
+export const createRoom = (username: string) => new Promise<string>((resolve, reject) => {
 
     let code: number = 0
     code = Math.floor(Math.random() * 9999 - 1000) + 1000
 
-    dbInstance.ref(`/rooms/${code}/`).set(defaultRoomState).then(() => {})
+    dbInstance.ref(`/rooms/${code}/`).set(defaultRoomState).then(() => {
+        resolve(code.toString())
+    })
 
 }
 
 // update the remote state of the room
-export function updateStoryState(roomID: string, newState: RoomState) {
-    const newRoom =  dbInstance.ref(`/rooms/${roomID}`).update(newState)
+export function updateStoryState(roomCode: string, newState: RoomState) {
+    const newRoom =  dbInstance.ref(`/rooms/${roomCode}`).update(newState)
 }
