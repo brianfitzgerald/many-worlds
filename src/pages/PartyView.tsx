@@ -15,11 +15,11 @@ import StoryObject, { Action, StoryOption } from '../Story'
 import Player from '../Player'
 import { dbInstance } from '../firebaseRef';
 import { updateRoom, RoomState } from '../firebaseFunctions';
-import { connect } from 'react-redux';
+import { connect, MapStateToProps } from 'react-redux';
 import { IndexState } from '../reducers/Index';
 
 type PartyViewProps = {
-    roomState: RoomState
+    roomState?: RoomState
     story: StoryObject
     currentPlayerName: string
     matchID?: string
@@ -61,10 +61,12 @@ class PartyView extends React.Component<PartyViewProps, PartyViewState> {
     }
 
     playerSelectChoice(option: StoryOption) {
-        const currentStoryIndex = this.state.currentStoryIndex
-        this.props.story.doAction(this.props.roomState.storyState, currentStoryIndex, option, this.props.roomState.connectedPlayers)
-        const nextStoryIndex = this.props.story.getNextActionIndex(this.props.roomState.storyState, currentStoryIndex)
-        this.setState({ currentStoryIndex: nextStoryIndex })
+        if (this.props.roomState) {
+            const currentStoryIndex = this.state.currentStoryIndex
+            this.props.story.doAction(this.props.roomState.storyState, currentStoryIndex, option, this.props.roomState.connectedPlayers)
+            const nextStoryIndex = this.props.story.getNextActionIndex(this.props.roomState.storyState, currentStoryIndex)
+            this.setState({ currentStoryIndex: nextStoryIndex })
+        }
     }
 
     render() {
@@ -88,15 +90,19 @@ class PartyView extends React.Component<PartyViewProps, PartyViewState> {
     }
 }
 
-interface StateFromProps {
+interface PropsFromState {
     roomState: RoomState
 }
 
-const ConnectedPartyView: React.SFC<StateFromProps> = (state: IndexState, props: PartyViewProps) => (
+const ConnectedPartyView: React.SFC<PropsFromState> = (state: IndexState, props: PartyViewProps) => (
     <PartyView roomState={state.roomState} {...props} />
 )
 
-export default connect<StateFromProps, void, void, PartyViewProps>((state) => state)(ConnectedPartyView)
+const mapStateToProps = (state: any) => ({
+    roomState: state.roomState
+})
+
+export default connect<PropsFromState, {}, PartyViewProps>(mapStateToProps)(ConnectedPartyView)
 
 const styles = StyleSheet.create({
     promptText: {

@@ -54,7 +54,7 @@ function joinRoomSuccess(matchID: string) {
 
 export function createRoom(username: string) {
 
-    return (dispatch: Dispatch<string>) => {
+    return (dispatch: Dispatch<{}>) => {
 
         dbInstance.ref(`/rooms/`).once('value', (snapshot) => {
             let code: number = 0

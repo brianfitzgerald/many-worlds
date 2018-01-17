@@ -72,7 +72,6 @@ export default class App extends React.Component<AppProps,AppState>  {
     page = (
       <PartyView
         currentPlayerName={this.state.playerName}
-        players={this.state.players}
         story={this.state.story}
       />
     )
