@@ -16,9 +16,6 @@ import appleDisaster from './stories/appleDisaster'
 
 import commonStyles from './styles/commonStyles';
 
-import { Provider, connect } from 'react-redux'
-import thunk from 'redux-thunk'
-import { createStore, applyMiddleware } from 'redux'
 import { Player } from './types/Player';
 import { Story } from './types/Story';
 import HeroButton from './components/HeroButton';

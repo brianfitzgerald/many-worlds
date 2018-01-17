@@ -12,7 +12,6 @@ import HeroButton from '../components/HeroButton';
 import colors from '../styles/colors';
 
 import { dbInstance } from '../firebaseRef';
-import { connect, MapStateToProps } from 'react-redux';
 import { Story, StoryOption } from '../types/Story';
 import { Player } from '../types/Player';
 import { getNextActionIndex, doAction, getActionByIndex } from '../actions/Story';

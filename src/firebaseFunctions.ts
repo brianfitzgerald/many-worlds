@@ -1,6 +1,5 @@
 import { dbInstance } from "./firebaseRef";
 import { Alert } from "react-native";
-import { Dispatch } from "redux";
 import { StoryAction, StoryState } from "./types/Story";
 import { Player } from "./types/Player";
 import { RoomState } from "./types/Network";
@@ -49,7 +48,7 @@ export const createRoom = (username: string) => new Promise<string>((resolve, re
         resolve(code.toString())
     })
 
-}
+})
 
 // update the remote state of the room
 export function updateStoryState(roomCode: string, newState: RoomState) {
