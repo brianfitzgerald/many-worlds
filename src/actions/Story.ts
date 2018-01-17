@@ -27,7 +27,7 @@ export function doAction(roomState: RoomState, story: Story, currentStoryIndex: 
         }
     })
 
-    const lastActionBeforeNewOne = getActionByIndex(story, currentStoryIndex)
+    const lastActionBeforeNewOne = getActionByIndex(story, currentStoryIndex).prompt
     roomState.history.push(lastActionBeforeNewOne)
 
     if (selectedOption.action) {

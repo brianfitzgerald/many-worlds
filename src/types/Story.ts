@@ -11,6 +11,8 @@ export type StoryState = {
     [key: string]: string | boolean
 }
 
+export type HistoryItem = string
+
 export type StoryOption = {
     title: string
     action?: StoryState

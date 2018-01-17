@@ -15,7 +15,7 @@ import { dbInstance } from '../firebaseRef';
 import { Story, StoryOption } from '../types/Story';
 import { Player } from '../types/Player';
 import { getNextActionIndex, doAction, getActionByIndex } from '../actions/Story';
-import { RoomState } from '../types/Network';
+import { RoomState, FirebaseRoomState } from '../types/Network';
 import { defaultRoomState, updateStoryState } from '../firebaseFunctions';
 
 type PartyViewProps = {
@@ -44,9 +44,15 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
     componentDidMount() {
         const matchID = this.props.roomCode
         dbInstance.ref(`/rooms/${matchID}/`).on('value', (snap) => {
-            const updatedRoomState: RoomState = snap ? snap.val() as RoomState : defaultRoomState
+            const updatedRoomState: FirebaseRoomState = snap ? snap.val() as RoomState : defaultRoomState
             // this should be the only place where room state is updated
-            this.setState({ roomState: updatedRoomState })
+            const safeRoomState: RoomState = {
+                currentStoryIndex: updatedRoomState.currentStoryIndex,
+                connectedPlayers: updatedRoomState.connectedPlayers || [],
+                storyState: updatedRoomState.storyState || {},
+                history: updatedRoomState.history || [],
+            }
+            this.setState({ roomState: safeRoomState })
         })
     }
 

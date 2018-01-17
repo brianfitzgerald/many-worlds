@@ -1,9 +1,15 @@
 import { Player } from "./Player";
-import { StoryState, StoryAction } from "./Story";
+import { StoryState, StoryAction, HistoryItem } from "./Story";
 
+export type FirebaseRoomState = {
+    currentStoryIndex: number
+    connectedPlayers?: Player[]
+    storyState?: StoryState
+    history?: HistoryItem[]
+}
 export type RoomState = {
     currentStoryIndex: number
     connectedPlayers: Player[]
     storyState: StoryState
-    history: StoryAction[]
+    history: HistoryItem[]
 }
