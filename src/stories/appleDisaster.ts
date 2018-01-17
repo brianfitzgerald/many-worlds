@@ -1,4 +1,6 @@
-import { StoryState, Action } from "../Story";
+import { StoryAction, StoryState } from "../types/Story";
+
+
 
 const defaultState = {
     applePickedUp: false,
@@ -11,7 +13,7 @@ const defaultState = {
 // actions act upon state, which 
 // once an action is hit, it cannot be hit again; there is a currentActionIndex which increments
 
-const actions: Action[] = [
+const actions: StoryAction[] = [
     {
         prompt: 'You see an apple on the floor.',
         actionFilter: (state: StoryState) => state.applePickedUp === true,

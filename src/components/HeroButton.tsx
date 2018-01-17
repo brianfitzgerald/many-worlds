@@ -15,7 +15,7 @@ import commonStyles from '../styles/commonStyles'
 type HeroButtonProps = {
     title: string
     onPress: () => void
-    style: StyleProp<ViewStyle>
+    style?: StyleProp<ViewStyle>
 }
 
 const HeroButton: React.SFC<HeroButtonProps> = ({ title, onPress, style }) => {

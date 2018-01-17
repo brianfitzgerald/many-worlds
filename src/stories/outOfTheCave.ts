@@ -1,4 +1,4 @@
-import { StoryState, Action } from "../Story";
+import { StoryState, StoryAction, Story } from "../types/Story";
 
 const defaultState = {
     name: '',
@@ -6,8 +6,7 @@ const defaultState = {
     joinedCarl: false
 }
 
-
-const actions: Action[] = [
+const actions: StoryAction[] = [
     {
         prompt:`
 You awake in a prison cell. The walls around you are some sort of bedrock, mottled with some sort of fungus, or a mucus, you can't tell.
@@ -38,12 +37,12 @@ Come to think of it, what was your name again?
     },
     {
         prompt: `That might be problematic, but for now, let's keep going.`,
-        actionFilter: (state) => state.name === 'not_sure',
+        actionFilter: (state: StoryState) => state.name === 'not_sure',
         options: [{ title: '->' }]
     },
     {
         prompt: `Not the prettiest name in the world, but I suppose one doesn't have much say in the matter.`,
-        actionFilter: (state) => state.name !== 'not_sure',
+        actionFilter: (state: StoryState) => state.name !== 'not_sure',
         options: [{ title: '->' }]
     },
     {
@@ -66,7 +65,7 @@ Did you commit a crime? Maybe you got caught stealing something...
     },
     {
         prompt: `Suddenly, you hear thuds from the other side of the wall. Like someone is smashing it down with a hammer.`,
-        actionFilter: (state) => true,
+        actionFilter: (state: StoryState) => true,
         options: [
             {
                 title: `Run to the other side of the wall`
@@ -81,7 +80,7 @@ Did you commit a crime? Maybe you got caught stealing something...
 It was, in fact, someone smashing down the wall with a hammer. He looks to be a giant blue orc.
 He screams in your face, spittle flying everywhere, 'You! Come join revolution! Smash the system! Smash hierarchy! Smash castle! Join!'
 `,
-        actionFilter: (state) => true,
+        actionFilter: (state: StoryState) => true,
         options: [
             {
                 title: `Attempt to run around the orc, out into the sunlight`,
@@ -96,28 +95,28 @@ He screams in your face, spittle flying everywhere, 'You! Come join revolution! 
     // If you joined Carl
     {
         prompt: `The orc says, 'Me name Carl. Me son of Barl, and father of Darl. Follow me, we don't have much time.`,
-        actionFilter: (state) => state.joinedCarl === true,
+        actionFilter: (state: StoryState) => state.joinedCarl === true,
         options: [{ title: '->' }]
     },
     {
         prompt: `You follow Carl across a sunlit forest.`,
-        actionFilter: (state) => true,
+        actionFilter: (state: StoryState) => true,
         options: [{ title: '->' }]
     },
     // If you ran away
     {
         prompt: `The orc shouts after you, but once you get far enough away he starts mumbling about wishing he were more convincing.`,
-        actionFilter: (state) => state.joinedCarl === false,
+        actionFilter: (state: StoryState) => state.joinedCarl === false,
         options: [{ title: '->' }]
     },
     {
         prompt: `You're back out in the fresh air. `,
-        actionFilter: (state) => true,
+        actionFilter: (state: StoryState) => true,
         options: [{ title: '->' }]
     },
     {
         prompt: `The end.`,
-        actionFilter: (state) => true,
+        actionFilter: (state: StoryState) => true,
         options: []
     },
 ]
@@ -126,4 +125,10 @@ He screams in your face, spittle flying everywhere, 'You! Come join revolution! 
 // section where you escape and come upon carl later on
 // in between filler section with some trials in a forest
 
-export default { defaultState, actions }
+const story: Story = {
+    name: 'Out of the Cave',
+    actions,
+    defaultState
+}
+
+export default story

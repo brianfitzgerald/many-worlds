@@ -11,20 +11,23 @@ import commonStyles from '../styles/commonStyles';
 import HeroButton from '../components/HeroButton';
 import colors from '../styles/colors';
 
-import Story, { Action, StoryOption } from '../Story'
-import Player from '../Player'
+import { dbInstance } from '../firebaseRef';
+import { Story, StoryOption } from '../types/Story';
+import { Player } from '../types/Player';
+import { getNextActionIndex, doAction, getActionByIndex } from '../actions/Story';
+import { RoomState, FirebaseRoomState } from '../types/Network';
+import { defaultRoomState, updateStoryState } from '../firebaseFunctions';
 
 type PartyViewProps = {
     story: Story
-    players: Player[],
     currentPlayerName: string
+    roomCode: string
+    dispatch?: (func: ({ type: string; value: RoomState; })) => void
 }
 
 type PartyViewState = {
-    currentStoryIndex: number
+    roomState: RoomState
 }
-
-export const getMe = (name: string, players: Player[]) => players.find((p) => p.name === name)
 
 export default class PartyView extends React.Component<PartyViewProps, PartyViewState> {
 
@@ -33,21 +36,36 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         super(props)
 
         this.state = {
-            currentStoryIndex: 0
+            roomState: defaultRoomState
         }
 
     }
 
-    playerSelectChoice(option: StoryOption) {
-        const currentStoryIndex = this.state.currentStoryIndex
-        this.props.story.doAction(currentStoryIndex, option, this.props.players)
-        const nextStoryIndex = this.props.story.getNextActionIndex(currentStoryIndex)
-        this.setState({ currentStoryIndex: nextStoryIndex })
+    componentDidMount() {
+        const matchID = this.props.roomCode
+        dbInstance.ref(`/rooms/${matchID}/`).on('value', (snap) => {
+            const updatedRoomState: FirebaseRoomState = snap ? snap.val() as RoomState : defaultRoomState
+            // this should be the only place where room state is updated
+            const safeRoomState: RoomState = {
+                currentStoryIndex: updatedRoomState.currentStoryIndex,
+                connectedPlayers: updatedRoomState.connectedPlayers || [],
+                storyState: updatedRoomState.storyState || {},
+                history: updatedRoomState.history || [],
+            }
+            this.setState({ roomState: safeRoomState })
+        })
     }
 
-    render() {
+    playerSelectChoice(option: StoryOption) {
+        const currentStoryIndex = this.state.roomState.currentStoryIndex
+        const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
+        const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
+        newState.currentStoryIndex = nextStoryIndex
+        updateStoryState(this.props.roomCode, newState)
+    }
 
-        const currentAction = this.props.story.getActionByIndex(this.state.currentStoryIndex)
+    render() {        
+        const currentAction = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex)
 
         return (
             <View style={commonStyles.container}>
@@ -56,7 +74,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                 barStyle="light-content"
             />
             <ScrollView>
-                {this.props.story.history.map((p, i) => <Text key={i} style={styles.promptText}>{p.prompt}</Text>)}
+                {this.state.roomState.history.map((p, i) => <Text key={i} style={styles.promptText}>{p.prompt}</Text>)}
                 <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
             </ScrollView>
             {currentAction.options.map((a, i) =>
@@ -65,6 +83,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         );
     }
 }
+
 
 const styles = StyleSheet.create({
     promptText: {
