@@ -14,63 +14,63 @@ import colors from '../styles/colors';
 import StoryObject, { Action, StoryOption } from '../Story'
 import Player from '../Player'
 import { dbInstance } from '../firebaseRef';
-import { updateRoom, RoomState } from '../firebaseFunctions';
+import { updateRoom, RoomState, updateStoryState, defaultRoomState } from '../firebaseFunctions';
 import { connect, MapStateToProps } from 'react-redux';
 import { IndexState } from '../reducers/Index';
 
 type PartyViewProps = {
-    roomState?: RoomState
     story: StoryObject
     currentPlayerName: string
-    matchID?: string
+    roomID: string
     dispatch?: (func: ({ type: string; value: RoomState; })) => void
 }
 
 type PartyViewState = {
-    currentStoryIndex: number
+    currentStoryIndex: number,
+    roomState: RoomState
 }
 
-const emptyRoomState: RoomState = {
-    connectedPlayers: [],
-    storyState: {},
-    history: []
-}
 
 export const getMe = (name: string, players: Player[]) => players.find((p) => p.name === name)
 
-class PartyView extends React.Component<PartyViewProps, PartyViewState> {
+export default class PartyView extends React.Component<PartyViewProps, PartyViewState> {
 
     constructor(props: PartyViewProps) {
 
         super(props)
 
         this.state = {
-            currentStoryIndex: 0
+            currentStoryIndex: 0,
+            roomState: {
+                connectedPlayers: [],
+                storyState: {},
+                history: []
+            }
         }
 
     }
 
     componentDidMount() {
-        const matchID = this.props.matchID
+        const matchID = this.props.roomID
         dbInstance.ref(`/rooms/${matchID}/`).on('value', (snap) => {
-            const updatedRoomState: RoomState = snap ? snap.val() as RoomState : emptyRoomState
-            if (this.props.dispatch) {
-                this.props.dispatch(updateRoom(updatedRoomState))
-            }
+            const updatedRoomState: RoomState = snap ? snap.val() as RoomState : defaultRoomState
+            // this should be the only place where room state is updated
+            this.setState({ roomState: updatedRoomState })
         })
     }
 
     playerSelectChoice(option: StoryOption) {
-        if (this.props.roomState) {
-            const currentStoryIndex = this.state.currentStoryIndex
-            this.props.story.doAction(this.props.roomState.storyState, currentStoryIndex, option, this.props.roomState.connectedPlayers)
-            const nextStoryIndex = this.props.story.getNextActionIndex(this.props.roomState.storyState, currentStoryIndex)
-            this.setState({ currentStoryIndex: nextStoryIndex })
-        }
+        const currentStoryIndex = this.state.currentStoryIndex
+        const newState = this.props.story.doAction(this.state.roomState.storyState, currentStoryIndex, option, this.state.roomState.connectedPlayers)
+        const nextStoryIndex = this.props.story.getNextActionIndex(this.state.roomState.storyState, currentStoryIndex)
+        updateStoryState(this.props.roomID, newState, nextStoryIndex)
     }
 
     render() {
 
+        console.log(this.props.story);
+        if (!this.props.story) return <View />
+        
         const currentAction = this.props.story.getActionByIndex(this.state.currentStoryIndex)
 
         return (
@@ -90,19 +90,6 @@ class PartyView extends React.Component<PartyViewProps, PartyViewState> {
     }
 }
 
-interface PropsFromState {
-    roomState: RoomState
-}
-
-const ConnectedPartyView: React.SFC<PropsFromState> = (state: IndexState, props: PartyViewProps) => (
-    <PartyView roomState={state.roomState} {...props} />
-)
-
-const mapStateToProps = (state: any) => ({
-    roomState: state.roomState
-})
-
-export default connect<PropsFromState, {}, PartyViewProps>(mapStateToProps)(ConnectedPartyView)
 
 const styles = StyleSheet.create({
     promptText: {

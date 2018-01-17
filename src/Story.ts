@@ -49,7 +49,6 @@ export default class StoryObject {
         
         while (this.actions[nextStoryIndex] !== undefined && this.actions[nextStoryIndex].actionFilter(currentState) !== true) {
             nextStoryIndex++
-            console.log(this.actions[nextStoryIndex]);
         }
 
         return nextStoryIndex

@@ -11,66 +11,46 @@ export type RoomState = {
     history: Action[]
 }
 
-export function joinRoom(matchID: string, username: string) {
-
-    return (dispatch: any) => {
-        return dbInstance.ref(`/rooms/${matchID}/`).once('value', (snapshot) => {
-            const value = snapshot.val()
-            if (value === null) {
-                Alert.alert('Room not found. Does it exist, and did you enter the code correctly?')
-                return
-            }
-
-            const newPlayerKey = value.players !== undefined ? Object.keys(value.players).length : 0
-
-            dbInstance.ref(`/rooms/${matchID}/players/${username}`).set({
-                role: '',
-                name: username,
-                ready: false,
-                alive: true,
-                switchedRole: '',
-                accusedPlayer: '',
-                actionUsed: false,
-                playAgain: false,
-                playerIndex: newPlayerKey
-            }).then(() => {
-                dispatch(joinRoomSuccess(matchID))
-            })
-        })
-        .catch((error) => {
-            console.log(error)
-        });
-    }
-
+export const defaultRoomState: RoomState = {
+    connectedPlayers: [],
+    storyState: {},
+    history: []
 }
 
-function joinRoomSuccess(matchID: string) {
-    return {
-        type: types.JOIN_ROOM_SUCCESS,
-        matchID
-    }
-}
+
+export const joinRoom = (matchID: string, username: string) => new Promise((resolve, reject) => {
+    return dbInstance.ref(`/rooms/${matchID}/`).once('value', (snapshot) => {
+
+        const value = snapshot.val()
+
+        if (value === null) {
+            Alert.alert('Room not found. Does it exist, and did you enter the code correctly?')
+            return
+        }
+
+        const newPlayerKey = value.players !== undefined ? Object.keys(value.players).length : 0
+        
+        const newPlayer: Player = {
+            name: username,
+            conditions: [],
+            inventory: [],
+            abilities: []
+        }
+
+        dbInstance.ref(`/rooms/${matchID}/players/${username}`).set(newPlayer).then(() => resolve())
+    })
+    .catch((error) => {
+        reject(error)
+    });
+})
 
 
 export function createRoom(username: string) {
 
-    return (dispatch: Dispatch<{}>) => {
+    let code: number = 0
+    code = Math.floor(Math.random() * 9999 - 1000) + 1000
 
-        dbInstance.ref(`/rooms/`).once('value', (snapshot) => {
-            let code: number = 0
-
-            code = Math.floor(Math.random() * 9999 - 1000) + 1000
-
-            dbInstance.ref(`/rooms/${code}/`).set({
-                players: {},
-                inProgress: true
-            }).then(() => {
-                dispatch(joinRoom(code.toString(), username))
-            })
-
-        })
-
-    }
+    dbInstance.ref(`/rooms/${code}/`).set(defaultRoomState).then(() => {})
 
 }
 
@@ -79,4 +59,11 @@ export function updateRoom(value: RoomState) {
         type: types.UPDATE_ROOM,
         value
     }
+}
+
+
+export function updateStoryState(roomID: string, newState: StoryState, newActionIndex: number) {
+    dbInstance.ref(`/rooms/${roomID}`).update({
+        actionUsed: true
+    })
 }

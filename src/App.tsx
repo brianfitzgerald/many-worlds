@@ -35,6 +35,8 @@ type AppState = {
   players: Player[]
   playerName: string
   nameSet: boolean
+  roomID: string
+  inRoom: false
 }
 
 type AppProps = {}
@@ -44,16 +46,17 @@ export default class App extends React.Component<AppProps,AppState>  {
   constructor(props: any) {
     super(props)
 
-    const playerName = 'Mark'
-    const player = new Player(playerName)
+    const player = new Player('')
     const players = [player]
     const story = new Story(outOfTheCave.defaultState, outOfTheCave.actions)
 
     this.state = {
-      playerName,
+      playerName: '',
       story,
-      players,
-      nameSet: false
+      players: [player],
+      roomID: '',
+      nameSet: false,
+      inRoom: false
     }
 
   }
@@ -62,17 +65,19 @@ export default class App extends React.Component<AppProps,AppState>  {
 
     let page = null
 
-    if (!this.state.nameSet) {
+    if (!this.state.nameSet || !this.state.inRoom) {
       page = (
         <View style={commonStyles.container}>
           <Text style={commonStyles.headerText}>What is your name?</Text>
         </View>
       )
     }
+
     page = (
       <PartyView
         currentPlayerName={this.state.playerName}
         story={this.state.story}
+        roomID={this.state.roomID}
       />
     )
 
