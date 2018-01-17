@@ -1,14 +1,10 @@
-import { RoomState } from "../firebaseFunctions";
+import { RoomState } from "../types/Network";
+import { defaultRoomState } from "../firebaseFunctions";
+
 
 export const types = {
     UPDATE_ROOM: 'UPDATE_ROOM',
     JOIN_ROOM_SUCCESS: 'JOIN_ROOM_SUCCESS'
-}
-
-const defaultState: RoomState = {
-    connectedPlayers: [],
-    storyState: {},
-    history: []
 }
 
 export type RoomAction = {
@@ -16,7 +12,7 @@ export type RoomAction = {
     value?: RoomState
 }
 
-const Room = (state: RoomState = defaultState, action: RoomAction) => {
+const Room = (state: RoomState = defaultRoomState, action: RoomAction) => {
 
     switch (action.type) {
 

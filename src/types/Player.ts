@@ -12,18 +12,9 @@ export type Ability = {
     description?: string
 }
 
-export default class Player {
-
+export type Player = {
     name: string
     conditions: Condition[]
     inventory: InventoryItem[]
     abilities: Ability[]
-
-    constructor(name: string) {
-        this.name = name
-        this.conditions = []
-        this.inventory = []
-        this.abilities = []
-    }
-
 }

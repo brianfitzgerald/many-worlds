@@ -14,19 +14,19 @@ import {
 
 import PartyView from './pages/PartyView'
 
-import Story from './Story'
 
 import outOfTheCave from './stories/outOfTheCave'
 import appleDisaster from './stories/appleDisaster'
 
 
-import Player from './Player';
 import commonStyles from './styles/commonStyles';
 
 import { Provider, connect } from 'react-redux'
 import thunk from 'redux-thunk'
 import { createStore, applyMiddleware } from 'redux'
 import Index from './reducers/Index';
+import { Player } from './types/Player';
+import { Story } from './types/Story';
 
 const store = createStore(Index, applyMiddleware(thunk))
 
@@ -46,9 +46,14 @@ export default class App extends React.Component<AppProps,AppState>  {
   constructor(props: any) {
     super(props)
 
-    const player = new Player('')
+    const player: Player = {
+      name: 'Gary',
+      conditions: [],
+      inventory: [],
+      abilities: []
+    }
     const players = [player]
-    const story = new Story(outOfTheCave.defaultState, outOfTheCave.actions)
+    const story = outOfTheCave
 
     this.state = {
       playerName: '',

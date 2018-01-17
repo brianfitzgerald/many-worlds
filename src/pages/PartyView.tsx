@@ -11,22 +11,23 @@ import commonStyles from '../styles/commonStyles';
 import HeroButton from '../components/HeroButton';
 import colors from '../styles/colors';
 
-import StoryObject, { Action, StoryOption } from '../Story'
-import Player from '../Player'
 import { dbInstance } from '../firebaseRef';
-import { updateRoom, RoomState, updateStoryState, defaultRoomState } from '../firebaseFunctions';
 import { connect, MapStateToProps } from 'react-redux';
 import { IndexState } from '../reducers/Index';
+import { Story, StoryOption } from '../types/Story';
+import { Player } from '../types/Player';
+import { getNextActionIndex, doAction, getActionByIndex } from '../actions/Story';
+import { RoomState } from '../types/Network';
+import { defaultRoomState, updateStoryState } from '../firebaseFunctions';
 
 type PartyViewProps = {
-    story: StoryObject
+    story: Story
     currentPlayerName: string
     roomID: string
     dispatch?: (func: ({ type: string; value: RoomState; })) => void
 }
 
 type PartyViewState = {
-    currentStoryIndex: number,
     roomState: RoomState
 }
 
@@ -40,12 +41,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         super(props)
 
         this.state = {
-            currentStoryIndex: 0,
-            roomState: {
-                connectedPlayers: [],
-                storyState: {},
-                history: []
-            }
+            roomState: defaultRoomState
         }
 
     }
@@ -60,9 +56,9 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
     }
 
     playerSelectChoice(option: StoryOption) {
-        const currentStoryIndex = this.state.currentStoryIndex
-        const newState = this.props.story.doAction(this.state.roomState.storyState, currentStoryIndex, option, this.state.roomState.connectedPlayers)
-        const nextStoryIndex = this.props.story.getNextActionIndex(this.state.roomState.storyState, currentStoryIndex)
+        const currentStoryIndex = this.state.roomState.currentStoryIndex
+        const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
+        const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
         updateStoryState(this.props.roomID, newState, nextStoryIndex)
     }
 
@@ -71,7 +67,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         console.log(this.props.story);
         if (!this.props.story) return <View />
         
-        const currentAction = this.props.story.getActionByIndex(this.state.currentStoryIndex)
+        const currentAction = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex)
 
         return (
             <View style={commonStyles.container}>
@@ -80,7 +76,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                 barStyle="light-content"
             />
             <ScrollView>
-                {this.props.story.history.map((p, i) => <Text key={i} style={styles.promptText}>{p.prompt}</Text>)}
+                {this.state.roomState.history.map((p, i) => <Text key={i} style={styles.promptText}>{p.prompt}</Text>)}
                 <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
             </ScrollView>
             {currentAction.options.map((a, i) =>

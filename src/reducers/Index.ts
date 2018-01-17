@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 
 import room from './Room'
-import { RoomState } from '../firebaseFunctions';
+import { RoomState } from '../types/Network';
 
 const indexReducer = combineReducers({ room })
 
