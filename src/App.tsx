@@ -4,7 +4,8 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput
+  TextInput,
+  StatusBar
 } from 'react-native';
 
 import PartyView from './pages/PartyView'
@@ -21,6 +22,7 @@ import { Story } from './types/Story';
 import HeroButton from './components/HeroButton';
 import { joinRoom, createRoom } from './firebaseFunctions';
 import { getStory } from './actions/StoryDB';
+import colors from './styles/colors';
 
 type AppState = {
   story: Story
@@ -80,30 +82,34 @@ export default class App extends React.Component<AppProps,AppState>  {
     })
   }
 
-  render() {
+  render() {    
 
     let page = null
 
     if (!this.state.inRoom) {
       page = (
         <View style={commonStyles.container}>
+          <StatusBar
+                backgroundColor={colors.black}
+                barStyle="light-content"
+          />
           <Text style={commonStyles.headerText}>What is your name?</Text>
-          <TextInput style={commonStyles.textInput} value={this.state.playerName} onChangeText={(val) => this.setState({ playerName: val })} />
+          <TextInput placeholder="Name" placeholderTextColor={colors.grey} style={commonStyles.textInput} value={this.state.playerName} onChangeText={(val) => this.setState({ playerName: val })} />
           <Text style={commonStyles.headerText}>Where are you going?</Text>
-          <TextInput style={commonStyles.textInput} value={this.state.roomCode} onChangeText={(val) => this.setState({ roomCode: val })} />
+          <TextInput placeholder="Room Code" placeholderTextColor={colors.grey} style={commonStyles.textInput} value={this.state.roomCode} onChangeText={(val) => this.setState({ roomCode: val })} />
           <HeroButton title="Join" onPress={this.joinRoom.bind(this)} />
           <HeroButton title="Create Room" onPress={this.createRoom.bind(this)} />
         </View>
       )
+    } else {
+      page = (
+        <PartyView
+          currentPlayerName={this.state.playerName}
+          story={this.state.story}
+          roomCode={this.state.roomCode}
+        />
+      )  
     }
-
-    page = (
-      <PartyView
-        currentPlayerName={this.state.playerName}
-        story={this.state.story}
-        roomCode={this.state.roomCode}
-      />
-    )
 
     return page
   }

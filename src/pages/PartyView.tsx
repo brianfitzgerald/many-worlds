@@ -29,9 +29,6 @@ type PartyViewState = {
     roomState: RoomState
 }
 
-
-export const getMe = (name: string, players: Player[]) => players.find((p) => p.name === name)
-
 export default class PartyView extends React.Component<PartyViewProps, PartyViewState> {
 
     constructor(props: PartyViewProps) {
