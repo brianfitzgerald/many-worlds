@@ -69,29 +69,40 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
         const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
         newState.currentStoryIndex = nextStoryIndex
-        updateStoryState(this.props.roomCode, newState)
+        updateStoryState(this.props.roomCode, newState).then(() => {
+            const scrollRef = this.refs.scrollView as ScrollViewStatic
+            if (scrollRef) {
+                scrollRef.scrollToEnd()
+            }    
+        })
         
-        const scrollRef = this.refs.scrollView as ScrollViewStatic
-        if (scrollRef) {
-            scrollRef.scrollToEnd()
-        }
     }
 
     render() {        
         const currentAction = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex)
 
         return (
-            <View style={commonStyles.container}>
+            <View style={[commonStyles.container, styles.partyContainer]}>
             <StatusBar
                 backgroundColor={colors.black}
                 barStyle="light-content"
             />
-            <ScrollView ref="scrollView">
+            <ScrollView ref="scrollView" style={styles.historyScroll}>
                 {this.state.roomState.history.map((p, i) => <Text key={i} style={styles.promptText}>{p}</Text>)}
                 <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
             </ScrollView>
-            {currentAction.options.map((a, i) =>
-                <HeroButton key={i} title={a.title} onPress={this.playerSelectChoice.bind(this, a)} style={styles.promptButton} />)}
+                <View style={styles.playerChoices}>
+                    {
+                        currentAction.options.map((a, i) =>
+                            <HeroButton
+                                key={i}
+                                title={a.title}
+                                onPress={this.playerSelectChoice.bind(this, a)}
+                                style={styles.promptButton}
+                            />
+                        )
+                    }
+                </View>
             </View>
         );
     }
@@ -107,6 +118,15 @@ const styles = StyleSheet.create({
         fontSize: 24,
         color: colors.white,
         textAlign: 'left'
+    },
+    partyContainer: {
+        flex: 1,
+        flexDirection: 'column'
+    },
+    historyScroll: {
+
+    },
+    playerChoices: {
     },
     promptButton: {
         width: '100%'
