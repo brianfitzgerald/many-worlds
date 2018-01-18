@@ -5,7 +5,9 @@ import {
   Text,
   ScrollView,
   StatusBar,
-  View
+  View,
+  ScrollViewProps,
+  ScrollViewStatic
 } from 'react-native';
 import commonStyles from '../styles/commonStyles';
 import HeroButton from '../components/HeroButton';
@@ -30,6 +32,12 @@ type PartyViewState = {
 }
 
 export default class PartyView extends React.Component<PartyViewProps, PartyViewState> {
+    
+    refs: {
+        scrollView: any
+    }
+    
+    historyScroll: React.Component<ScrollViewProps, React.ComponentState> | null
 
     constructor(props: PartyViewProps) {
 
@@ -62,6 +70,11 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
         newState.currentStoryIndex = nextStoryIndex
         updateStoryState(this.props.roomCode, newState)
+        
+        const scrollRef = this.refs.scrollView as ScrollViewStatic
+        if (scrollRef) {
+            scrollRef.scrollToEnd()
+        }
     }
 
     render() {        
@@ -73,7 +86,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                 backgroundColor={colors.black}
                 barStyle="light-content"
             />
-            <ScrollView>
+            <ScrollView ref="scrollView">
                 {this.state.roomState.history.map((p, i) => <Text key={i} style={styles.promptText}>{p}</Text>)}
                 <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
             </ScrollView>
