@@ -72,8 +72,10 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         const scrollRef = this.refs.scrollView as ScrollViewStatic
 
         const numPlayersWhoConcur = getPlayersWhoSelectedOption(optionIndex, this.state.roomState)
+        console.log('players who concur', numPlayersWhoConcur);
+        
 
-        if (numPlayersWhoConcur.length + 1 === this.state.roomState.connectedPlayers.length) {
+        if (numPlayersWhoConcur.length === this.state.roomState.connectedPlayers.length) {
             const currentStoryIndex = this.state.roomState.currentStoryIndex
             const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
             const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
