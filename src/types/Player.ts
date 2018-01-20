@@ -12,6 +12,13 @@ export type Ability = {
     description?: string
 }
 
+export const playerDefaultState: Player = {
+    name: '',
+    conditions: [],
+    inventory: [],
+    abilities: []
+}
+
 export type Player = {
     name: string
     conditions: Condition[]

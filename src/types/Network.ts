@@ -6,9 +6,11 @@ export type FirebaseRoomState = {
     connectedPlayers?: Player[]
     storyState?: StoryState
     history?: HistoryItem[]
+    storyID: string
 }
 export type RoomState = {
     currentStoryIndex: number
+    storyID: string
     connectedPlayers: Player[]
     storyState: StoryState
     history: HistoryItem[]

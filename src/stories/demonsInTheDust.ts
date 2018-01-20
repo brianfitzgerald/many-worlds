@@ -79,7 +79,7 @@ It starts to get closer...
 // in between filler section with some trials in a forest
 
 const story: Story = {
-    id: '0346d80a-c170-4d96-a61e-2a0e786665ba',
+    id: '5580ec7e-139d-4faa-bafd-7f1382291216',
     name: 'Demons in the Dust',
     actions,
     defaultState

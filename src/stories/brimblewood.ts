@@ -55,8 +55,8 @@ Suddenly, a frog-man hops in front of your path!
 // in between filler section with some trials in a forest
 
 const story: Story = {
-    id: '0346d80a-c170-4d96-a61e-2a0e786665ba',
-    name: 'Demons in the Dust',
+    id: '820ebcfa-547e-4809-93c8-ad7008d782a8',
+    name: 'Brimblewood',
     actions,
     defaultState
 }

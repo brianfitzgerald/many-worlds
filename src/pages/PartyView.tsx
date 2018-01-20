@@ -18,7 +18,7 @@ import { Story, StoryOption } from '../types/Story';
 import { Player } from '../types/Player';
 import { getNextActionIndex, doAction, getActionByIndex } from '../actions/Story';
 import { RoomState, FirebaseRoomState } from '../types/Network';
-import { defaultRoomState, updateRoomState, updatePlayerState } from '../firebaseFunctions';
+import { roomDefaultState, updateRoomState, updatePlayerState } from '../firebaseFunctions';
 
 type PartyViewProps = {
     story: Story
@@ -46,7 +46,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         super(props)
 
         this.state = {
-            roomState: defaultRoomState
+            roomState: roomDefaultState
         }
 
     }
@@ -54,9 +54,10 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
     componentDidMount() {
         const matchID = this.props.roomCode
         dbInstance.ref(`/rooms/${matchID}/`).on('value', (snap) => {
-            const updatedRoomState: FirebaseRoomState = snap ? snap.val() as RoomState : defaultRoomState
+            const updatedRoomState: FirebaseRoomState = snap ? snap.val() as RoomState : roomDefaultState
             // this should be the only place where room state is updated
             const safeRoomState: RoomState = {
+                storyID: updatedRoomState.storyID,
                 currentStoryIndex: updatedRoomState.currentStoryIndex,
                 connectedPlayers: updatedRoomState.connectedPlayers || [],
                 storyState: updatedRoomState.storyState || {},
@@ -104,6 +105,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                 backgroundColor={colors.black}
                 barStyle="light-content"
             />
+            <Text style={{ color: 'white' }}>Room {this.props.roomCode}</Text>
             <ScrollView ref="scrollView">
                 {this.state.roomState.history.map((p, i) => <Text key={i} style={styles.promptText}>{p}</Text>)}
                 <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
@@ -118,8 +120,8 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                                 onPress={this.playerSelectChoice.bind(this, a, i)}
                                 style={styles.promptButton}
                             />
-                            {getPlayersWhoSelectedOption(i, this.state.roomState).map((p) => (
-                                <Text style={styles.playersWhoSelectedOption}>{p.name}</Text>
+                            {getPlayersWhoSelectedOption(i, this.state.roomState).map((p, i) => (
+                                <Text key={i} style={styles.playersWhoSelectedOption}>{p.name}</Text>
                             ))}
                             </View>
                         )

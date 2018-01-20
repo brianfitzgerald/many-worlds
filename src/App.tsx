@@ -20,7 +20,7 @@ import commonStyles from './styles/commonStyles';
 import { Player } from './types/Player';
 import { Story } from './types/Story';
 import HeroButton from './components/HeroButton';
-import { joinRoom, createRoom } from './firebaseFunctions';
+import { joinRoom, createRoom, roomDefaultState } from './firebaseFunctions';
 import { getStory } from './actions/StoryDB';
 import colors from './styles/colors';
 
@@ -62,15 +62,18 @@ export default class App extends React.Component<AppProps,AppState>  {
       const story = getStory(storyID).then((story: Story) => {
         this.setState({
           inRoom: true,
-          story
+          story,
+          roomCode
         })
+      }).catch((e) => {
+        console.log(e);
       })
     })
   }
 
   createRoom() {
     const { playerName } = this.state
-    const dummyStoryID = '239c41f0-9c9f-4f30-b322-e7d288eadd8e'
+    const dummyStoryID = roomDefaultState.storyID
     createRoom(playerName).then((roomCode: string) => {
       const story = getStory(dummyStoryID).then((story: Story) => {
         this.setState({
