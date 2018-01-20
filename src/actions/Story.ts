@@ -2,6 +2,8 @@ import { StoryAction, StoryState, StoryOption, Story } from "../types/Story";
 import { Player } from "../types/Player";
 import { RoomState } from "../types/Network";
 
+export const next = { title: '->' }
+
 export function getActionByIndex(story: Story, index: number): StoryAction {
     return story.actions[index]
 }
