@@ -110,7 +110,7 @@ He screams in your face, spittle flying everywhere, 'You! Come join revolution! 
         options: [{ title: '->' }]
     },
     {
-        prompt: `You're back out in the fresh air. `,
+        prompt: `You're back out in the fresh air.`,
         actionFilter: (state: StoryState) => true,
         options: [{ title: '->' }]
     },
@@ -126,6 +126,7 @@ He screams in your face, spittle flying everywhere, 'You! Come join revolution! 
 // in between filler section with some trials in a forest
 
 const story: Story = {
+    id: '239c41f0-9c9f-4f30-b322-e7d288eadd8e',
     name: 'Out of the Cave',
     actions,
     defaultState
