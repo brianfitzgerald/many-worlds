@@ -51,6 +51,10 @@ export const createRoom = (username: string) => new Promise<string>((resolve, re
 })
 
 // update the remote state of the room
-export function updateStoryState(roomCode: string, newState: RoomState) {
+export function updateRoomState(roomCode: string, newState: RoomState) {
     return dbInstance.ref(`/rooms/${roomCode}`).update(newState)
+}
+
+export function updatePlayerState(roomCode: string, playerName: string, newState: Player) {
+    return dbInstance.ref(`/rooms/${roomCode}/players/${playerName}`).update(newState)
 }

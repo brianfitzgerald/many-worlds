@@ -18,7 +18,7 @@ import { Story, StoryOption } from '../types/Story';
 import { Player } from '../types/Player';
 import { getNextActionIndex, doAction, getActionByIndex } from '../actions/Story';
 import { RoomState, FirebaseRoomState } from '../types/Network';
-import { defaultRoomState, updateStoryState } from '../firebaseFunctions';
+import { defaultRoomState, updateRoomState, updatePlayerState } from '../firebaseFunctions';
 
 type PartyViewProps = {
     story: Story
@@ -30,6 +30,8 @@ type PartyViewProps = {
 type PartyViewState = {
     roomState: RoomState
 }
+
+const getPlayersWhoSelectedOption = (optionIndex: number, roomState: RoomState) => roomState.connectedPlayers.filter((p) => p.selectedChoiceIndex === optionIndex)
 
 export default class PartyView extends React.Component<PartyViewProps, PartyViewState> {
     
@@ -64,17 +66,32 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         })
     }
 
-    playerSelectChoice(option: StoryOption) {
-        const currentStoryIndex = this.state.roomState.currentStoryIndex
-        const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
-        const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
-        newState.currentStoryIndex = nextStoryIndex
-        updateStoryState(this.props.roomCode, newState).then(() => {
-            const scrollRef = this.refs.scrollView as ScrollViewStatic
-            if (scrollRef) {
-                scrollRef.scrollToEnd()
-            }    
-        })
+    playerSelectChoice(option: StoryOption, optionIndex: number) {
+
+        const scrollRef = this.refs.scrollView as ScrollViewStatic
+
+        const numPlayersWhoConcur = getPlayersWhoSelectedOption(optionIndex, this.state.roomState)
+
+        if (numPlayersWhoConcur.length + 1 === this.state.roomState.connectedPlayers.length) {
+            const currentStoryIndex = this.state.roomState.currentStoryIndex
+            const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
+            const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
+            newState.currentStoryIndex = nextStoryIndex
+            updateRoomState(this.props.roomCode, newState).then(() => {
+                if (scrollRef) {
+                    scrollRef.scrollToEnd()
+                }    
+            })
+        } else {
+            const newPlayerState = this.state.roomState.connectedPlayers.filter((p) => p.name === this.props.currentPlayerName)[0]
+            newPlayerState.selectedChoiceIndex = optionIndex
+            updatePlayerState(this.props.roomCode, this.props.currentPlayerName, newPlayerState).then(() => {
+                if (scrollRef) {
+                    scrollRef.scrollToEnd()
+                }
+            })
+        }
+        
         
     }
 
@@ -87,19 +104,25 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                 backgroundColor={colors.black}
                 barStyle="light-content"
             />
-            <ScrollView ref="scrollView" style={styles.historyScroll}>
+            <ScrollView ref="scrollView">
                 {this.state.roomState.history.map((p, i) => <Text key={i} style={styles.promptText}>{p}</Text>)}
                 <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
             </ScrollView>
-                <View style={styles.playerChoices}>
+                <View>
                     {
-                        currentAction.options.map((a, i) =>
+                        currentAction.options.map((a, i) => (
+                            <View>
                             <HeroButton
                                 key={i}
                                 title={a.title}
-                                onPress={this.playerSelectChoice.bind(this, a)}
+                                onPress={this.playerSelectChoice.bind(this, a, i)}
                                 style={styles.promptButton}
                             />
+                            {getPlayersWhoSelectedOption(i, this.state.roomState).map((p) => (
+                                <Text style={styles.playersWhoSelectedOption}>{p.name}</Text>
+                            ))}
+                            </View>
+                        )
                         )
                     }
                 </View>
@@ -123,10 +146,9 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column'
     },
-    historyScroll: {
-
-    },
-    playerChoices: {
+    playersWhoSelectedOption: {
+        fontSize: 8,
+        color: 'white'
     },
     promptButton: {
         width: '100%'

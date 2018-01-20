@@ -17,4 +17,5 @@ export type Player = {
     conditions: Condition[]
     inventory: InventoryItem[]
     abilities: Ability[]
+    selectedChoiceIndex?: number
 }
