@@ -120,7 +120,7 @@ export default class App extends React.Component<AppProps,AppState>  {
           <TextInput placeholder="Name" placeholderTextColor={colors.grey} style={commonStyles.textInput} value={this.state.playerName} onChangeText={(val) => this.setState({ playerName: val })} />
           <Text style={commonStyles.headerText}>Where are you going?</Text>
           <TextInput placeholder="Room Code" placeholderTextColor={colors.grey} style={commonStyles.textInput} value={this.state.roomCode} onChangeText={(val) => this.setState({ roomCode: val })} />
-          <HeroButton title="Join" onPress={this.joinRoom.bind(this)} />
+          <HeroButton style={commonStyles.heroButtonMargins} title="Join" onPress={this.joinRoom.bind(this)} />
           <HeroButton title="Create Room" onPress={this.createRoom.bind(this)} />
         </View>
       )
