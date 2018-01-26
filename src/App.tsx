@@ -5,11 +5,13 @@ import {
   Text,
   View,
   TextInput,
-  StatusBar
+  StatusBar,
+  AsyncStorage
 } from 'react-native';
 
-import PartyView from './pages/PartyView'
+const usernameStorageKey = 'username_entry'
 
+import PartyView from './pages/PartyView'
 
 import outOfTheCave from './stories/outOfTheCave'
 import appleDisaster from './stories/appleDisaster'
@@ -44,7 +46,7 @@ export default class App extends React.Component<AppProps,AppState>  {
       inventory: [],
       abilities: []
     }
-    const players = [player]
+    const connectedPlayers = [player]
     const story = outOfTheCave
 
     this.state = {
@@ -56,10 +58,27 @@ export default class App extends React.Component<AppProps,AppState>  {
 
   }
 
+  componentWillMount() {
+    this._loadUsername()
+  }
+
+  _loadUsername() {
+    const storedUsername = AsyncStorage.getItem(usernameStorageKey).then((value) => {
+        if (value !== null) {
+            this.setState({ playerName: value })
+        }
+    }).catch((error) => console.warn(error))
+  }
+
+  _updateUsername() {
+    AsyncStorage.setItem(usernameStorageKey, this.state.playerName)
+  }
+
   joinRoom() {
     const { roomCode, playerName } = this.state
     joinRoom(roomCode, playerName).then((storyID: string) => {
       const story = getStory(storyID).then((story: Story) => {
+        this._updateUsername()
         this.setState({
           inRoom: true,
           story,
@@ -76,6 +95,7 @@ export default class App extends React.Component<AppProps,AppState>  {
     const dummyStoryID = roomDefaultState.storyID
     createRoom(playerName).then((roomCode: string) => {
       const story = getStory(dummyStoryID).then((story: Story) => {
+        this._updateUsername()
         this.setState({
           inRoom: true,
           roomCode,

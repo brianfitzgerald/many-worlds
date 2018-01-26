@@ -18,7 +18,7 @@ import { Story, StoryOption } from '../types/Story';
 import { Player } from '../types/Player';
 import { getNextActionIndex, doAction, getActionByIndex } from '../actions/Story';
 import { RoomState, FirebaseRoomState } from '../types/Network';
-import { roomDefaultState, updateRoomState, updatePlayerState } from '../firebaseFunctions';
+import { roomDefaultState, updateRoomState } from '../firebaseFunctions';
 
 type PartyViewProps = {
     story: Story
@@ -73,22 +73,37 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
 
         const numPlayersWhoConcur = getPlayersWhoSelectedOption(optionIndex, this.state.roomState)
         console.log('players who concur', numPlayersWhoConcur);
+        console.log('meme');
         
 
         if (numPlayersWhoConcur.length === this.state.roomState.connectedPlayers.length) {
             const currentStoryIndex = this.state.roomState.currentStoryIndex
             const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
             const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
+            console.log(newState);
+            
             newState.currentStoryIndex = nextStoryIndex
             updateRoomState(this.props.roomCode, newState).then(() => {
                 if (scrollRef) {
                     scrollRef.scrollToEnd()
-                }    
+                }
             })
         } else {
-            const newPlayerState = this.state.roomState.connectedPlayers.filter((p) => p.name === this.props.currentPlayerName)[0]
-            newPlayerState.selectedChoiceIndex = optionIndex
-            updatePlayerState(this.props.roomCode, this.props.currentPlayerName, newPlayerState).then(() => {
+            const newConnectedPlayersState = this.state.roomState.connectedPlayers.map((p) => {
+                if (p.name === this.props.currentPlayerName) {
+                    p.selectedChoiceIndex = optionIndex
+                }
+                return p
+            })
+            console.log(newConnectedPlayersState);
+            
+            const newRoomState = this.state.roomState
+            console.log(newRoomState);
+            
+            newRoomState.connectedPlayers = newConnectedPlayersState
+            console.log(newRoomState);
+            
+            updateRoomState(this.props.roomCode, newRoomState).then(() => {
                 if (scrollRef) {
                     scrollRef.scrollToEnd()
                 }

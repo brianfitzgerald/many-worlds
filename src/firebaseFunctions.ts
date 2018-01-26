@@ -58,7 +58,3 @@ export const createRoom = (username: string) => new Promise<string>((resolve, re
 export function updateRoomState(roomCode: string, newState: RoomState) {
     return dbInstance.ref(`/rooms/${roomCode}`).update(newState)
 }
-
-export function updatePlayerState(roomCode: string, playerName: string, newState: Player) {
-    return dbInstance.ref(`/rooms/${roomCode}/players/${playerName}`).update(newState)
-}
