@@ -32,7 +32,7 @@ type PartyViewState = {
     currentTimer: number
 }
 
-const TIMER_AMOUNT = 30
+const TIMER_AMOUNT = 8
 
 const getPlayersWhoSelectedOption = (optionIndex: number, roomState: RoomState) => roomState.connectedPlayers.filter((p) => p.selectedChoiceIndex === optionIndex)
 const getCurrentBestSelection = (roomState: RoomState): number => {
@@ -63,11 +63,14 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
     _resetTimer() {
         this.setState({ currentTimer: TIMER_AMOUNT })
         const intervalTimer = setInterval(() => {
-            this.setState({ currentTimer: this.state.currentTimer - 0.5 })
-        }, 500)
+            this.setState({ currentTimer: this.state.currentTimer - 1 })
+            console.log(this.state.currentTimer);
+        }, 1000)
         setTimeout(() => {
-            this.playerSelectChoice(getCurrentBestSelection(this.state.roomState))
+            alert('time up!')
+            this._executeAction(getCurrentBestSelection(this.state.roomState))
             clearInterval(intervalTimer)
+            this._resetTimer()
         }, TIMER_AMOUNT * 1000)
         
     }
@@ -85,10 +88,11 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                 history: updatedRoomState.history || [],
             }
             this.setState({ roomState: safeRoomState })
+            this._resetTimer()
         })
     }
 
-    playerSelectChoice(optionIndex: number) {
+    _executeAction(optionIndex: number) {
 
         const option = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex).options[optionIndex]
         console.log(option);
@@ -125,7 +129,6 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                 if (scrollRef) {
                     scrollRef.scrollToEnd()
                 }
-                this._resetTimer()
             })
         }
         
@@ -141,7 +144,10 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                     backgroundColor={colors.black}
                     barStyle="light-content"
                 />
-                <Text style={{ color: 'white' }}>Room {this.props.roomCode}</Text>
+                <View>
+                    <Text style={{ color: 'white' }}>Room {this.props.roomCode}</Text>
+                    <Text style={{ color: 'white' }}>{this.state.currentTimer} Seconds Left</Text>
+                </View>
                 <ScrollView ref="scrollView">
                     {this.state.roomState.history.map((p, i) => <Text key={i} style={styles.promptText}>{p}</Text>)}
                     <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
@@ -159,7 +165,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                             <HeroButton
                                 key={i}
                                 title={a.title}
-                                onPress={this.playerSelectChoice.bind(this, i)}
+                                onPress={this._executeAction.bind(this, i)}
                                 style={styles.promptButton}
                             />
                             </View>
