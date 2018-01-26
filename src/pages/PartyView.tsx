@@ -28,10 +28,18 @@ type PartyViewProps = {
 }
 
 type PartyViewState = {
-    roomState: RoomState
+    roomState: RoomState,
+    currentTimer: number
 }
 
+const TIMER_AMOUNT = 30
+
 const getPlayersWhoSelectedOption = (optionIndex: number, roomState: RoomState) => roomState.connectedPlayers.filter((p) => p.selectedChoiceIndex === optionIndex)
+const getCurrentBestSelection = (roomState: RoomState): number => {
+    const playerVotes = roomState.connectedPlayers.map((p: Player, i: number) => ({ index: i, amount: p.selectedChoiceIndex ? p.selectedChoiceIndex : 0 }))
+    const sortedPlayerVotes = playerVotes.sort((a, b) => a && b ? a.amount - b.amount : -1)
+    return sortedPlayerVotes[0].index
+}
 
 export default class PartyView extends React.Component<PartyViewProps, PartyViewState> {
     
@@ -46,9 +54,22 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         super(props)
 
         this.state = {
-            roomState: roomDefaultState
+            roomState: roomDefaultState,
+            currentTimer: 0
         }
 
+    }
+
+    _resetTimer() {
+        this.setState({ currentTimer: TIMER_AMOUNT })
+        const intervalTimer = setInterval(() => {
+            this.setState({ currentTimer: this.state.currentTimer - 0.5 })
+        }, 500)
+        setTimeout(() => {
+            this.playerSelectChoice(getCurrentBestSelection(this.state.roomState))
+            clearInterval(intervalTimer)
+        }, TIMER_AMOUNT * 1000)
+        
     }
 
     componentDidMount() {
@@ -67,8 +88,11 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         })
     }
 
-    playerSelectChoice(option: StoryOption, optionIndex: number) {
+    playerSelectChoice(optionIndex: number) {
 
+        const option = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex).options[optionIndex]
+        console.log(option);
+        
         const scrollRef = this.refs.scrollView as ScrollViewStatic
 
         const numPlayersWhoConcur = getPlayersWhoSelectedOption(optionIndex, this.state.roomState)        
@@ -77,12 +101,14 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
             const currentStoryIndex = this.state.roomState.currentStoryIndex
             const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
             const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)
-            
+            console.log(newState)
+
             newState.currentStoryIndex = nextStoryIndex
             updateRoomState(this.props.roomCode, newState).then(() => {
                 if (scrollRef) {
                     scrollRef.scrollToEnd()
                 }
+                this._resetTimer()
             })
         } else {
             const newConnectedPlayersState = this.state.roomState.connectedPlayers.map((p) => {
@@ -99,6 +125,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                 if (scrollRef) {
                     scrollRef.scrollToEnd()
                 }
+                this._resetTimer()
             })
         }
         
@@ -110,15 +137,15 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
 
         return (
             <View style={[commonStyles.container, styles.partyContainer]}>
-            <StatusBar
-                backgroundColor={colors.black}
-                barStyle="light-content"
-            />
-            <Text style={{ color: 'white' }}>Room {this.props.roomCode}</Text>
-            <ScrollView ref="scrollView">
-                {this.state.roomState.history.map((p, i) => <Text key={i} style={styles.promptText}>{p}</Text>)}
-                <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
-            </ScrollView>
+                <StatusBar
+                    backgroundColor={colors.black}
+                    barStyle="light-content"
+                />
+                <Text style={{ color: 'white' }}>Room {this.props.roomCode}</Text>
+                <ScrollView ref="scrollView">
+                    {this.state.roomState.history.map((p, i) => <Text key={i} style={styles.promptText}>{p}</Text>)}
+                    <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
+                </ScrollView>
                 <View>
                     {
                         currentAction.options.map((a, i) => (
@@ -132,7 +159,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                             <HeroButton
                                 key={i}
                                 title={a.title}
-                                onPress={this.playerSelectChoice.bind(this, a, i)}
+                                onPress={this.playerSelectChoice.bind(this, i)}
                                 style={styles.promptButton}
                             />
                             </View>
