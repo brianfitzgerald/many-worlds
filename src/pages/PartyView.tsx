@@ -43,7 +43,8 @@ const getCurrentBestSelection = (roomState: RoomState): number => {
 
 export default class PartyView extends React.Component<PartyViewProps, PartyViewState> {
 
-    private timer: NodeJS.Timer | undefined
+    private intervalRef: NodeJS.Timer | undefined
+    private timeoutRef: NodeJS.Timer | undefined
 
     refs: {
         scrollView: any
@@ -58,17 +59,20 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
             currentTimer: 0
         }
 
+        this._executeAction = this._executeAction.bind(this)
+
     }
 
     _resetTimer() {
-        if (this.timer) {
-            clearInterval(this.timer)
+        if (this.intervalRef && this.timeoutRef) {
+            clearInterval(this.intervalRef)
+            clearTimeout(this.timeoutRef)
         }
         this.setState({ currentTimer: TIMER_AMOUNT })
-        this.timer = setInterval(() => {
+        this.intervalRef = setInterval(() => {
             this.setState({ currentTimer: this.state.currentTimer - 1 })
         }, 1000)
-        setTimeout(() => {
+        this.timeoutRef = setTimeout(() => {
             this._executeAction(getCurrentBestSelection(this.state.roomState))
             this._resetTimer()
         }, TIMER_AMOUNT * 1000)
@@ -93,24 +97,31 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
 
     _executeAction(optionIndex: number) {
 
-        const option = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex).options[optionIndex]
-
         const scrollRef = this.refs.scrollView as ScrollViewStatic
+
+        const option = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex).options[optionIndex]
+        const currentStoryIndex = this.state.roomState.currentStoryIndex
+
+        const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
+        const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)            
+
+        newState.currentStoryIndex = nextStoryIndex
+
+        updateRoomState(this.props.roomCode, newState).then(() => {
+            if (scrollRef) {
+                scrollRef.scrollToEnd()
+            }
+            this._resetTimer()
+        })
+
+    }
+
+    _chooseAction(optionIndex: number) {
 
         const numPlayersWhoConcur = getPlayersWhoSelectedOption(optionIndex, this.state.roomState)
 
         if (numPlayersWhoConcur.length === this.state.roomState.connectedPlayers.length) {
-            const currentStoryIndex = this.state.roomState.currentStoryIndex
-            const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
-            const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)            
-
-            newState.currentStoryIndex = nextStoryIndex
-            updateRoomState(this.props.roomCode, newState).then(() => {
-                if (scrollRef) {
-                    scrollRef.scrollToEnd()
-                }
-                this._resetTimer()
-            })
+            this._executeAction(optionIndex)
         } else {
             const newConnectedPlayersState = this.state.roomState.connectedPlayers.map((p) => {
                 if (p.name === this.props.currentPlayerName) {
@@ -122,13 +133,8 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
             const newRoomState = this.state.roomState
             newRoomState.connectedPlayers = newConnectedPlayersState
 
-            updateRoomState(this.props.roomCode, newRoomState).then(() => {
-                if (scrollRef) {
-                    scrollRef.scrollToEnd()
-                }
-            })
+            updateRoomState(this.props.roomCode, newRoomState)
         }
-
 
     }
 
@@ -162,7 +168,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                                 <HeroButton
                                     key={i}
                                     title={a.title}
-                                    onPress={this._executeAction.bind(this, i)}
+                                    onPress={this._chooseAction.bind(this, i)}
                                     style={styles.promptButton}
                                 />
                             </View>
