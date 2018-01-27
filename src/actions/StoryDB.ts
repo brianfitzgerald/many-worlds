@@ -1,13 +1,16 @@
 import outOfTheCave from "../stories/outOfTheCave";
+import appleDisaster from "../stories/appleDisaster";
+import demonsInTheDust from "../stories/demonsInTheDust";
 import { Story } from "../types/Story";
+import brimblewood from "../stories/brimblewood";
 
-const storyStore: { id: string, story: Story }[] = [
-    {
-        id: '239c41f0-9c9f-4f30-b322-e7d288eadd8e',
-        story: outOfTheCave
-    }
-]
+const storyStore: Story[] = [outOfTheCave, appleDisaster, demonsInTheDust, brimblewood]
 
 export const getStory = (id: string) => new Promise<Story>((resolve, reject) => {
-    resolve(storyStore[0].story)
+    const result = storyStore.find((s) => s.id === id)
+    if (result) {
+        resolve(result)
+    } else {
+        reject('no such room found')
+    }
 })

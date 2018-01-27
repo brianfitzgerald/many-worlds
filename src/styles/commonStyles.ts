@@ -21,6 +21,9 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
         width: 250,
         color: colors.white
     },
+    heroButtonMargins: {
+        marginBottom: 25
+    },
     headerText: {
         fontSize: 28,
         fontWeight: 'bold',
@@ -54,22 +57,7 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
         fontSize: 24,
         color: colors.black,
         paddingLeft: 15
-    },
-    HeroButton: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: 50,
-        marginBottom: 25,
-        backgroundColor: colors.white,
-        borderRadius: 10,
-        minWidth: 200
-    },
-    HeroButtonTitle: {
-        textAlign: 'center',
-        fontSize: 24,
-        color: colors.black,
-    },
+    }
 });
 
 export default styles

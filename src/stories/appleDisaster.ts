@@ -1,6 +1,4 @@
-import { StoryAction, StoryState } from "../types/Story";
-
-
+import { StoryAction, StoryState, Story } from "../types/Story";
 
 const defaultState = {
     applePickedUp: false,
@@ -16,7 +14,7 @@ const defaultState = {
 const actions: StoryAction[] = [
     {
         prompt: 'You see an apple on the floor.',
-        actionFilter: (state: StoryState) => state.applePickedUp === true,
+        actionFilter: (state: StoryState) => true,
         options: [
             {
                 title: 'Pick it up',
@@ -62,7 +60,19 @@ const actions: StoryAction[] = [
         prompt: 'You are consumed. Game over.',
         actionFilter: (state: StoryState) => state.voidApproached === true,
         options: []
+    },
+    {
+        prompt: 'You live a happy and fruitful life.',
+        actionFilter: (state: StoryState) => state.voidApproached === false,
+        options: []
     }
 ]
 
-export default { defaultState, actions }
+const story: Story = {
+    id: 'f35e804d-19fd-4488-98d3-09344e81dc80',
+    name: 'Apple Disaster',
+    actions,
+    defaultState
+}
+
+export default story

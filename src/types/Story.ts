@@ -2,6 +2,7 @@ import { InventoryItem, Condition, Ability } from "./Player";
 
 
 export type Story = {
+    id: string
     name: string
     actions: StoryAction[]
     defaultState: StoryState
