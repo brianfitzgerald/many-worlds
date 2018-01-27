@@ -158,7 +158,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                 <View>
                     {
                         currentAction.options.map((a, i) => (
-                            <View>
+                            <View key={i}>
                                 {getPlayersWhoSelectedOption(i, this.state.roomState).map((p, i) => (
                                     <Text key={i} style={styles.playersWhoSelectedOption}>
                                         {p.name}
@@ -177,7 +177,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                     }
                 </View>
             </View>
-        );
+        )
     }
 }
 
