@@ -25,9 +25,10 @@ export type StoryOption = {
 }
 
 export type StoryAction = {
+    type?: 'boolean' | 'end'
     prompt: string
     actionFilter?: (state: StoryState) => boolean
-    options: StoryOption[]
+    options?: StoryOption[]
 }
 
 type PlayerStateChange = {

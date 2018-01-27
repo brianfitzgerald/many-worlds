@@ -81,7 +81,8 @@ Or you could head to the shrine, and ask for a blessing.
 Your group departs, carefully following the cliffside down the mountain.
 But not before long, you hear the mountain rumble, and the cliff you're on collapses!
 You're plunging to your doom....
-`
+`,
+        options: [next]
     },
     {
         prompt: `
@@ -115,7 +116,8 @@ The shrine has been replaced with a power terminal.
 On the base of the terminal is located a plaque, which reads:
 'JOB COMPL 4 64 1203 : TERM 1093 : KW 364 : JPY 932'
 `,
-        actionFilter: (state) => state.examineTerminal === true
+        actionFilter: (state) => state.examineTerminal === true,
+        options: [next]
     },
     {
         prompt: `
@@ -126,6 +128,9 @@ You reach the city wall. There is a terminal set into it, with a number of optio
             },
             {
                 title: 'HISTORY OF THE CITY'
+            },
+            {
+                title: 'OVERVIEW OF THE CITY'
             }
         ]
     },
@@ -135,8 +140,45 @@ You reach the city wall. There is a terminal set into it, with a number of optio
 The City was founded a hundred years ago, when the First Leader used his spoils from defeating the Lich King to purchase
 several hundred turnips. Through his shrewd business skills, he was able to turn this into several thousand turnips,
 and eventually, he amassed more wealth than anyone in the Kingdom.
+----ZZZTTT----
+The computer seems to be glitching out...
+`,
+        options: [{
+            title: 'Knock on it',
+            response: 'The computer reboots, but the text is a different color and font.'
+        }]
+    },
+    {
+        prompt: `
+As his power grew, so did his greed. Soon, each citizen was given a quota of turnips to produce each year.
+Those that did not meet it would be thrown into exile.
+Now we are rich in turnips, but poor in spirit. The city is dying.
 `,
         options: [next]
+    },
+    {
+        prompt: `
+It has been decades since anyone reached the wall, so I will likely be long dead before you read this...
+Tell me, though. The outside world - is there still food? What awaits us on the outside?
+`,
+        options: [
+            {
+                title: 'There is food for everyone',
+                action: {
+                    outsideWorldResponse: true
+                }
+            },
+            {
+                title: 'It is a barren wasteland',
+                action: {
+                    outsideWorldResponse: false
+                }
+            }
+        ]
+    },
+    {
+        prompt: `Hooray! We'll raise the gates at once.`,
+        type: 'end'
     }
 ]
 

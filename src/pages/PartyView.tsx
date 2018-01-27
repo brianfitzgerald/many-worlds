@@ -99,7 +99,13 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
 
         const scrollRef = this.refs.scrollView as ScrollViewStatic
 
-        const option = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex).options[optionIndex]
+        const currentAction = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex)
+
+        if (!currentAction.options) {
+            return
+        }
+
+        const option = currentAction.options[optionIndex]
         
         if (option.response) {
             alert(option.response)
@@ -142,6 +148,10 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
 
     }
 
+    _finishStory() {
+
+    }
+
     render() {
         const currentAction = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex)
 
@@ -161,7 +171,7 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                 </ScrollView>
                 <View>
                     {
-                        currentAction.options.map((a, i) => (
+                        currentAction.options ? currentAction.options.map((a, i) => (
                             <View key={i}>
                                 {getPlayersWhoSelectedOption(i, this.state.roomState).map((p, i) => (
                                     <Text key={i} style={styles.playersWhoSelectedOption}>
@@ -177,7 +187,16 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
                                 />
                             </View>
                         )
-                        )
+                        ) : null
+                    }
+                    {
+                        currentAction.type === 'end' ? (
+                            <HeroButton
+                                title="Finish Story"
+                                onPress={this._finishStory.bind(this)}
+                                style={styles.promptButton}
+                            />
+                        ) : null
                     }
                 </View>
             </View>
@@ -206,6 +225,8 @@ const styles = StyleSheet.create({
     promptButton: {
         width: '100%',
         marginBottom: 12,
-        marginTop: 4
+        marginTop: 4,
+        paddingLeft: 5,
+        paddingRight: 5
     }
 });
