@@ -20,12 +20,13 @@ export type StoryOption = {
     playerStateChange?: {
         allPlayers?: PlayerStateChange
         self?: PlayerStateChange
-    }
+    },
+    response?: string
 }
 
 export type StoryAction = {
     prompt: string
-    actionFilter: (state: StoryState) => boolean
+    actionFilter?: (state: StoryState) => boolean
     options: StoryOption[]
 }
 

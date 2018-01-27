@@ -8,10 +8,17 @@ export function getActionByIndex(story: Story, index: number): StoryAction {
     return story.actions[index]
 }
 
+function validateActionFilter(action: StoryAction, currentState: StoryState) {
+    if (action.actionFilter !== undefined) {
+        return action.actionFilter(currentState) !== true
+    }
+    return false
+}
+
 export function getNextActionIndex(story: Story, currentState: StoryState, currentStoryIndex: number): number {
     let nextStoryIndex = currentStoryIndex + 1
     
-    while (story.actions[nextStoryIndex] !== undefined && story.actions[nextStoryIndex].actionFilter(currentState) !== true) {
+    while (validateActionFilter(story.actions[nextStoryIndex], currentState)) {
         nextStoryIndex++
     }
 

@@ -4,6 +4,7 @@ import demonsInTheDust from "../stories/demonsInTheDust";
 import { Story } from "../types/Story";
 import brimblewood from "../stories/brimblewood";
 
+// Mock story database, will be replaced with DynamoDB actions at a later point
 const storyStore: Story[] = [outOfTheCave, appleDisaster, demonsInTheDust, brimblewood]
 
 export const getStory = (id: string) => new Promise<Story>((resolve, reject) => {

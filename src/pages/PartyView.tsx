@@ -100,8 +100,12 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
         const scrollRef = this.refs.scrollView as ScrollViewStatic
 
         const option = getActionByIndex(this.props.story, this.state.roomState.currentStoryIndex).options[optionIndex]
-        const currentStoryIndex = this.state.roomState.currentStoryIndex
+        
+        if (option.response) {
+            alert(option.response)
+        }
 
+        const currentStoryIndex = this.state.roomState.currentStoryIndex
         const nextStoryIndex = getNextActionIndex(this.props.story, this.state.roomState.storyState, currentStoryIndex)
         const newState = doAction(this.state.roomState, this.props.story, currentStoryIndex, option)            
 
