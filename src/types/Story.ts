@@ -27,7 +27,7 @@ export type StoryOption = {
 export type StoryAction = {
     type?: 'boolean' | 'end'
     prompt: string
-    actionFilter?: (state: StoryState) => boolean
+    filter?: (state: StoryState) => boolean
     options?: StoryOption[]
 }
 

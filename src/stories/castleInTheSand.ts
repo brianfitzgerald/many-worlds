@@ -10,7 +10,7 @@ With the plunge of your sword, the Lich King sinks to the ground. As he collapse
 'Bah! So annoying, to be bested once again! No matter, there will be more kingdoms to conquer, in another time...'
 The amulet bursts open, and a blue light escapes from within. It swirls into a portal, and the Lich King jumps into it, seemingly vanishing.
 `,
-        actionFilter: (state) => true,
+        filter: (state) => true,
         options: [
             {
                 title: 'Jump into the portal',
@@ -116,7 +116,7 @@ The shrine has been replaced with a power terminal.
 On the base of the terminal is located a plaque, which reads:
 'JOB COMPL 4 64 1203 : TERM 1093 : KW 364 : JPY 932'
 `,
-        actionFilter: (state) => state.examineTerminal === true,
+        filter: (state) => state.examineTerminal === true,
         options: [next]
     },
     {
@@ -135,7 +135,7 @@ You reach the city wall. There is a terminal set into it, with a number of optio
         ]
     },
     {
-        actionFilter: (state) => state.lootGivenToBoy !== 'none',
+        filter: (state) => state.lootGivenToBoy !== 'none',
         prompt: `
 The City was founded a hundred years ago, when the First Leader used his spoils from defeating the Lich King to purchase
 several hundred turnips. Through his shrewd business skills, he was able to turn this into several thousand turnips,

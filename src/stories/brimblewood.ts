@@ -13,14 +13,14 @@ const actions: StoryAction[] = [
 Your party leaves the inn and hits the road for another day of walking. Brimblewood is still another couple of weeks away,
 but spirits are high and the sun is out today.
 `,
-        actionFilter: (state) => true,
+        filter: (state) => true,
         options: [{ title: '->' }]
     },
     {
         prompt: `Soon, you reach a fork in the road. One leads into a swamp, and the other goes higher into the mountains. They both
 lead to Brimblewood. Which do you choose?
 `,
-        actionFilter: (state) => state.name !== 'not_sure',
+        filter: (state) => state.name !== 'not_sure',
         options: [
             { title: 'Cave', action: { swampBranchChosen: false } },
             { title: 'Swamp', action: { swampBranchChosen: true } }
@@ -28,7 +28,7 @@ lead to Brimblewood. Which do you choose?
     },
     // Swamp
     {
-        actionFilter: (state) => state.swampBranchChosen === true,
+        filter: (state) => state.swampBranchChosen === true,
         prompt: `
 The swamp is dank, and reeks of frog piss. Your party follows a creaky wooden bridge across the murk.
 Suddenly, a frog-man hops in front of your path!
@@ -39,12 +39,12 @@ Suddenly, a frog-man hops in front of your path!
         ]
     },
     {
-        actionFilter: (state) => state.swampBranchChosen === true,
+        filter: (state) => state.swampBranchChosen === true,
         prompt: `'REEEEE!', the frog-man says. He jumps back into the lake, but not before splashing you one more time.`,
         options: [{ title: '->', action: { wetFromFrogman: true } }]
     },
     {
-        actionFilter: () => true,
+        filter: () => true,
         prompt: `There is a shiny apple on a tree above you.`,
         options: [
             {
