@@ -7,6 +7,7 @@ import { RoomState } from "./types/Network";
 const dummySelectedStoryID = '1b0dc9d6-9480-4afd-bda4-eb18167b3ef2'
 
 export const roomDefaultState: RoomState = {
+    status: 'pregame',
     currentStoryIndex: 0,
     storyID: dummySelectedStoryID,
     connectedPlayers: [],
