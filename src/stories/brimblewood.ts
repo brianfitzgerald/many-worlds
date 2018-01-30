@@ -3,7 +3,8 @@ import { next } from "../actions/Story";
 
 const defaultState = {
     swampBranchChosen: false,
-    wetFromFrogman: true
+    appleEaten: false,
+    wellRested: false
 }
 
 const actions: StoryAction[] = [
@@ -16,8 +17,8 @@ but spirits are high and the sun is out today.
         options: [{ title: '->' }]
     },
     {
-        prompt: `Soon, you reach a fork in the road. Oddly enough, both signs point to Brimblewood. But one path leads down into
-an underground passage, and the other leads into a swamp. Which do you choose?
+        prompt: `Soon, you reach a fork in the road. One leads into a swamp, and the other goes higher into the mountains. They both
+lead to Brimblewood. Which do you choose?
 `,
         actionFilter: (state) => state.name !== 'not_sure',
         options: [
@@ -42,11 +43,56 @@ Suddenly, a frog-man hops in front of your path!
         prompt: `'REEEEE!', the frog-man says. He jumps back into the lake, but not before splashing you one more time.`,
         options: [{ title: '->', action: { wetFromFrogman: true } }]
     },
-    // Cave
     {
-        actionFilter: (state) => state.swampBranchChosen === false,
-        prompt: `'REEEEE!', the frog-man says. He jumps back into the lake, but not before splashing you one more time.`,
-        options: [{ title: '->', action: { wetFromFrogman: true } }]
+        actionFilter: () => true,
+        prompt: `There is a shiny apple on a tree above you.`,
+        options: [
+            {
+                title: 'eat it',
+                action: {
+                    appleEaten: true
+                }
+            },
+            {
+                title: 'ignore it'
+            }
+        ]
+    },
+    {
+        prompt: `A low level slime blocks your path. 'Must consume!' it says.`,
+        options: [
+            {
+                title: 'give it some food',
+                action: {
+                    slimeGivenFood: true
+                },
+                response: 'The slime recedes.'
+            },
+            {
+                title: 'veer off the path, into the woods'
+            }
+        ]
+    },
+    {
+        prompt: 'The sun begins to set.',
+        options: [
+            {
+                title: 'Set up camp',
+                action: {
+                    wellRested: true
+                }
+            },
+            {
+                title: 'Walk on through the night'
+            }
+        ]
+    },
+    {
+        prompt: `Dawn of the second day.`,
+        options: [next]
+    },
+    {
+        prompt: ``
     }
 ]
 
