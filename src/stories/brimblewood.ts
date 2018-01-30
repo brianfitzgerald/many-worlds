@@ -4,7 +4,8 @@ import { next } from "../actions/Story";
 const defaultState = {
     swampBranchChosen: false,
     appleEaten: false,
-    wellRested: false
+    wellRested: false,
+    slimeGivenFood: false
 }
 
 const actions: StoryAction[] = [
@@ -92,7 +93,23 @@ Suddenly, a frog-man hops in front of your path!
         options: [next]
     },
     {
-        prompt: ``
+        prompt: `Your stomach begins to rumble, but it's probably not serious..`,
+        filter: (state) => state.appleEaten
+    },
+    {
+        filter: (state) => state.slimeGivenFood,
+        prompt: `You awake to several slimes crowding around your tent. 'Consume! Consume! Consume! they chant.`,
+        options: [
+            {
+                title: 'Give them more food',
+                response: 'They ooze away, for now.'
+            },
+            {
+                title: 'Swing your sword at them',
+                response: 'They suffocate you to death.',
+                type: 'end'
+            }
+        ]
     }
 ]
 
