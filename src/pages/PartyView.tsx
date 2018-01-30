@@ -84,10 +84,11 @@ export default class PartyView extends React.Component<PartyViewProps, PartyView
             const updatedRoomState: FirebaseRoomState = snap ? snap.val() as RoomState : roomDefaultState
             // this should be the only place where room state is updated
             const safeRoomState: RoomState = {
+                status: updatedRoomState.status,
                 storyID: updatedRoomState.storyID,
                 currentStoryIndex: updatedRoomState.currentStoryIndex,
                 connectedPlayers: updatedRoomState.connectedPlayers || [],
-                storyState: updatedRoomState.storyState || {},
+                storyState: updatedRoomState.storyState || { status: 'in_play' },
                 history: updatedRoomState.history || [],
             }
             this.setState({ roomState: safeRoomState })

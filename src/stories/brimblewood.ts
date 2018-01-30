@@ -1,7 +1,7 @@
 import { StoryState, StoryAction, Story } from "../types/Story";
 import { next } from "../actions/Story";
 
-const defaultState = {
+const defaultState: StoryState = {
     swampBranchChosen: false,
     appleEaten: false,
     wellRested: false,
@@ -94,10 +94,10 @@ Suddenly, a frog-man hops in front of your path!
     },
     {
         prompt: `Your stomach begins to rumble, but it's probably not serious..`,
-        filter: (state) => state.appleEaten
+        filter: (state) => state.appleEaten === true
     },
     {
-        filter: (state) => state.slimeGivenFood,
+        filter: (state) => state.slimeGivenFood === true,
         prompt: `You awake to several slimes crowding around your tent. 'Consume! Consume! Consume! they chant.`,
         options: [
             {
@@ -110,6 +110,10 @@ Suddenly, a frog-man hops in front of your path!
                 type: 'end'
             }
         ]
+    },
+    {
+        prompt: `As you walk through the forest, you encounter a centaur that looks at you, and then walks away.`,
+        type: 'end'
     }
 ]
 
