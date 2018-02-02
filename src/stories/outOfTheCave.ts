@@ -13,7 +13,7 @@ You awake in a prison cell. The walls around you are some sort of bedrock, mottl
 The room pulses, but you figure that must be due to dehydration. You have no idea how long you've been in here.
 Come to think of it, what was your name again?
 `,
-        actionFilter: () => true,
+        filter: () => true,
         options: [
             {
                 title: 'Dave',
@@ -37,12 +37,12 @@ Come to think of it, what was your name again?
     },
     {
         prompt: `That might be problematic, but for now, let's keep going.`,
-        actionFilter: (state: StoryState) => state.name === 'not_sure',
+        filter: (state: StoryState) => state.name === 'not_sure',
         options: [{ title: '->' }]
     },
     {
         prompt: `Not the prettiest name in the world, but I suppose one doesn't have much say in the matter.`,
-        actionFilter: (state: StoryState) => state.name !== 'not_sure',
+        filter: (state: StoryState) => state.name !== 'not_sure',
         options: [{ title: '->' }]
     },
     {
@@ -50,7 +50,7 @@ Come to think of it, what was your name again?
 Slumped against the wall of your cell, you wonder about how you might have wound up here.
 Did you commit a crime? Maybe you got caught stealing something...
 `,
-        actionFilter: () => true,
+        filter: () => true,
         options: [
             {
                 title: `It was bound to happen eventually.`,
@@ -65,7 +65,7 @@ Did you commit a crime? Maybe you got caught stealing something...
     },
     {
         prompt: `Suddenly, you hear thuds from the other side of the wall. Like someone is smashing it down with a hammer.`,
-        actionFilter: (state: StoryState) => true,
+        filter: (state: StoryState) => true,
         options: [
             {
                 title: `Run to the other side of the wall`
@@ -80,7 +80,7 @@ Did you commit a crime? Maybe you got caught stealing something...
 It was, in fact, someone smashing down the wall with a hammer. He looks to be a giant blue orc.
 He screams in your face, spittle flying everywhere, 'You! Come join revolution! Smash the system! Smash hierarchy! Smash castle! Join!'
 `,
-        actionFilter: (state: StoryState) => true,
+        filter: (state: StoryState) => true,
         options: [
             {
                 title: `Attempt to run around the orc, out into the sunlight`,
@@ -95,28 +95,28 @@ He screams in your face, spittle flying everywhere, 'You! Come join revolution! 
     // If you joined Carl
     {
         prompt: `The orc says, 'Me name Carl. Me son of Barl, and father of Darl. Follow me, we don't have much time.`,
-        actionFilter: (state: StoryState) => state.joinedCarl === true,
+        filter: (state: StoryState) => state.joinedCarl === true,
         options: [{ title: '->' }]
     },
     {
         prompt: `You follow Carl across a sunlit forest.`,
-        actionFilter: (state: StoryState) => true,
+        filter: (state: StoryState) => true,
         options: [{ title: '->' }]
     },
     // If you ran away
     {
         prompt: `The orc shouts after you, but once you get far enough away he starts mumbling about wishing he were more convincing.`,
-        actionFilter: (state: StoryState) => state.joinedCarl === false,
+        filter: (state: StoryState) => state.joinedCarl === false,
         options: [{ title: '->' }]
     },
     {
         prompt: `You're back out in the fresh air.`,
-        actionFilter: (state: StoryState) => true,
+        filter: (state: StoryState) => true,
         options: [{ title: '->' }]
     },
     {
         prompt: `The end.`,
-        actionFilter: (state: StoryState) => true,
+        filter: (state: StoryState) => true,
         options: []
     },
 ]

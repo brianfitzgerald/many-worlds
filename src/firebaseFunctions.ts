@@ -4,9 +4,12 @@ import { StoryAction, StoryState } from "./types/Story";
 import { Player, playerDefaultState } from "./types/Player";
 import { RoomState } from "./types/Network";
 
+const dummySelectedStoryID = '1b0dc9d6-9480-4afd-bda4-eb18167b3ef2'
+
 export const roomDefaultState: RoomState = {
+    status: 'pregame',
     currentStoryIndex: 0,
-    storyID: '239c41f0-9c9f-4f30-b322-e7d288eadd8e',
+    storyID: dummySelectedStoryID,
     connectedPlayers: [],
     storyState: {},
     history: []
