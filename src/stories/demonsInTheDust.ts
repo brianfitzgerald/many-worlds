@@ -11,13 +11,13 @@ const actions: StoryAction[] = [
 You're deep into the Mojave desert when your car starts making weird noises, then concerning ones,
 before the back wheels pop off. You're hours away from anywhere...
 `,
-        actionFilter: (state: StoryState) => true,
+        filter: (state: StoryState) => true,
         options: [next]
     },
     {
         prompt: `
 Your party has to make a decision. Do you try to wait for a passing vehicle, or walk along the road until you find something?`,
-        actionFilter: (state: StoryState) => state.name === 'not_sure',
+        filter: (state: StoryState) => state.name === 'not_sure',
         options: [
             {
                 title: `Wait for a passing vehicle`,
@@ -38,17 +38,17 @@ Your party has to make a decision. Do you try to wait for a passing vehicle, or 
 Your party waits for a while, but no cars come. The sun begins to set in the sky. Right when everyone is about to go to bed, you see a light in the distance.
 It starts to get closer...
 `,
-        actionFilter: (state: StoryState) => state.waitedForVehicle === true,
+        filter: (state: StoryState) => state.waitedForVehicle === true,
         options: [next]
     },
     {
         prompt: `It can't be a car, it's moving much too fast...`,
-        actionFilter: (state: StoryState) => true,
+        filter: (state: StoryState) => true,
         options: [next]
     },
     {
         prompt: `And all of a sudden, it's a above you, a greal whirling metal cylinder. A beam of light descends..`,
-        actionFilter: (state: StoryState) => true,
+        filter: (state: StoryState) => true,
         options: [
             {
                 title: "Hide inside the car",
@@ -69,7 +69,7 @@ It starts to get closer...
 'Get in!' You all pile into the car. As you peek your heads outside the window, you see two shapes emerge from the light.
 
 `,
-        actionFilter: (state: StoryState) => state.hideInsideCar === true,
+        filter: (state: StoryState) => state.hideInsideCar === true,
         options: [next]
     },
 ]

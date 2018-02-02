@@ -14,7 +14,7 @@ const defaultState = {
 const actions: StoryAction[] = [
     {
         prompt: 'You see an apple on the floor.',
-        actionFilter: (state: StoryState) => true,
+        filter: (state: StoryState) => true,
         options: [
             {
                 title: 'Pick it up',
@@ -26,7 +26,7 @@ const actions: StoryAction[] = [
     },
     {
         prompt: 'The apple is covered in mold.',
-        actionFilter: (state: StoryState) => state.applePickedUp === true,
+        filter: (state: StoryState) => state.applePickedUp === true,
         options: [
             {
                 title: 'Eat apple',
@@ -41,12 +41,12 @@ const actions: StoryAction[] = [
     },
     {
         prompt: 'You live a happy and successful life.',
-        actionFilter: (state: StoryState) => state.appleEaten === false,
+        filter: (state: StoryState) => state.appleEaten === false,
         options: []
     },
     {
         prompt: 'You begin to feel ill. Your head hits the ground, and you being convulsing. A black void grows before you.',
-        actionFilter: (state: StoryState) => state.appleEaten === true,
+        filter: (state: StoryState) => state.appleEaten === true,
         options: [
             {
                 title: 'Approach the void',
@@ -58,12 +58,12 @@ const actions: StoryAction[] = [
     },
     {
         prompt: 'You are consumed. Game over.',
-        actionFilter: (state: StoryState) => state.voidApproached === true,
+        filter: (state: StoryState) => state.voidApproached === true,
         options: []
     },
     {
         prompt: 'You live a happy and fruitful life.',
-        actionFilter: (state: StoryState) => state.voidApproached === false,
+        filter: (state: StoryState) => state.voidApproached === false,
         options: []
     }
 ]
