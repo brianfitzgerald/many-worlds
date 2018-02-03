@@ -28,7 +28,7 @@ type PartyViewProps = {
   story: Story;
   currentPlayerName: string;
   roomCode: string;
-  dispatch?: (func: { type: string; value: RoomState }) => void;
+  onFinish: () => void;
 };
 
 type PartyViewState = {
@@ -182,7 +182,9 @@ export default class PartyView extends React.Component<
     }
   }
 
-  _finishStory() {}
+  _finishStory() {
+    this.props.onFinish();
+  }
 
   render() {
     const currentAction = getActionByIndex(

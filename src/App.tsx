@@ -43,7 +43,7 @@ export default class App extends React.Component<AppProps, AppState> {
     super(props);
 
     const player: Player = {
-      name: "Gary",
+      name: "",
       conditions: [],
       inventory: [],
       abilities: []
@@ -97,6 +97,12 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  onFinish() {
+    this.setState({
+      inRoom: false
+    });
+  }
+
   showRoomSetup() {
     this.setState({ createRoomModalVisible: true });
   }
@@ -121,12 +127,6 @@ export default class App extends React.Component<AppProps, AppState> {
           story
         });
       });
-    });
-  }
-
-  selectStory(story: Story) {
-    this.setState({
-      selectedStoryID: story.id
     });
   }
 
@@ -176,6 +176,7 @@ export default class App extends React.Component<AppProps, AppState> {
           currentPlayerName={this.state.playerName}
           story={this.state.story}
           roomCode={this.state.roomCode}
+          onFinish={this.onFinish.bind(this)}
         />
       );
     }
