@@ -3,6 +3,7 @@ import {
   Platform,
   StyleSheet,
   Text,
+  Modal,
   View,
   TextInput,
   StatusBar,
@@ -24,12 +25,14 @@ import HeroButton from "./components/HeroButton";
 import { joinRoom, createRoom, roomDefaultState } from "./firebaseFunctions";
 import { getStory } from "./actions/StoryDB";
 import colors from "./styles/colors";
+import RoomSetupView from "./pages/RoomSetupView";
 
 type AppState = {
   story: Story;
   playerName: string;
   roomCode: string;
   inRoom: boolean;
+  createRoomModalVisible: boolean;
 };
 
 type AppProps = {};
@@ -51,7 +54,8 @@ export default class App extends React.Component<AppProps, AppState> {
       playerName: "",
       story,
       roomCode: "",
-      inRoom: false
+      inRoom: false,
+      createRoomModalVisible: false
     };
   }
 
@@ -91,6 +95,14 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  showRoomSetup() {
+    this.setState({ createRoomModalVisible: true });
+  }
+
+  hideRoomSetup() {
+    this.setState({ createRoomModalVisible: false });
+  }
+
   createRoom() {
     const { playerName } = this.state;
     const dummyStoryID = roomDefaultState.storyID;
@@ -99,6 +111,7 @@ export default class App extends React.Component<AppProps, AppState> {
         this._updateUsername();
         this.setState({
           inRoom: true,
+          createRoomModalVisible: false,
           roomCode,
           story
         });
@@ -113,6 +126,12 @@ export default class App extends React.Component<AppProps, AppState> {
       page = (
         <View style={commonStyles.container}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
+          <Modal visible={this.state.createRoomModalVisible}>
+            <RoomSetupView
+              onStoryBeginPressed={this.createRoom}
+              onCloseModal={this.hideRoomSetup}
+            />
+          </Modal>
           <Text style={commonStyles.headerText}>What is your name?</Text>
           <TextInput
             placeholder="Name"
@@ -131,12 +150,12 @@ export default class App extends React.Component<AppProps, AppState> {
           />
           <HeroButton
             style={commonStyles.heroButtonMargins}
-            title="Join"
+            title="Join Game"
             onPress={this.joinRoom.bind(this)}
           />
           <HeroButton
-            title="Create Room"
-            onPress={this.createRoom.bind(this)}
+            title="Start New Game"
+            onPress={this.showRoomSetup.bind(this)}
           />
         </View>
       );

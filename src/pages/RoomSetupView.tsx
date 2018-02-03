@@ -7,7 +7,8 @@ import {
   StatusBar,
   View,
   ScrollViewProps,
-  ScrollViewStatic
+  ScrollViewStatic,
+  Button
 } from "react-native";
 import commonStyles from "../styles/commonStyles";
 import HeroButton from "../components/HeroButton";
@@ -27,10 +28,8 @@ import { storyStore } from "../actions/StoryDB";
 import StoryListItem from "../components/StoryListItem";
 
 type RoomSetupViewProps = {
-  story: Story;
-  currentPlayerName: string;
-  roomCode: string;
   onStoryBeginPressed: () => void;
+  onCloseModal: () => void;
 };
 
 type RoomSetupViewState = {
@@ -49,12 +48,21 @@ export default class PartyView extends React.Component<
     };
   }
 
-  selectStory(story: Story) {}
+  selectStory(story: Story) {
+    this.setState({
+      selectedStoryID: story.id
+    });
+  }
 
   render() {
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
+        <Button
+          title="Cancel"
+          color={colors.white}
+          onPress={this.props.onCloseModal}
+        />
         {storyStore.map((story, i) => (
           <StoryListItem
             key={i}
