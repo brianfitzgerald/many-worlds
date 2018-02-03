@@ -21,9 +21,14 @@ type StoryListItemProps = {
   selected: boolean;
 };
 
-const StoryListItem: React.SFC<StoryListItemProps> = ({ story, onPress }) => {
+const StoryListItem: React.SFC<StoryListItemProps> = ({
+  story,
+  onPress,
+  selected
+}) => {
   return (
     <TouchableOpacity onPress={onPress}>
+      {selected ? <Text style={{ color: colors.white }}>Selected</Text> : null}
       <View style={styles.ItemBase}>
         <Text style={styles.StoryName}>{story.name}</Text>
         <Text style={styles.StoryDescription}>{story.description}</Text>
@@ -38,9 +43,11 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     minHeight: 50,
+    marginBottom: 15,
+    marginTop: 15,
     backgroundColor: colors.white,
     borderRadius: 10,
-    minWidth: 200
+    minWidth: 300
   },
   StoryName: {
     textAlign: "center",

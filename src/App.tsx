@@ -33,6 +33,7 @@ type AppState = {
   roomCode: string;
   inRoom: boolean;
   createRoomModalVisible: boolean;
+  selectedStoryID: string;
 };
 
 type AppProps = {};
@@ -55,7 +56,8 @@ export default class App extends React.Component<AppProps, AppState> {
       story,
       roomCode: "",
       inRoom: false,
-      createRoomModalVisible: false
+      createRoomModalVisible: false,
+      selectedStoryID: ""
     };
   }
 
@@ -103,11 +105,10 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({ createRoomModalVisible: false });
   }
 
-  createRoom() {
+  createRoom(storyID: string) {
     const { playerName } = this.state;
-    const dummyStoryID = roomDefaultState.storyID;
     createRoom(playerName).then((roomCode: string) => {
-      const story = getStory(dummyStoryID).then((story: Story) => {
+      const story = getStory(storyID).then((story: Story) => {
         this._updateUsername();
         this.setState({
           inRoom: true,
@@ -116,6 +117,12 @@ export default class App extends React.Component<AppProps, AppState> {
           story
         });
       });
+    });
+  }
+
+  selectStory(story: Story) {
+    this.setState({
+      selectedStoryID: story.id
     });
   }
 
@@ -128,8 +135,8 @@ export default class App extends React.Component<AppProps, AppState> {
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <Modal visible={this.state.createRoomModalVisible}>
             <RoomSetupView
-              onStoryBeginPressed={this.createRoom}
-              onCloseModal={this.hideRoomSetup}
+              onStoryBeginPressed={this.createRoom.bind(this)}
+              onCloseModal={this.hideRoomSetup.bind(this)}
             />
           </Modal>
           <Text style={commonStyles.headerText}>What is your name?</Text>

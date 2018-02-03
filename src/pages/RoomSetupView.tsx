@@ -71,7 +71,13 @@ export default class PartyView extends React.Component<
             onPress={this.selectStory.bind(this, story)}
           />
         ))}
-        <HeroButton title="Begin" onPress={this.props.onStoryBeginPressed} />
+        <HeroButton
+          title="Begin"
+          onPress={this.props.onStoryBeginPressed.bind(
+            this,
+            this.state.selectedStoryID
+          )}
+        />
       </View>
     );
   }
