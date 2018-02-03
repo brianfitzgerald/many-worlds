@@ -7,13 +7,20 @@ import brimblewood from "../stories/brimblewood";
 import castleInTheSand from "../stories/castleInTheSand";
 
 // Mock story database, will be replaced with DynamoDB actions at a later point
-const storyStore: Story[] = [outOfTheCave, appleDisaster, demonsInTheDust, brimblewood, castleInTheSand]
+export const storyStore: Story[] = [
+  outOfTheCave,
+  appleDisaster,
+  demonsInTheDust,
+  brimblewood,
+  castleInTheSand
+];
 
-export const getStory = (id: string) => new Promise<Story>((resolve, reject) => {
-    const result = storyStore.find((s) => s.id === id)
+export const getStory = (id: string) =>
+  new Promise<Story>((resolve, reject) => {
+    const result = storyStore.find(s => s.id === id);
     if (result) {
-        resolve(result)
+      resolve(result);
     } else {
-        reject('no such room found')
+      reject("no such room found");
     }
-})
+  });

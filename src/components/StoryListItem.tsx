@@ -13,25 +13,27 @@ import * as React from "react";
 
 import commonStyles from "../styles/commonStyles";
 import colors from "../styles/colors";
+import { Story } from "../types/Story";
 
-type HeroButtonProps = {
-  title: string;
+type StoryListItemProps = {
+  story: Story;
   onPress: () => void;
-  style?: StyleProp<ViewStyle>;
+  selected: boolean;
 };
 
-const HeroButton: React.SFC<HeroButtonProps> = ({ title, onPress, style }) => {
+const StoryListItem: React.SFC<StoryListItemProps> = ({ story, onPress }) => {
   return (
-    <TouchableOpacity style={style} onPress={onPress}>
-      <View style={styles.HeroButton}>
-        <Text style={styles.HeroButtonTitle}>{title}</Text>
+    <TouchableOpacity onPress={onPress}>
+      <View style={styles.ItemBase}>
+        <Text style={styles.StoryName}>{story.name}</Text>
+        <Text style={styles.StoryDescription}>{story.description}</Text>
       </View>
     </TouchableOpacity>
   );
 };
 
 const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
-  HeroButton: {
+  ItemBase: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -40,11 +42,16 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
     borderRadius: 10,
     minWidth: 200
   },
-  HeroButtonTitle: {
+  StoryName: {
     textAlign: "center",
     fontSize: 24,
+    color: colors.black
+  },
+  StoryDescription: {
+    textAlign: "left",
+    fontSize: 12,
     color: colors.black
   }
 });
 
-export default HeroButton;
+export default StoryListItem;

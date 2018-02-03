@@ -1,43 +1,43 @@
 import { InventoryItem, Condition, Ability } from "./Player";
 
-
 export type Story = {
-    id: string
-    name: string
-    actions: StoryAction[]
-    defaultState: StoryState
-}
+  id: string;
+  name: string;
+  description?: string;
+  actions: StoryAction[];
+  defaultState: StoryState;
+};
 
 export type StoryState = {
-    [key: string]: string | boolean
-}
+  [key: string]: string | boolean;
+};
 
-export type HistoryItem = string
+export type HistoryItem = string;
 
 export type StoryOption = {
-    title: string
-    action?: StoryState
-    playerStateChange?: {
-        allPlayers?: PlayerStateChange
-        self?: PlayerStateChange
-    },
-    response?: string
-    type?: 'end'
-}
+  title: string;
+  action?: StoryState;
+  playerStateChange?: {
+    allPlayers?: PlayerStateChange;
+    self?: PlayerStateChange;
+  };
+  response?: string;
+  type?: "end";
+};
 
 export type StoryAction = {
-    type?: 'boolean' | 'end'
-    prompt: string
-    filter?: (state: StoryState) => boolean
-    options?: StoryOption[]
-}
+  type?: "boolean" | "end";
+  prompt: string;
+  filter?: (state: StoryState) => boolean;
+  options?: StoryOption[];
+};
 
 type PlayerStateChange = {
-    newItems?: InventoryItem[]
-    newConditions?: Condition[]
-    newAbilities?: Ability[]
+  newItems?: InventoryItem[];
+  newConditions?: Condition[];
+  newAbilities?: Ability[];
 
-    lostItems?: InventoryItem[]
-    lostConditions?: Condition[]
-    lostAbilities?: Ability[]
-}
+  lostItems?: InventoryItem[];
+  lostConditions?: Condition[];
+  lostAbilities?: Ability[];
+};

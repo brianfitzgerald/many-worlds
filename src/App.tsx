@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 import {
   Platform,
   StyleSheet,
@@ -7,123 +7,139 @@ import {
   TextInput,
   StatusBar,
   AsyncStorage
-} from 'react-native';
+} from "react-native";
 
-const usernameStorageKey = 'username_entry'
+const usernameStorageKey = "username_entry";
 
-import PartyView from './pages/PartyView'
+import PartyView from "./pages/PartyView";
 
-import outOfTheCave from './stories/outOfTheCave'
-import appleDisaster from './stories/appleDisaster'
+import outOfTheCave from "./stories/outOfTheCave";
+import appleDisaster from "./stories/appleDisaster";
 
+import commonStyles from "./styles/commonStyles";
 
-import commonStyles from './styles/commonStyles';
-
-import { Player } from './types/Player';
-import { Story } from './types/Story';
-import HeroButton from './components/HeroButton';
-import { joinRoom, createRoom, roomDefaultState } from './firebaseFunctions';
-import { getStory } from './actions/StoryDB';
-import colors from './styles/colors';
+import { Player } from "./types/Player";
+import { Story } from "./types/Story";
+import HeroButton from "./components/HeroButton";
+import { joinRoom, createRoom, roomDefaultState } from "./firebaseFunctions";
+import { getStory } from "./actions/StoryDB";
+import colors from "./styles/colors";
 
 type AppState = {
-  story: Story
-  playerName: string
-  roomCode: string
-  inRoom: boolean
-}
+  story: Story;
+  playerName: string;
+  roomCode: string;
+  inRoom: boolean;
+};
 
-type AppProps = {}
+type AppProps = {};
 
-export default class App extends React.Component<AppProps,AppState>  {
-
+export default class App extends React.Component<AppProps, AppState> {
   constructor(props: any) {
-    super(props)
+    super(props);
 
     const player: Player = {
-      name: 'Gary',
+      name: "Gary",
       conditions: [],
       inventory: [],
       abilities: []
-    }
-    const connectedPlayers = [player]
-    const story = outOfTheCave
+    };
+    const connectedPlayers = [player];
+    const story = outOfTheCave;
 
     this.state = {
-      playerName: '',
+      playerName: "",
       story,
-      roomCode: '',
+      roomCode: "",
       inRoom: false
-    }
-
+    };
   }
 
   componentWillMount() {
-    this._loadUsername()
+    this._loadUsername();
   }
 
   _loadUsername() {
-    const storedUsername = AsyncStorage.getItem(usernameStorageKey).then((value) => {
+    const storedUsername = AsyncStorage.getItem(usernameStorageKey)
+      .then(value => {
         if (value !== null) {
-            this.setState({ playerName: value })
+          this.setState({ playerName: value });
         }
-    }).catch((error) => console.warn(error))
+      })
+      .catch(error => console.warn(error));
   }
 
   _updateUsername() {
-    AsyncStorage.setItem(usernameStorageKey, this.state.playerName)
+    AsyncStorage.setItem(usernameStorageKey, this.state.playerName);
   }
 
   joinRoom() {
-    const { roomCode, playerName } = this.state
+    const { roomCode, playerName } = this.state;
     joinRoom(roomCode, playerName).then((storyID: string) => {
-      const story = getStory(storyID).then((story: Story) => {
-        this._updateUsername()
-        this.setState({
-          inRoom: true,
-          story,
-          roomCode
+      const story = getStory(storyID)
+        .then((story: Story) => {
+          this._updateUsername();
+          this.setState({
+            inRoom: true,
+            story,
+            roomCode
+          });
         })
-      }).catch((e) => {
-        console.log(e);
-      })
-    })
+        .catch(e => {
+          console.log(e);
+        });
+    });
   }
 
   createRoom() {
-    const { playerName } = this.state
-    const dummyStoryID = roomDefaultState.storyID
+    const { playerName } = this.state;
+    const dummyStoryID = roomDefaultState.storyID;
     createRoom(playerName).then((roomCode: string) => {
       const story = getStory(dummyStoryID).then((story: Story) => {
-        this._updateUsername()
+        this._updateUsername();
         this.setState({
           inRoom: true,
           roomCode,
           story
-        })  
-      })
-    })
+        });
+      });
+    });
   }
 
-  render() {    
-
-    let page = null
+  render() {
+    let page = null;
 
     if (!this.state.inRoom) {
       page = (
         <View style={commonStyles.container}>
-          <StatusBar
-                backgroundColor={colors.black}
-                barStyle="light-content"
-          />
+          <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <Text style={commonStyles.headerText}>What is your name?</Text>
-          <TextInput placeholder="Name" placeholderTextColor={colors.grey} style={commonStyles.textInput} value={this.state.playerName} onChangeText={(val) => this.setState({ playerName: val })} />
+          <TextInput
+            placeholder="Name"
+            placeholderTextColor={colors.grey}
+            style={commonStyles.textInput}
+            value={this.state.playerName}
+            onChangeText={val => this.setState({ playerName: val })}
+          />
           <Text style={commonStyles.headerText}>Where are you going?</Text>
-          <TextInput placeholder="Room Code" placeholderTextColor={colors.grey} style={commonStyles.textInput} value={this.state.roomCode} onChangeText={(val) => this.setState({ roomCode: val })} />
-          <HeroButton style={commonStyles.heroButtonMargins} title="Join" onPress={this.joinRoom.bind(this)} />
-          <HeroButton title="Create Room" onPress={this.createRoom.bind(this)} />
+          <TextInput
+            placeholder="Room Code"
+            placeholderTextColor={colors.grey}
+            style={commonStyles.textInput}
+            value={this.state.roomCode}
+            onChangeText={val => this.setState({ roomCode: val })}
+          />
+          <HeroButton
+            style={commonStyles.heroButtonMargins}
+            title="Join"
+            onPress={this.joinRoom.bind(this)}
+          />
+          <HeroButton
+            title="Create Room"
+            onPress={this.createRoom.bind(this)}
+          />
         </View>
-      )
+      );
     } else {
       page = (
         <PartyView
@@ -131,9 +147,9 @@ export default class App extends React.Component<AppProps,AppState>  {
           story={this.state.story}
           roomCode={this.state.roomCode}
         />
-      )  
+      );
     }
 
-    return page
+    return page;
   }
 }
