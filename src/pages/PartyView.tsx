@@ -36,7 +36,7 @@ type PartyViewState = {
   currentTimer: number;
 };
 
-const TIMER_AMOUNT = 8;
+const TIMER_AMOUNT = 14;
 
 const getPlayersWhoSelectedOption = (
   optionIndex: number,
@@ -95,6 +95,7 @@ export default class PartyView extends React.Component<
 
   componentDidMount() {
     const matchID = this.props.roomCode;
+    // room update listener
     dbInstance.ref(`/rooms/${matchID}/`).on("value", snap => {
       const updatedRoomState: FirebaseRoomState = snap
         ? (snap.val() as RoomState)
@@ -195,9 +196,9 @@ export default class PartyView extends React.Component<
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
-        <View>
-          <Text style={{ color: "white" }}>Room {this.props.roomCode}</Text>
-          <Text style={{ color: "white" }}>
+        <View style={styles.header}>
+          <Text style={styles.roomCode}>{this.props.roomCode}</Text>
+          <Text style={styles.timer}>
             {this.state.currentTimer} Seconds Left
           </Text>
         </View>
@@ -267,5 +268,21 @@ const styles = StyleSheet.create({
     marginTop: 4,
     paddingLeft: 5,
     paddingRight: 5
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  timer: {
+    flex: 2,
+    color: colors.white,
+    textAlign: "right",
+    fontSize: 18
+  },
+  roomCode: {
+    flex: 1,
+    color: colors.white,
+    textAlign: "left",
+    fontSize: 20
   }
 });
