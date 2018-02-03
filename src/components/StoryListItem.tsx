@@ -28,30 +28,31 @@ const StoryListItem: React.SFC<StoryListItemProps> = ({
 }) => {
   return (
     <TouchableOpacity onPress={onPress}>
-      {selected ? <Text style={{ color: colors.white }}>Selected</Text> : null}
       <View style={styles.ItemBase}>
         <Text style={styles.StoryName}>{story.name}</Text>
         <Text style={styles.StoryDescription}>{story.description}</Text>
       </View>
+      {selected ? <Text style={{ color: colors.white }}>Selected</Text> : null}
     </TouchableOpacity>
   );
 };
 
 const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
   ItemBase: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: "column",
+    paddingTop: 5,
+    padding: 15,
     minHeight: 50,
-    marginBottom: 15,
+    marginBottom: 5,
     marginTop: 15,
     backgroundColor: colors.white,
     borderRadius: 10,
     minWidth: 300
   },
   StoryName: {
-    textAlign: "center",
+    textAlign: "left",
     fontSize: 24,
+    backgroundColor: "transparent",
     color: colors.black
   },
   StoryDescription: {

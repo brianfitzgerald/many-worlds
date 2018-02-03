@@ -106,6 +106,10 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   createRoom(storyID: string) {
+    if (storyID === "") {
+      alert("Select a story first.");
+      return;
+    }
     const { playerName } = this.state;
     createRoom(playerName).then((roomCode: string) => {
       const story = getStory(storyID).then((story: Story) => {

@@ -63,14 +63,16 @@ export default class PartyView extends React.Component<
           color={colors.white}
           onPress={this.props.onCloseModal}
         />
-        {storyStore.map((story, i) => (
-          <StoryListItem
-            key={i}
-            story={story}
-            selected={story.id === this.state.selectedStoryID}
-            onPress={this.selectStory.bind(this, story)}
-          />
-        ))}
+        <ScrollView>
+          {storyStore.map((story, i) => (
+            <StoryListItem
+              key={i}
+              story={story}
+              selected={story.id === this.state.selectedStoryID}
+              onPress={this.selectStory.bind(this, story)}
+            />
+          ))}
+        </ScrollView>
         <HeroButton
           title="Begin"
           onPress={this.props.onStoryBeginPressed.bind(
