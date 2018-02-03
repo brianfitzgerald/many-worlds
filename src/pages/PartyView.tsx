@@ -7,7 +7,8 @@ import {
   StatusBar,
   View,
   ScrollViewProps,
-  ScrollViewStatic
+  ScrollViewStatic,
+  Button
 } from "react-native";
 import commonStyles from "../styles/commonStyles";
 import HeroButton from "../components/HeroButton";
@@ -36,7 +37,7 @@ type PartyViewState = {
   currentTimer: number;
 };
 
-const TIMER_AMOUNT = 14;
+const TIMER_AMOUNT = 14000;
 
 const getPlayersWhoSelectedOption = (
   optionIndex: number,
@@ -274,12 +275,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   timer: {
+    paddingTop: 6,
     flex: 2,
     color: colors.white,
     textAlign: "right",
     fontSize: 18
   },
   roomCode: {
+    paddingTop: 5,
     flex: 1,
     color: colors.white,
     textAlign: "left",

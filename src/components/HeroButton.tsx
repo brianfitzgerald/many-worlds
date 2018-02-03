@@ -39,7 +39,9 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 10,
     minWidth: 200,
-    padding: 5
+    padding: 5,
+    paddingLeft: 15,
+    paddingRight: 15
   },
   HeroButtonTitle: {
     textAlign: "center",
