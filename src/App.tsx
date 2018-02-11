@@ -75,34 +75,34 @@ export default class App extends React.Component<AppProps, AppState> {
   joinRoom() {
     const { roomCode, playerName } = this.state
     joinRoom(roomCode, playerName).then((storyID: string) => {
-      const story = getStory(storyID)
-        .then((story: Story) => {
-          this._updateUsername()
-          this.setState({
-            inRoom: true,
-            story,
-            roomCode
-          })
+      const story = getStory(storyID).then((story: Story) => {
+        this._updateUsername()
+        this.setState({
+          inRoom: true,
+          story,
+          roomCode
         })
-        .catch(e => {
-          console.log(e)
-        })
+      })
     })
   }
 
   createRoom() {
     const { playerName } = this.state
     const dummyStoryID = roomDefaultState.storyID
-    createRoom(playerName).then((roomCode: string) => {
-      const story = getStory(dummyStoryID).then((story: Story) => {
-        this._updateUsername()
-        this.setState({
-          inRoom: true,
-          roomCode,
-          story
-        })
+    createRoom(playerName)
+      .then((roomCode: string) => {
+        const story = getStory(dummyStoryID)
+          .then((story: Story) => {
+            this._updateUsername()
+            this.setState({
+              inRoom: true,
+              roomCode,
+              story
+            })
+          })
+          .catch(err => console.log(err))
       })
-    })
+      .catch(err => console.log(err))
   }
 
   render() {
