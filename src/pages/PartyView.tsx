@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from "react"
 import {
   Platform,
   StyleSheet,
@@ -7,100 +7,96 @@ import {
   StatusBar,
   View,
   ScrollViewProps,
-  ScrollViewStatic,
-  Button
-} from "react-native";
-import commonStyles from "../styles/commonStyles";
-import HeroButton from "../components/HeroButton";
-import colors from "../styles/colors";
+  ScrollViewStatic
+} from "react-native"
+import commonStyles from "../styles/commonStyles"
+import HeroButton from "../components/HeroButton"
+import colors from "../styles/colors"
 
-import { dbInstance } from "../firebaseRef";
-import { Story, StoryOption } from "../types/Story";
-import { Player } from "../types/Player";
+import { dbInstance } from "../firebaseRef"
+import { Story, StoryOption } from "../types/Story"
+import { Player } from "../types/Player"
 import {
   getNextActionIndex,
   doAction,
   getActionByIndex
-} from "../actions/Story";
-import { RoomState, FirebaseRoomState } from "../types/Network";
-import { roomDefaultState, updateRoomState } from "../firebaseFunctions";
+} from "../actions/Story"
+import { RoomState, FirebaseRoomState } from "../types/Network"
+import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 
 type PartyViewProps = {
-  story: Story;
-  currentPlayerName: string;
-  roomCode: string;
-  onFinish: () => void;
-};
+  story?: Story
+  currentPlayerName: string
+  roomCode: string
+  dispatch?: (func: { type: string; value: RoomState }) => void
+}
 
 type PartyViewState = {
-  roomState: RoomState;
-  currentTimer: number;
-};
+  roomState: RoomState
+  currentTimer: number
+}
 
-const TIMER_AMOUNT = 14000;
+const TIMER_AMOUNT = 14000
 
 const getPlayersWhoSelectedOption = (
   optionIndex: number,
   roomState: RoomState
 ) =>
-  roomState.connectedPlayers.filter(p => p.selectedChoiceIndex === optionIndex);
+  roomState.connectedPlayers.filter(p => p.selectedChoiceIndex === optionIndex)
 const getCurrentBestSelection = (roomState: RoomState): number => {
   const playerVotes = roomState.connectedPlayers.map(
     (p: Player, i: number) => ({
       index: i,
       amount: p.selectedChoiceIndex ? p.selectedChoiceIndex : 0
     })
-  );
+  )
   const sortedPlayerVotes = playerVotes.sort(
     (a, b) => (a && b ? a.amount - b.amount : -1)
-  );
-  return sortedPlayerVotes[0].index;
-};
+  )
+  return sortedPlayerVotes[0].index
+}
 
 export default class PartyView extends React.Component<
   PartyViewProps,
   PartyViewState
 > {
-  private intervalRef: NodeJS.Timer | undefined;
-  private timeoutRef: NodeJS.Timer | undefined;
+  private intervalRef: NodeJS.Timer | undefined
+  private timeoutRef: NodeJS.Timer | undefined
 
-  refs: {
-    scrollView: any;
-  };
+  refs: any
 
   constructor(props: PartyViewProps) {
-    super(props);
+    super(props)
 
     this.state = {
       roomState: roomDefaultState,
       currentTimer: 0
-    };
+    }
 
-    this._executeAction = this._executeAction.bind(this);
+    this._executeAction = this._executeAction.bind(this)
   }
 
   _resetTimer() {
     if (this.intervalRef && this.timeoutRef) {
-      clearInterval(this.intervalRef);
-      clearTimeout(this.timeoutRef);
+      clearInterval(this.intervalRef)
+      clearTimeout(this.timeoutRef)
     }
-    this.setState({ currentTimer: TIMER_AMOUNT });
+    this.setState({ currentTimer: TIMER_AMOUNT })
     this.intervalRef = setInterval(() => {
-      this.setState({ currentTimer: this.state.currentTimer - 1 });
-    }, 1000);
+      this.setState({ currentTimer: this.state.currentTimer - 1 })
+    }, 1000)
     this.timeoutRef = setTimeout(() => {
-      this._executeAction(getCurrentBestSelection(this.state.roomState));
-      this._resetTimer();
-    }, TIMER_AMOUNT * 1000);
+      this._executeAction(getCurrentBestSelection(this.state.roomState))
+      this._resetTimer()
+    }, TIMER_AMOUNT * 1000)
   }
 
   componentDidMount() {
-    const matchID = this.props.roomCode;
-    // room update listener
+    const matchID = this.props.roomCode
     dbInstance.ref(`/rooms/${matchID}/`).on("value", snap => {
       const updatedRoomState: FirebaseRoomState = snap
         ? (snap.val() as RoomState)
-        : roomDefaultState;
+        : roomDefaultState
       // this should be the only place where room state is updated
       const safeRoomState: RoomState = {
         status: updatedRoomState.status,
@@ -109,90 +105,98 @@ export default class PartyView extends React.Component<
         connectedPlayers: updatedRoomState.connectedPlayers || [],
         storyState: updatedRoomState.storyState || { status: "in_play" },
         history: updatedRoomState.history || []
-      };
-      this.setState({ roomState: safeRoomState });
-    });
-    this._resetTimer();
+      }
+      this.setState({ roomState: safeRoomState })
+    })
+    this._resetTimer()
   }
 
   _executeAction(optionIndex: number) {
-    const scrollRef = this.refs.scrollView as ScrollViewStatic;
+    if (!this.props.story) return
+
+    const scrollRef = this.refs.scrollView as ScrollViewStatic
 
     const currentAction = getActionByIndex(
       this.props.story,
       this.state.roomState.currentStoryIndex
-    );
+    )
 
     if (!currentAction.options) {
-      return;
+      return
     }
 
-    const option = currentAction.options[optionIndex];
+    const option = currentAction.options[optionIndex]
 
     if (option.response) {
-      alert(option.response);
+      alert(option.response)
     }
 
-    const currentStoryIndex = this.state.roomState.currentStoryIndex;
+    const currentStoryIndex = this.state.roomState.currentStoryIndex
     const nextStoryIndex = getNextActionIndex(
       this.props.story,
       this.state.roomState.storyState,
       currentStoryIndex
-    );
+    )
     const newState = doAction(
       this.state.roomState,
       this.props.story,
       currentStoryIndex,
       option
-    );
+    )
 
-    newState.currentStoryIndex = nextStoryIndex;
+    newState.currentStoryIndex = nextStoryIndex
 
     updateRoomState(this.props.roomCode, newState).then(() => {
       if (scrollRef) {
-        scrollRef.scrollToEnd();
+        scrollRef.scrollToEnd()
       }
-      this._resetTimer();
-    });
+      this._resetTimer()
+    })
   }
 
   _chooseAction(optionIndex: number) {
     const numPlayersWhoConcur = getPlayersWhoSelectedOption(
       optionIndex,
       this.state.roomState
-    );
+    )
 
     if (
       numPlayersWhoConcur.length ===
       this.state.roomState.connectedPlayers.length
     ) {
-      this._executeAction(optionIndex);
+      this._executeAction(optionIndex)
     } else {
       const newConnectedPlayersState = this.state.roomState.connectedPlayers.map(
         p => {
           if (p.name === this.props.currentPlayerName) {
-            p.selectedChoiceIndex = optionIndex;
+            p.selectedChoiceIndex = optionIndex
           }
-          return p;
+          return p
         }
-      );
+      )
 
-      const newRoomState = this.state.roomState;
-      newRoomState.connectedPlayers = newConnectedPlayersState;
+      const newRoomState = this.state.roomState
+      newRoomState.connectedPlayers = newConnectedPlayersState
 
-      updateRoomState(this.props.roomCode, newRoomState);
+      updateRoomState(this.props.roomCode, newRoomState)
     }
   }
 
-  _finishStory() {
-    this.props.onFinish();
-  }
+  _finishStory() {}
 
   render() {
+    if (!this.props.story) {
+      return (
+        <View style={[commonStyles.container, styles.partyContainer]}>
+          <Text style={styles.roomCode}>Loading</Text>
+        </View>
+      )
+    }
+
     const currentAction = getActionByIndex(
       this.props.story,
       this.state.roomState.currentStoryIndex
-    );
+    )
 
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
@@ -241,7 +245,7 @@ export default class PartyView extends React.Component<
           ) : null}
         </View>
       </View>
-    );
+    )
   }
 }
 
@@ -288,4 +292,4 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontSize: 20
   }
-});
+})

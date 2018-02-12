@@ -5,15 +5,15 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "start-ts": "tsc --watch & npm run start",
+    "updateStory": "node lib/updateStoryCLI",
     "build": "tsc",
     "test": "jest"
   },
   "dependencies": {
+    "aws-sdk": "^2.189.0",
     "firebase": "^4.8.2",
     "react": "16.0.0",
-    "react-native": "0.51.0",
-    "tslint-config-prettier": "^1.7.0",
-    "tslint-react": "^3.4.0"
+    "react-native": "0.51.0"
   },
   "devDependencies": {
     "@types/jest": "^22.0.1",
@@ -28,11 +28,7 @@
   },
   "jest": {
     "preset": "react-native",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
+    "moduleFileExtensions": ["ts", "tsx", "js"],
     "transform": {
       "^.+\\.(js)$": "<rootDir>/node_modules/babel-jest",
       "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"

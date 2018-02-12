@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from "react"
 import {
   Platform,
   StyleSheet,
@@ -9,52 +9,114 @@ import {
   ScrollViewProps,
   ScrollViewStatic,
   Button
-} from "react-native";
-import commonStyles from "../styles/commonStyles";
-import HeroButton from "../components/HeroButton";
-import colors from "../styles/colors";
+} from "react-native"
+import commonStyles from "../styles/commonStyles"
+import HeroButton from "../components/HeroButton"
+import colors from "../styles/colors"
 
-import { dbInstance } from "../firebaseRef";
-import { Story, StoryOption } from "../types/Story";
-import { Player } from "../types/Player";
+import { dbInstance } from "../firebaseRef"
+import { Story, StoryOption } from "../types/Story"
+import { Player } from "../types/Player"
 import {
   getNextActionIndex,
   doAction,
   getActionByIndex
-} from "../actions/Story";
-import { RoomState, FirebaseRoomState } from "../types/Network";
-import { roomDefaultState, updateRoomState } from "../firebaseFunctions";
-import { storyStore } from "../actions/StoryDB";
-import StoryListItem from "../components/StoryListItem";
+} from "../actions/Story"
+import { RoomState, FirebaseRoomState } from "../types/Network"
+import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
+import StoryListItem from "../components/StoryListItem"
+import { getAllStories } from "../actions/StoryDB"
 
 type RoomSetupViewProps = {
-  onStoryBeginPressed: () => void;
-  onCloseModal: () => void;
-};
+  onStoryBeginPressed: () => void
+  onCloseModal: () => void
+}
+
+type SortOption = "AverageRating" | "Alphabetical"
 
 type RoomSetupViewState = {
-  selectedStoryID: string;
-};
+  selectedStoryID: string
+  stories: Story[]
+  selectedSortOption: SortOption
+}
+
+const sortStories = (stories: Story[], option: SortOption): Story[] => {
+  if (option === "AverageRating") {
+    return stories.sort((a, b) => a.averageRating - b.averageRating)
+  }
+  if (option === "Alphabetical") {
+    return stories.sort((a, b) => {
+      if (a.name < b.name) return -1
+      if (a.name > b.name) return 1
+      return 0
+    })
+  }
+
+  return stories
+}
 
 export default class PartyView extends React.Component<
   RoomSetupViewProps,
   RoomSetupViewState
 > {
   constructor(props: RoomSetupViewProps) {
-    super(props);
+    super(props)
 
     this.state = {
-      selectedStoryID: ""
-    };
+      selectedStoryID: "",
+      stories: [],
+      selectedSortOption: "Alphabetical"
+    }
+  }
+
+  componentDidMount() {
+    getAllStories()
+      .then(stories => {
+        console.log(stories)
+        this.setState({ stories })
+      })
+      .catch(err => console.log(err))
   }
 
   selectStory(story: Story) {
     this.setState({
       selectedStoryID: story.id
-    });
+    })
+  }
+
+  changeSort(selectedSortOption: SortOption) {
+    this.setState({ selectedSortOption })
   }
 
   render() {
+    if (this.state.stories.length < 1) {
+      return (
+        <View style={[commonStyles.container, styles.partyContainer]}>
+          <Text style={styles.promptButton}>Loading...</Text>
+        </View>
+      )
+    }
+
+    const sortedStories = sortStories(
+      this.state.stories,
+      this.state.selectedSortOption
+    )
+
+    const sortButtons = (
+      <View>
+        <Button
+          color={colors.white}
+          title="Sort by Rating"
+          onPress={this.changeSort.bind(this, "AverageRating")}
+        />
+        <Button
+          color={colors.white}
+          title="Sort by Title"
+          onPress={this.changeSort.bind(this, "Alphabetical")}
+        />
+      </View>
+    )
+
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
@@ -63,8 +125,9 @@ export default class PartyView extends React.Component<
           color={colors.white}
           onPress={this.props.onCloseModal}
         />
+        {sortButtons}
         <ScrollView>
-          {storyStore.map((story, i) => (
+          {sortedStories.map((story: Story, i) => (
             <StoryListItem
               key={i}
               story={story}
@@ -81,7 +144,7 @@ export default class PartyView extends React.Component<
           )}
         />
       </View>
-    );
+    )
   }
 }
 
@@ -104,8 +167,11 @@ const styles = StyleSheet.create({
     color: "white"
   },
   promptButton: {
+    color: "white",
+    fontSize: 32,
     width: "100%",
+    textAlign: "center",
     marginBottom: 12,
     marginTop: 4
   }
-});
+})

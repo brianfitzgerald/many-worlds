@@ -59,3 +59,18 @@ lib/
 # Jest
 #
 .jest/
+
+#  Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
+*.tfvars
+
+# sensitive information
+src/secrets.ts
+**/secrets.ts
+src/secrets.ts
