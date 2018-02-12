@@ -69,3 +69,7 @@ lib/
 
 # .tfvars files
 *.tfvars
+
+# sensitive information
+src/secrets.ts
+lib/secrets.ts
