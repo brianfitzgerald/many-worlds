@@ -18,6 +18,7 @@ export type HistoryItem = string
 export type StoryOption = {
   title: string
   action?: StoryState
+  filter?: StoryState
   playerStateChange?: {
     allPlayers?: PlayerStateChange
     self?: PlayerStateChange
