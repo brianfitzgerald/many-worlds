@@ -71,3 +71,5 @@ lib/
 *.tfvars
 
 # sensitive information
+src/secrets.ts
+lib/secrets.ts
