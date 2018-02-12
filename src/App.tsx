@@ -3,6 +3,7 @@ import {
   Platform,
   StyleSheet,
   Text,
+  Modal,
   View,
   TextInput,
   StatusBar,
@@ -13,8 +14,6 @@ const usernameStorageKey = "username_entry"
 
 import PartyView from "./pages/PartyView"
 
-import appleDisaster from "./stories/appleDisaster"
-
 import commonStyles from "./styles/commonStyles"
 
 import { Player } from "./types/Player"
@@ -23,12 +22,15 @@ import HeroButton from "./components/HeroButton"
 import { joinRoom, createRoom, roomDefaultState } from "./firebaseFunctions"
 import { getStory } from "./actions/StoryDB"
 import colors from "./styles/colors"
+import RoomSetupView from "./pages/RoomSetupView"
 
 type AppState = {
-  story: Story
   playerName: string
   roomCode: string
+  story?: Story
   inRoom: boolean
+  createRoomModalVisible: boolean
+  selectedStoryID: string
 }
 
 type AppProps = {}
@@ -38,19 +40,19 @@ export default class App extends React.Component<AppProps, AppState> {
     super(props)
 
     const player: Player = {
-      name: "Gary",
+      name: "",
       conditions: [],
       inventory: [],
       abilities: []
     }
     const connectedPlayers = [player]
-    const story = appleDisaster
 
     this.state = {
       playerName: "",
-      story,
       roomCode: "",
-      inRoom: false
+      inRoom: false,
+      createRoomModalVisible: false,
+      selectedStoryID: ""
     }
   }
 
@@ -75,34 +77,52 @@ export default class App extends React.Component<AppProps, AppState> {
   joinRoom() {
     const { roomCode, playerName } = this.state
     joinRoom(roomCode, playerName).then((storyID: string) => {
+      const story = getStory(storyID)
+        .then((story: Story) => {
+          this._updateUsername()
+          this.setState({
+            inRoom: true,
+            story,
+            roomCode
+          })
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    })
+  }
+
+  onFinish() {
+    this.setState({
+      inRoom: false
+    })
+  }
+
+  showRoomSetup() {
+    this.setState({ createRoomModalVisible: true })
+  }
+
+  hideRoomSetup() {
+    this.setState({ createRoomModalVisible: false })
+  }
+
+  createRoom(storyID: string) {
+    if (storyID === "") {
+      alert("Select a story first.")
+      return
+    }
+    const { playerName } = this.state
+    createRoom(playerName).then((roomCode: string) => {
       const story = getStory(storyID).then((story: Story) => {
         this._updateUsername()
         this.setState({
           inRoom: true,
-          story,
-          roomCode
+          createRoomModalVisible: false,
+          roomCode,
+          story
         })
       })
     })
-  }
-
-  createRoom() {
-    const { playerName } = this.state
-    const dummyStoryID = roomDefaultState.storyID
-    createRoom(playerName)
-      .then((roomCode: string) => {
-        const story = getStory(dummyStoryID)
-          .then((story: Story) => {
-            this._updateUsername()
-            this.setState({
-              inRoom: true,
-              roomCode,
-              story
-            })
-          })
-          .catch(err => console.log(err))
-      })
-      .catch(err => console.log(err))
   }
 
   render() {
@@ -112,6 +132,13 @@ export default class App extends React.Component<AppProps, AppState> {
       page = (
         <View style={commonStyles.container}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
+          <Modal visible={this.state.createRoomModalVisible}>
+            <RoomSetupView
+              stories={[]}
+              onStoryBeginPressed={this.createRoom.bind(this)}
+              onCloseModal={this.hideRoomSetup.bind(this)}
+            />
+          </Modal>
           <Text style={commonStyles.headerText}>What is your name?</Text>
           <TextInput
             placeholder="Name"
@@ -130,12 +157,12 @@ export default class App extends React.Component<AppProps, AppState> {
           />
           <HeroButton
             style={commonStyles.heroButtonMargins}
-            title="Join"
+            title="Join Game"
             onPress={this.joinRoom.bind(this)}
           />
           <HeroButton
-            title="Create Room"
-            onPress={this.createRoom.bind(this)}
+            title="Start New Game"
+            onPress={this.showRoomSetup.bind(this)}
           />
         </View>
       )

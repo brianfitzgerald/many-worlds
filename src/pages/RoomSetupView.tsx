@@ -7,7 +7,8 @@ import {
   StatusBar,
   View,
   ScrollViewProps,
-  ScrollViewStatic
+  ScrollViewStatic,
+  Button
 } from "react-native"
 import commonStyles from "../styles/commonStyles"
 import HeroButton from "../components/HeroButton"
@@ -23,26 +24,62 @@ import {
 } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
+import StoryListItem from "../components/StoryListItem"
 
 type RoomSetupViewProps = {
-  story: Story
-  currentPlayerName: string
-  roomCode: string
-  dispatch?: (func: { type: string; value: RoomState }) => void
+  stories: Story[]
+  onStoryBeginPressed: () => void
+  onCloseModal: () => void
 }
 
 type RoomSetupViewState = {
-  selectedStoryID: number
+  selectedStoryID: string
 }
 
-export default class RoomSetupView extends React.Component<
+export default class PartyView extends React.Component<
   RoomSetupViewProps,
   RoomSetupViewState
 > {
+  constructor(props: RoomSetupViewProps) {
+    super(props)
+
+    this.state = {
+      selectedStoryID: ""
+    }
+  }
+
+  selectStory(story: Story) {
+    this.setState({
+      selectedStoryID: story.id
+    })
+  }
+
   render() {
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
+        <Button
+          title="Cancel"
+          color={colors.white}
+          onPress={this.props.onCloseModal}
+        />
+        <ScrollView>
+          {this.props.stories.map((story: Story, i) => (
+            <StoryListItem
+              key={i}
+              story={story}
+              selected={story.id === this.state.selectedStoryID}
+              onPress={this.selectStory.bind(this, story)}
+            />
+          ))}
+        </ScrollView>
+        <HeroButton
+          title="Begin"
+          onPress={this.props.onStoryBeginPressed.bind(
+            this,
+            this.state.selectedStoryID
+          )}
+        />
       </View>
     )
   }

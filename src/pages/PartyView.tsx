@@ -25,7 +25,7 @@ import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 
 type PartyViewProps = {
-  story: Story
+  story?: Story
   currentPlayerName: string
   roomCode: string
   dispatch?: (func: { type: string; value: RoomState }) => void
@@ -36,7 +36,7 @@ type PartyViewState = {
   currentTimer: number
 }
 
-const TIMER_AMOUNT = 8
+const TIMER_AMOUNT = 14000
 
 const getPlayersWhoSelectedOption = (
   optionIndex: number,
@@ -63,9 +63,7 @@ export default class PartyView extends React.Component<
   private intervalRef: NodeJS.Timer | undefined
   private timeoutRef: NodeJS.Timer | undefined
 
-  refs: {
-    scrollView: any
-  }
+  refs: any
 
   constructor(props: PartyViewProps) {
     super(props)
@@ -114,6 +112,8 @@ export default class PartyView extends React.Component<
   }
 
   _executeAction(optionIndex: number) {
+    if (!this.props.story) return
+
     const scrollRef = this.refs.scrollView as ScrollViewStatic
 
     const currentAction = getActionByIndex(
@@ -185,6 +185,14 @@ export default class PartyView extends React.Component<
   _finishStory() {}
 
   render() {
+    if (!this.props.story) {
+      return (
+        <View style={[commonStyles.container, styles.partyContainer]}>
+          <Text style={styles.roomCode}>Loading</Text>
+        </View>
+      )
+    }
+
     const currentAction = getActionByIndex(
       this.props.story,
       this.state.roomState.currentStoryIndex
@@ -193,9 +201,9 @@ export default class PartyView extends React.Component<
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
-        <View>
-          <Text style={{ color: "white" }}>Room {this.props.roomCode}</Text>
-          <Text style={{ color: "white" }}>
+        <View style={styles.header}>
+          <Text style={styles.roomCode}>{this.props.roomCode}</Text>
+          <Text style={styles.timer}>
             {this.state.currentTimer} Seconds Left
           </Text>
         </View>
@@ -265,5 +273,23 @@ const styles = StyleSheet.create({
     marginTop: 4,
     paddingLeft: 5,
     paddingRight: 5
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  timer: {
+    paddingTop: 6,
+    flex: 2,
+    color: colors.white,
+    textAlign: "right",
+    fontSize: 18
+  },
+  roomCode: {
+    paddingTop: 5,
+    flex: 1,
+    color: colors.white,
+    textAlign: "left",
+    fontSize: 20
   }
 })
