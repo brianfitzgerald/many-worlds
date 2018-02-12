@@ -6,13 +6,9 @@ import brimblewood from "../stories/brimblewood"
 import { awsKeys } from "../secrets"
 import { DocumentClient } from "aws-sdk/lib/dynamodb/document_client"
 
-const storiesTableName = "midnight_sun-stories"
+export const storiesTableName = "midnight_sun-stories"
 
-AWS.config.update({
-  region: awsKeys.region,
-  accessKeyId: awsKeys.accessKeyId,
-  secretAccessKey: awsKeys.secretAccessKey
-})
+AWS.config.update(awsKeys)
 
 const documentClient = new AWS.DynamoDB.DocumentClient()
 

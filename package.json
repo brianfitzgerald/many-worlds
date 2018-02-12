@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "start-ts": "tsc --watch & npm run start",
+    "updateStory": "node lib/updateStoryCLI",
     "build": "tsc",
     "test": "jest"
   },
