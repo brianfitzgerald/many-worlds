@@ -1,6 +1,6 @@
 import { dbInstance } from "./firebaseRef"
 import { Alert } from "react-native"
-import { StoryAction, StoryState } from "./types/Story"
+import { StoryAction, StoryState, Story } from "./types/Story"
 import { Player, playerDefaultState } from "./types/Player"
 import { RoomState } from "./types/Network"
 
@@ -42,7 +42,7 @@ export const joinRoom = (roomCode: string, username: string) =>
     })
   })
 
-export const createRoom = (username: string) =>
+export const createRoom = (username: string, story: Story) =>
   new Promise<string>((resolve, reject) => {
     let code: number = 0
     code = Math.floor(Math.random() * 9999 - 1000) + 1000
@@ -53,6 +53,7 @@ export const createRoom = (username: string) =>
     newPlayer.name = username
 
     roomDefaultState.connectedPlayers.push(newPlayer)
+    roomDefaultState.storyState = story.defaultState
 
     dbInstance
       .ref(`/rooms/${code}/`)

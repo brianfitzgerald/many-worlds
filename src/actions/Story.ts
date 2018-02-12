@@ -19,6 +19,7 @@ export function validateFilter(
       Object.keys(filter)
         .map(k => filter && filter[k] === currentState[k])
         .filter(t => t !== true).length === 0
+    return isValid
   }
   return true
 }
@@ -52,7 +53,8 @@ export function getViableOptions(
   const viableOptions = options.filter(o =>
     validateFilter(o.filter, currentState)
   )
-  return options
+  console.log(`${viableOptions.length} viable options out of ${options.length}`)
+  return viableOptions
 }
 
 export function getNextActionIndex(
