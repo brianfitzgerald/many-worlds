@@ -32,9 +32,27 @@ type RoomSetupViewProps = {
   onCloseModal: () => void
 }
 
+type SortOption = "AverageRating" | "Alphabetical"
+
 type RoomSetupViewState = {
   selectedStoryID: string
   stories: Story[]
+  selectedSortOption: SortOption
+}
+
+const sortStories = (stories: Story[], option: SortOption): Story[] => {
+  if (option === "AverageRating") {
+    return stories.sort((a, b) => a.averageRating - b.averageRating)
+  }
+  if (option === "Alphabetical") {
+    return stories.sort((a, b) => {
+      if (a.name < b.name) return -1
+      if (a.name > b.name) return 1
+      return 0
+    })
+  }
+
+  return stories
 }
 
 export default class PartyView extends React.Component<
@@ -46,7 +64,8 @@ export default class PartyView extends React.Component<
 
     this.state = {
       selectedStoryID: "",
-      stories: []
+      stories: [],
+      selectedSortOption: "Alphabetical"
     }
   }
 
@@ -65,7 +84,39 @@ export default class PartyView extends React.Component<
     })
   }
 
+  changeSort(selectedSortOption: SortOption) {
+    this.setState({ selectedSortOption })
+  }
+
   render() {
+    if (this.state.stories.length < 1) {
+      return (
+        <View style={[commonStyles.container, styles.partyContainer]}>
+          <Text style={styles.promptButton}>Loading...</Text>
+        </View>
+      )
+    }
+
+    const sortedStories = sortStories(
+      this.state.stories,
+      this.state.selectedSortOption
+    )
+
+    const sortButtons = (
+      <View>
+        <Button
+          color={colors.white}
+          title="Sort by Rating"
+          onPress={this.changeSort.bind(this, "AverageRating")}
+        />
+        <Button
+          color={colors.white}
+          title="Sort by Title"
+          onPress={this.changeSort.bind(this, "Alphabetical")}
+        />
+      </View>
+    )
+
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
@@ -74,8 +125,9 @@ export default class PartyView extends React.Component<
           color={colors.white}
           onPress={this.props.onCloseModal}
         />
+        {sortButtons}
         <ScrollView>
-          {this.state.stories.map((story: Story, i) => (
+          {sortedStories.map((story: Story, i) => (
             <StoryListItem
               key={i}
               story={story}
@@ -115,7 +167,10 @@ const styles = StyleSheet.create({
     color: "white"
   },
   promptButton: {
+    color: "white",
+    fontSize: 32,
     width: "100%",
+    textAlign: "center",
     marginBottom: 12,
     marginTop: 4
   }

@@ -8,18 +8,18 @@ import {
   ViewProperties,
   ViewStyle,
   StyleSheet
-} from "react-native";
-import * as React from "react";
+} from "react-native"
+import * as React from "react"
 
-import commonStyles from "../styles/commonStyles";
-import colors from "../styles/colors";
-import { Story } from "../types/Story";
+import commonStyles from "../styles/commonStyles"
+import colors from "../styles/colors"
+import { Story } from "../types/Story"
 
 type StoryListItemProps = {
-  story: Story;
-  onPress: () => void;
-  selected: boolean;
-};
+  story: Story
+  onPress: () => void
+  selected: boolean
+}
 
 const StoryListItem: React.SFC<StoryListItemProps> = ({
   story,
@@ -31,11 +31,14 @@ const StoryListItem: React.SFC<StoryListItemProps> = ({
       <View style={styles.ItemBase}>
         <Text style={styles.StoryName}>{story.name}</Text>
         <Text style={styles.StoryDescription}>{story.description}</Text>
+        <Text style={styles.StoryDescription}>
+          Average rating: {story.averageRating} / 10
+        </Text>
       </View>
       {selected ? <Text style={{ color: colors.white }}>Selected</Text> : null}
     </TouchableOpacity>
-  );
-};
+  )
+}
 
 const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
   ItemBase: {
@@ -60,6 +63,6 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
     fontSize: 12,
     color: colors.black
   }
-});
+})
 
-export default StoryListItem;
+export default StoryListItem
