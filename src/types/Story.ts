@@ -3,6 +3,7 @@ import { InventoryItem, Condition, Ability } from "./Player"
 export type Story = {
   id: string
   name: string
+  description: string
   actions: StoryAction[]
   defaultState: StoryState
 }

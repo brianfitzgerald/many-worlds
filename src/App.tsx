@@ -134,7 +134,6 @@ export default class App extends React.Component<AppProps, AppState> {
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <Modal visible={this.state.createRoomModalVisible}>
             <RoomSetupView
-              stories={[]}
               onStoryBeginPressed={this.createRoom.bind(this)}
               onCloseModal={this.hideRoomSetup.bind(this)}
             />

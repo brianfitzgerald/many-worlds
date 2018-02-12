@@ -25,15 +25,16 @@ import {
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
+import { getAllStories } from "../actions/StoryDB"
 
 type RoomSetupViewProps = {
-  stories: Story[]
   onStoryBeginPressed: () => void
   onCloseModal: () => void
 }
 
 type RoomSetupViewState = {
   selectedStoryID: string
+  stories: Story[]
 }
 
 export default class PartyView extends React.Component<
@@ -44,8 +45,18 @@ export default class PartyView extends React.Component<
     super(props)
 
     this.state = {
-      selectedStoryID: ""
+      selectedStoryID: "",
+      stories: []
     }
+  }
+
+  componentDidMount() {
+    getAllStories()
+      .then(stories => {
+        console.log(stories)
+        this.setState({ stories })
+      })
+      .catch(err => console.log(err))
   }
 
   selectStory(story: Story) {
@@ -64,7 +75,7 @@ export default class PartyView extends React.Component<
           onPress={this.props.onCloseModal}
         />
         <ScrollView>
-          {this.props.stories.map((story: Story, i) => (
+          {this.state.stories.map((story: Story, i) => (
             <StoryListItem
               key={i}
               story={story}
