@@ -53,7 +53,6 @@ export function getViableOptions(
   const viableOptions = options.filter(o =>
     validateFilter(o.filter, currentState)
   )
-  console.log(`${viableOptions.length} viable options out of ${options.length}`)
   return viableOptions
 }
 
