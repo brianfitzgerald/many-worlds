@@ -14,12 +14,16 @@ import HeroButton from "../components/HeroButton"
 import colors from "../styles/colors"
 
 import { dbInstance } from "../firebaseRef"
-import { Story, StoryOption } from "../types/Story"
+import { Story, StoryOption, StoryState } from "../types/Story"
 import { Player } from "../types/Player"
 import {
   getNextActionIndex,
   doAction,
-  getActionByIndex
+  getActionByIndex,
+  validateFilter,
+  getViableOptions,
+  getCurrentBestSelection,
+  getPlayersWhoSelectedOption
 } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
@@ -37,24 +41,6 @@ type PartyViewState = {
 }
 
 const TIMER_AMOUNT = 14000
-
-const getPlayersWhoSelectedOption = (
-  optionIndex: number,
-  roomState: RoomState
-) =>
-  roomState.connectedPlayers.filter(p => p.selectedChoiceIndex === optionIndex)
-const getCurrentBestSelection = (roomState: RoomState): number => {
-  const playerVotes = roomState.connectedPlayers.map(
-    (p: Player, i: number) => ({
-      index: i,
-      amount: p.selectedChoiceIndex ? p.selectedChoiceIndex : 0
-    })
-  )
-  const sortedPlayerVotes = playerVotes.sort(
-    (a, b) => (a && b ? a.amount - b.amount : -1)
-  )
-  return sortedPlayerVotes[0].index
-}
 
 export default class PartyView extends React.Component<
   PartyViewProps,
@@ -216,26 +202,27 @@ export default class PartyView extends React.Component<
           <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
         </ScrollView>
         <View>
-          {currentAction.options
-            ? currentAction.options.map((a, i) => (
-                <View key={i}>
-                  {getPlayersWhoSelectedOption(i, this.state.roomState).map(
-                    (p, i) => (
-                      <Text key={i} style={styles.playersWhoSelectedOption}>
-                        {p.name}
-                        {i > 0 ? ", " : ""}
-                      </Text>
-                    )
-                  )}
-                  <HeroButton
-                    key={i}
-                    title={a.title}
-                    onPress={this._chooseAction.bind(this, i)}
-                    style={styles.promptButton}
-                  />
-                </View>
-              ))
-            : null}
+          {getViableOptions(
+            currentAction.options,
+            this.state.roomState.storyState
+          ).map((a, i) => (
+            <View key={i}>
+              {getPlayersWhoSelectedOption(i, this.state.roomState).map(
+                (p, i) => (
+                  <Text key={i} style={styles.playersWhoSelectedOption}>
+                    {p.name}
+                    {i > 0 ? ", " : ""}
+                  </Text>
+                )
+              )}
+              <HeroButton
+                key={i}
+                title={a.title}
+                onPress={this._chooseAction.bind(this, i)}
+                style={styles.promptButton}
+              />
+            </View>
+          ))}
           {currentAction.type === "end" ? (
             <HeroButton
               title="Finish Story"

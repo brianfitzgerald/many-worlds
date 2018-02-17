@@ -4,6 +4,7 @@ import { next } from "../actions/Story"
 const story: Story = {
   id: "820ebcfa-547e-4809-93c8-ad7008d782a8",
   name: "Brimblewood",
+  averageRating: 4.1,
   description: "A fun romp",
   actions: [
     {
@@ -19,7 +20,10 @@ const story: Story = {
       prompt: "There is a shiny apple on a tree above you.",
       options: [
         {
-          title: "eat it",
+          title: "eat it"
+        },
+        {
+          title: "store it in your bag",
           action: {
             applePicked: true
           }
@@ -55,7 +59,10 @@ const story: Story = {
         " The swamp is dank, and reeks of frog piss. Your party follows a creaky wooden bridge across the murk. Suddenly, a frog-man hops in front of your path!",
       options: [
         {
-          title: "Give him some of your rations",
+          title: "Give him a bite of your apple",
+          filter: {
+            applePicked: true
+          },
           action: {
             fewerRations: true
           }
@@ -81,6 +88,9 @@ const story: Story = {
       prompt: "A low level slime blocks your path. 'Must consume!' it says.",
       options: [
         {
+          filter: {
+            applePicked: true
+          },
           title: "give it some food",
           action: {
             slimeGivenFood: true
@@ -174,7 +184,7 @@ const story: Story = {
   ],
   defaultState: {
     swampBranchChosen: false,
-    appleEaten: false,
+    applePicked: false,
     wellRested: false,
     slimeGivenFood: false
   }

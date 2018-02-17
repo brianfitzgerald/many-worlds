@@ -39,14 +39,6 @@ export default class App extends React.Component<AppProps, AppState> {
   constructor(props: any) {
     super(props)
 
-    const player: Player = {
-      name: "",
-      conditions: [],
-      inventory: [],
-      abilities: []
-    }
-    const connectedPlayers = [player]
-
     this.state = {
       playerName: "",
       roomCode: "",
@@ -112,8 +104,8 @@ export default class App extends React.Component<AppProps, AppState> {
       return
     }
     const { playerName } = this.state
-    createRoom(playerName).then((roomCode: string) => {
-      const story = getStory(storyID).then((story: Story) => {
+    const story = getStory(storyID).then((story: Story) => {
+      createRoom(playerName, story).then((roomCode: string) => {
         this._updateUsername()
         this.setState({
           inRoom: true,
