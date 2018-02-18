@@ -186,9 +186,16 @@ export default class StoryBuilderView extends React.Component<
       }
       newFilterState.push(newFilter)
     } else if (existingFilterIndex !== -1) {
-      newFilterState[existingFilterIndex].filterBooleanValue = !newFilterState[
-        existingFilterIndex
-      ].filterBooleanValue
+      const currentValue =
+        newFilterState[existingFilterIndex].filterBooleanValue
+      if (currentValue === false) {
+        newFilterState.splice(existingFilterIndex, 1)
+      } else {
+        newFilterState[
+          existingFilterIndex
+        ].filterBooleanValue = !newFilterState[existingFilterIndex]
+          .filterBooleanValue
+      }
     }
     this.setState({ filterModeNewFilterState: newFilterState })
   }
@@ -231,22 +238,34 @@ export default class StoryBuilderView extends React.Component<
                 <Text style={PromptButtonTextStyle}>{action.prompt}</Text>
               </View>
               {action.options
-                ? action.options.map((action, k) => (
-                    <TouchableOpacity
-                      onPress={this.updateActionFilterSelection.bind(
-                        this,
-                        i,
-                        k,
-                        targetIndex
-                      )}
-                    >
-                      <View style={OptionButtonBaseStyle}>
-                        <Text style={OptionButtonTextStyle}>
-                          {action.title}
-                        </Text>
+                ? action.options.map((action, k) => {
+                    const isInFilter = newFilter.find(
+                      f => f.optionIndex === k && f.actionIndex === i
+                    )
+                    return (
+                      <View>
+                        {isInFilter ? (
+                          <Text>
+                            {isInFilter.filterBooleanValue ? "True" : "False"}
+                          </Text>
+                        ) : null}
+                        <TouchableOpacity
+                          onPress={this.updateActionFilterSelection.bind(
+                            this,
+                            i,
+                            k,
+                            targetIndex
+                          )}
+                        >
+                          <View style={OptionButtonBaseStyle}>
+                            <Text style={OptionButtonTextStyle}>
+                              {action.title}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
                       </View>
-                    </TouchableOpacity>
-                  ))
+                    )
+                  })
                 : null}
             </View>
           ))}
