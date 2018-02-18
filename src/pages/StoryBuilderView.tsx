@@ -9,7 +9,9 @@ import {
   ScrollViewProps,
   ScrollViewStatic,
   Button,
-  TextInput
+  TextInput,
+  ViewStyle,
+  TouchableOpacity
 } from "react-native"
 import Swipeout from "react-native-swipeout"
 
@@ -29,7 +31,12 @@ import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
 import { getAllStories } from "../actions/StoryDB"
-import StoryActionInput from "../components/StoryActionInput"
+import StoryActionInput, {
+  PromptButtonBaseStyle,
+  PromptButtonTextStyle,
+  OptionButtonBaseStyle,
+  OptionButtonTextStyle
+} from "../components/StoryActionInput"
 
 type StoryBuilderProps = {
   onCloseModal: () => {}
@@ -198,54 +205,25 @@ export default class StoryBuilderView extends React.Component<
           </Text>
           {validActionsToFilterBy.map((action, i) => (
             <View key={i}>
-              <Swipeout
-                backgroundColor={colors.black}
-                right={[
-                  {
-                    text: "Remove",
-                    onPress: this.removeActionPrompt.bind(this, i),
-                    backgroundColor: "#FE3A2F"
-                  }
-                ]}
-              >
-                <View
-                  style={{
-                    backgroundColor: "#33333E",
-                    maxWidth: 320,
-                    borderRadius: 10,
-                    minWidth: 200,
-                    marginLeft: 15,
-                    padding: 5,
-                    paddingLeft: 15,
-                    paddingRight: 15
-                  }}
-                >
-                  <Text style={{ color: colors.white }}>{action.prompt}</Text>
-                </View>
-              </Swipeout>
+              <View style={PromptButtonBaseStyle}>
+                <Text style={PromptButtonTextStyle}>{action.prompt}</Text>
+              </View>
               {action.options
                 ? action.options.map((action, k) => (
-                    <Swipeout
-                      key={k}
-                      backgroundColor={colors.black}
-                      right={[
-                        {
-                          text: "Remove",
-                          onPress: this.removeActionOption.bind(this, i, k),
-                          backgroundColor: "#FE3A2F"
-                        }
-                      ]}
+                    <TouchableOpacity
+                      onPress={this.updateActionFilterSelection.bind(
+                        this,
+                        i,
+                        k,
+                        targetIndex
+                      )}
                     >
-                      <Button
-                        onPress={this.updateActionFilterSelection.bind(
-                          this,
-                          i,
-                          k,
-                          targetIndex
-                        )}
-                        title={action.title}
-                      />
-                    </Swipeout>
+                      <View style={OptionButtonBaseStyle}>
+                        <Text style={OptionButtonTextStyle}>
+                          {action.title}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
                   ))
                 : null}
             </View>
