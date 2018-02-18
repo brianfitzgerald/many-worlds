@@ -16,7 +16,7 @@ import HeroButton, { LightHeroButton } from "../components/HeroButton"
 import colors from "../styles/colors"
 
 import { dbInstance } from "../firebaseRef"
-import { Story, StoryOption } from "../types/Story"
+import { Story, StoryOption, StoryAction } from "../types/Story"
 import { Player } from "../types/Player"
 import {
   getNextActionIndex,
@@ -27,6 +27,9 @@ import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
 import { getAllStories } from "../actions/StoryDB"
+import StoryActionPromptInput, {
+  StoryActionOptionInput
+} from "../components/StoryActionInput"
 
 type StoryBuilderProps = {
   onCloseModal: () => {}
@@ -34,6 +37,7 @@ type StoryBuilderProps = {
 
 type StoryBuilderState = {
   hasMadeChanges: boolean
+  story: Story
 }
 
 export default class StoryBuilderView extends React.Component<
@@ -44,12 +48,64 @@ export default class StoryBuilderView extends React.Component<
     super(props)
 
     this.state = {
+      story: {
+        id: "",
+        name: "",
+        author: "",
+        description: "",
+        averageRating: 0,
+        actions: [],
+        defaultState: {}
+      },
       hasMadeChanges: false
     }
   }
 
   saveAndExit() {
     this.props.onCloseModal()
+  }
+
+  setAuthor(value: any) {
+    this.setState({
+      story: { ...this.state.story, author: value },
+      hasMadeChanges: true
+    })
+  }
+
+  setTitle(value: any) {
+    this.setState({
+      story: { ...this.state.story, name: value },
+      hasMadeChanges: true
+    })
+  }
+
+  addAction() {
+    const newAction: StoryAction = {
+      prompt: "Add a prompt",
+      options: [
+        {
+          title: "Add an option"
+        }
+      ]
+    }
+    const newActions = this.state.story.actions.concat(newAction)
+    this.setState({
+      story: { ...this.state.story, actions: newActions },
+      hasMadeChanges: true
+    })
+  }
+
+  updateActionPrompt(actionIndex: number, value: string) {
+    console.log(value, actionIndex)
+    const newActions = this.state.story.actions
+    newActions[actionIndex].prompt = value
+    this.setState({ story: { ...this.state.story, actions: newActions } })
+  }
+
+  updateActionOption(actionIndex: number, optionIndex: number, value: string) {
+    const newActions = this.state.story.actions
+    newActions[actionIndex].options[optionIndex].title = value
+    this.setState({ story: { ...this.state.story, actions: newActions } })
   }
 
   render() {
@@ -85,18 +141,42 @@ export default class StoryBuilderView extends React.Component<
         <View style={{ flexDirection: "column", width: 380 }}>
           <TextInput
             placeholder="Enter a title"
+            value={this.state.story.name || ""}
+            onChange={this.setTitle.bind(this)}
             placeholderTextColor={colors.grey}
             style={styles.titleInput}
           />
           <TextInput
             placeholder="Enter your name"
             placeholderTextColor={colors.grey}
+            value={this.state.story.author || ""}
+            onChange={this.setAuthor.bind(this)}
             style={styles.nameInput}
           />
         </View>
+        {this.state.story.actions.map((action, i) => (
+          <View>
+            <StoryActionPromptInput
+              value={action.prompt}
+              onChange={this.updateActionPrompt.bind(this, i)}
+            />
+            {action.options
+              ? action.options.map((action, k) => (
+                  <StoryActionOptionInput
+                    value={action.title}
+                    onChange={this.updateActionOption.bind(this, i, k)}
+                  />
+                ))
+              : null}
+          </View>
+        ))}
         <LightHeroButton
-          title="Add your first action"
-          onPress={() => {}}
+          title={
+            this.state.story.actions.length > 0
+              ? "Add action"
+              : "Add your first action"
+          }
+          onPress={this.addAction.bind(this)}
           style={{ minWidth: 350 }}
         />
       </View>
