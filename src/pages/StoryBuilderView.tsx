@@ -47,13 +47,14 @@ type StoryBuilderState = {
   story: Story
   filterModeActive: boolean
   filterModeTargetIndex: number
-  filterModeNewFilter: NewFilter[]
+  filterModeNewFilterState: NewFilter[]
 }
 
 type NewFilter = {
-  newFilterRecipientIndex: number
-  targetActionIndex: number
-  targetOptionIndex: number
+  actionIndex: number
+  optionIndex: number
+  targetIndex: number
+  filterBooleanValue: boolean
 }
 
 export default class StoryBuilderView extends React.Component<
@@ -75,7 +76,7 @@ export default class StoryBuilderView extends React.Component<
       },
       filterModeTargetIndex: 0,
       filterModeActive: false,
-      filterModeNewFilter: [],
+      filterModeNewFilterState: [],
       hasMadeChanges: false
     }
   }
@@ -168,7 +169,28 @@ export default class StoryBuilderView extends React.Component<
     optionIndex: number,
     targetIndex: number
   ) {
-    const filter = this.state.filterModeNewFilter
+    const newFilterState = this.state.filterModeNewFilterState
+    const existingFilterIndex = newFilterState.findIndex(
+      f =>
+        f.optionIndex === optionIndex &&
+        f.actionIndex === actionIndex &&
+        f.targetIndex === targetIndex
+    )
+
+    if (existingFilterIndex === -1) {
+      const newFilter: NewFilter = {
+        actionIndex,
+        optionIndex,
+        targetIndex,
+        filterBooleanValue: true
+      }
+      newFilterState.push(newFilter)
+    } else if (existingFilterIndex !== -1) {
+      newFilterState[existingFilterIndex].filterBooleanValue = !newFilterState[
+        existingFilterIndex
+      ].filterBooleanValue
+    }
+    this.setState({ filterModeNewFilterState: newFilterState })
   }
 
   render() {
@@ -177,7 +199,7 @@ export default class StoryBuilderView extends React.Component<
     if (this.state.filterModeActive) {
       const targetIndex = this.state.filterModeTargetIndex
       const target = this.state.story.actions[targetIndex]
-      const newFilter = this.state.filterModeNewFilter
+      const newFilter = this.state.filterModeNewFilterState
       const validActionsToFilterBy = this.state.story.actions.filter(
         (a, i) => i !== targetIndex
       )
