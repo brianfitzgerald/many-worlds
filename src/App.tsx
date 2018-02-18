@@ -46,8 +46,7 @@ export default class App extends React.Component<AppProps, AppState> {
       roomCode: "",
       inRoom: false,
       createRoomModalVisible: false,
-      // change this back!!
-      storyBuilderVisible: true,
+      storyBuilderVisible: false,
       selectedStoryID: ""
     }
   }
