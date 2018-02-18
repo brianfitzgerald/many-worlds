@@ -25,14 +25,18 @@ type StoryInputProps = {
   hasFilter: boolean
   onFilterPressed?: () => void
   inputType: InputType
+  suppressFilterIcon?: boolean
 }
 
 const StoryActionInput: React.SFC<StoryInputProps> = props => {
-  const filterButton = (
-    <TouchableOpacity onPress={props.onFilterPressed}>
-      <Text style={{ color: colors.white }}>F</Text>
-    </TouchableOpacity>
-  )
+  const filterButton =
+    props.suppressFilterIcon === true ? null : (
+      <TouchableOpacity onPress={props.onFilterPressed}>
+        <Text style={{ color: props.hasFilter ? colors.white : colors.grey }}>
+          FF
+        </Text>
+      </TouchableOpacity>
+    )
 
   let body = null
 
