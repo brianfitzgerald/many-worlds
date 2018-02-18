@@ -48,7 +48,7 @@ type StoryBuilderState = {
   story: Story
   filterModeActive: boolean
   filterModeTargetIndex: number
-  filterModeNewFilterState: NewFilter[]
+  filters: NewFilter[]
 }
 
 type NewFilter = {
@@ -77,7 +77,7 @@ export default class StoryBuilderView extends React.Component<
       },
       filterModeTargetIndex: 0,
       filterModeActive: false,
-      filterModeNewFilterState: [],
+      filters: [],
       hasMadeChanges: false
     }
   }
@@ -170,7 +170,7 @@ export default class StoryBuilderView extends React.Component<
     optionIndex: number,
     targetIndex: number
   ) {
-    const newFilterState = this.state.filterModeNewFilterState
+    const newFilterState = this.state.filters
     const existingFilterIndex = newFilterState.findIndex(
       f =>
         f.optionIndex === optionIndex &&
@@ -198,7 +198,7 @@ export default class StoryBuilderView extends React.Component<
           .filterBooleanValue
       }
     }
-    this.setState({ filterModeNewFilterState: newFilterState })
+    this.setState({ filters: newFilterState })
   }
 
   render() {
@@ -207,7 +207,7 @@ export default class StoryBuilderView extends React.Component<
     if (this.state.filterModeActive) {
       const targetIndex = this.state.filterModeTargetIndex
       const target = this.state.story.actions[targetIndex]
-      const newFilter = this.state.filterModeNewFilterState
+      const newFilter = this.state.filters
       const validActionsToFilterBy = this.state.story.actions.filter(
         (a, i) => i !== targetIndex
       )
