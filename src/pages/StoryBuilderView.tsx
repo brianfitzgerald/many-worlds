@@ -82,13 +82,22 @@ export default class StoryBuilderView extends React.Component<
   addAction() {
     const newAction: StoryAction = {
       prompt: "Add a prompt",
-      options: [
-        {
-          title: "Add an option"
-        }
-      ]
+      options: []
     }
     const newActions = this.state.story.actions.concat(newAction)
+    this.setState({
+      story: { ...this.state.story, actions: newActions },
+      hasMadeChanges: true
+    })
+  }
+
+  addOption(actionIndex: number) {
+    const newOption: StoryOption = {
+      title: "New option"
+    }
+    const newActions = this.state.story.actions
+    newActions[actionIndex].options.push(newOption)
+    console.log(newActions)
     this.setState({
       story: { ...this.state.story, actions: newActions },
       hasMadeChanges: true
@@ -138,42 +147,50 @@ export default class StoryBuilderView extends React.Component<
             />
           </View>
         </View>
-        <View style={{ flexDirection: "column", width: 380 }}>
-          <TextInput
-            placeholder="Enter a title"
-            value={this.state.story.name || ""}
-            onChange={this.setTitle.bind(this)}
-            placeholderTextColor={colors.grey}
-            style={styles.titleInput}
-          />
-          <TextInput
-            placeholder="Enter your name"
-            placeholderTextColor={colors.grey}
-            value={this.state.story.author || ""}
-            onChange={this.setAuthor.bind(this)}
-            style={styles.nameInput}
-          />
-        </View>
-        {this.state.story.actions.map((action, i) => (
-          <View>
-            <StoryActionPromptInput
-              value={action.prompt}
-              onChange={this.updateActionPrompt.bind(this, i)}
+        <ScrollView>
+          <View style={{ flexDirection: "column", width: 300 }}>
+            <TextInput
+              placeholder="Enter a title"
+              value={this.state.story.name || ""}
+              onChange={this.setTitle.bind(this)}
+              placeholderTextColor={colors.grey}
+              style={styles.titleInput}
             />
-            {action.options
-              ? action.options.map((action, k) => (
-                  <StoryActionOptionInput
-                    value={action.title}
-                    onChange={this.updateActionOption.bind(this, i, k)}
-                  />
-                ))
-              : null}
+            <TextInput
+              placeholder="Enter your name"
+              placeholderTextColor={colors.grey}
+              value={this.state.story.author || ""}
+              onChange={this.setAuthor.bind(this)}
+              style={styles.nameInput}
+            />
           </View>
-        ))}
+          {this.state.story.actions.map((action, i) => (
+            <View key={i}>
+              <StoryActionPromptInput
+                value={action.prompt}
+                onChange={this.updateActionPrompt.bind(this, i)}
+              />
+              {action.options
+                ? action.options.map((action, k) => (
+                    <StoryActionOptionInput
+                      key={k}
+                      value={action.title}
+                      onChange={this.updateActionOption.bind(this, i, k)}
+                    />
+                  ))
+                : null}
+              <LightHeroButton
+                title="Add an option"
+                onPress={this.addOption.bind(this, i)}
+                style={{ minWidth: 100, alignSelf: "flex-end" }}
+              />
+            </View>
+          ))}
+        </ScrollView>
         <LightHeroButton
           title={
             this.state.story.actions.length > 0
-              ? "Add action"
+              ? "Add another action"
               : "Add your first action"
           }
           onPress={this.addAction.bind(this)}

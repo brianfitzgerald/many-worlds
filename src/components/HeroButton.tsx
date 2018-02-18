@@ -60,7 +60,9 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
     paddingRight: 15
   },
   LightHeroButton: {
-    backgroundColor: "#33333E"
+    backgroundColor: "#33333E",
+    maxWidth: 320,
+    marginLeft: 15
   },
   HeroButtonTitle: {
     textAlign: "center",

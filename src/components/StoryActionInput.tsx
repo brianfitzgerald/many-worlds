@@ -61,17 +61,17 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
     marginTop: 15,
     backgroundColor: "#33333E",
     borderRadius: 10,
-    minWidth: 350
+    minWidth: 320
   },
   OptionBase: {
-    flexDirection: "column",
-    justifyContent: "flex-end",
     padding: 15,
-    minHeight: 18,
+    paddingTop: 10,
+    paddingBottom: 10,
     marginBottom: 15,
+    alignSelf: "flex-end",
     backgroundColor: colors.white,
     borderRadius: 10,
-    maxWidth: 200
+    minWidth: 200
   },
   prompt: {
     textAlign: "left",
