@@ -11,7 +11,8 @@ import {
   Button,
   TextInput,
   ViewStyle,
-  TouchableOpacity
+  TouchableOpacity,
+  TextStyle
 } from "react-native"
 import Swipeout from "react-native-swipeout"
 
@@ -245,7 +246,7 @@ export default class StoryBuilderView extends React.Component<
                     return (
                       <View>
                         {isInFilter ? (
-                          <Text>
+                          <Text style={FilterLabelStyle}>
                             {isInFilter.filterBooleanValue ? "True" : "False"}
                           </Text>
                         ) : null}
@@ -382,6 +383,10 @@ export default class StoryBuilderView extends React.Component<
       </View>
     )
   }
+}
+
+const FilterLabelStyle: TextStyle = {
+  color: colors.blue
 }
 
 const styles = StyleSheet.create({
