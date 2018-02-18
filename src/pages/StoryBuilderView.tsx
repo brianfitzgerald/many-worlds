@@ -29,9 +29,7 @@ import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
 import { getAllStories } from "../actions/StoryDB"
-import StoryActionPromptInput, {
-  StoryActionOptionInput
-} from "../components/StoryActionInput"
+import StoryActionInput from "../components/StoryActionInput"
 
 type StoryBuilderProps = {
   onCloseModal: () => {}
@@ -192,14 +190,17 @@ export default class StoryBuilderView extends React.Component<
                   }
                 ]}
               >
-                <StoryActionPromptInput
+                <StoryActionInput
                   value={action.prompt}
                   onChange={this.updateActionPrompt.bind(this, i)}
+                  hasFilter={action.filter !== undefined}
+                  inputType="prompt"
                 />
               </Swipeout>
               {action.options
                 ? action.options.map((action, k) => (
                     <Swipeout
+                      key={k}
                       backgroundColor={colors.black}
                       right={[
                         {
@@ -209,10 +210,11 @@ export default class StoryBuilderView extends React.Component<
                         }
                       ]}
                     >
-                      <StoryActionOptionInput
-                        key={k}
+                      <StoryActionInput
                         value={action.title}
+                        hasFilter={action.filter !== undefined}
                         onChange={this.updateActionOption.bind(this, i, k)}
+                        inputType="option"
                       />
                     </Swipeout>
                   ))

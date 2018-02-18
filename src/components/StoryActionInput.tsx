@@ -16,38 +16,56 @@ import commonStyles from "../styles/commonStyles"
 import colors from "../styles/colors"
 import { Story } from "../types/Story"
 
-type StoryActionInputProps = {
+type InputType = "prompt" | "option"
+
+type StoryInputProps = {
   value: string
   onChange: (text: string) => void
   placeholder?: string
+  hasFilter: boolean
+  onFilterPressed?: () => void
+  inputType: InputType
 }
 
-const StoryActionPromptInput: React.SFC<StoryActionInputProps> = props => {
-  return (
-    <View style={styles.PromptBase}>
-      <TextInput
-        placeholder={props.placeholder}
-        placeholderTextColor={colors.grey}
-        value={props.value}
-        onChange={event => props.onChange(event.nativeEvent.text)}
-        style={styles.prompt}
-      />
-    </View>
+const StoryActionInput: React.SFC<StoryInputProps> = props => {
+  const filterButton = (
+    <TouchableOpacity onPress={props.onFilterPressed}>
+      <Text style={{ color: colors.white }}>F</Text>
+    </TouchableOpacity>
   )
-}
 
-export const StoryActionOptionInput: React.SFC<
-  StoryActionInputProps
-> = props => {
+  let body = null
+
+  if (props.inputType === "prompt") {
+    body = (
+      <View style={styles.PromptBase}>
+        <TextInput
+          placeholder={props.placeholder}
+          placeholderTextColor={colors.grey}
+          value={props.value}
+          onChange={event => props.onChange(event.nativeEvent.text)}
+          style={styles.prompt}
+        />
+      </View>
+    )
+  } else if (props.inputType === "option") {
+    body = (
+      <View style={styles.OptionBase}>
+        <TextInput
+          placeholder={props.placeholder}
+          placeholderTextColor={colors.grey}
+          value={props.value}
+          onChange={event => props.onChange(event.nativeEvent.text)}
+          style={styles.option}
+        />
+      </View>
+    )
+  }
+
   return (
-    <View style={styles.OptionBase}>
-      <TextInput
-        placeholder={props.placeholder}
-        placeholderTextColor={colors.grey}
-        value={props.value}
-        onChange={event => props.onChange(event.nativeEvent.text)}
-        style={styles.option}
-      />
+    <View>
+      {filterButton}
+      {body}
     </View>
   )
 }
@@ -92,4 +110,4 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
   }
 })
 
-export default StoryActionPromptInput
+export default StoryActionInput
