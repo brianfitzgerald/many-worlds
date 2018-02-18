@@ -11,6 +11,8 @@ import {
   Button,
   TextInput
 } from "react-native"
+import Swipeout from "react-native-swipeout"
+
 import commonStyles from "../styles/commonStyles"
 import HeroButton, { LightHeroButton } from "../components/HeroButton"
 import colors from "../styles/colors"
@@ -91,13 +93,28 @@ export default class StoryBuilderView extends React.Component<
     })
   }
 
+  removeActionPrompt(actionIndex: number) {
+    const newActions = this.state.story.actions
+    newActions.splice(actionIndex, 1)
+    this.setState({
+      story: { ...this.state.story, actions: newActions }
+    })
+  }
+
+  removeActionOption(actionIndex: number, optionIndex: number) {
+    const newActions = this.state.story.actions
+    newActions[actionIndex].options.splice(optionIndex, 1)
+    this.setState({
+      story: { ...this.state.story, actions: newActions }
+    })
+  }
+
   addOption(actionIndex: number) {
     const newOption: StoryOption = {
       title: "New option"
     }
     const newActions = this.state.story.actions
     newActions[actionIndex].options.push(newOption)
-    console.log(newActions)
     this.setState({
       story: { ...this.state.story, actions: newActions },
       hasMadeChanges: true
@@ -105,7 +122,6 @@ export default class StoryBuilderView extends React.Component<
   }
 
   updateActionPrompt(actionIndex: number, value: string) {
-    console.log(value, actionIndex)
     const newActions = this.state.story.actions
     newActions[actionIndex].prompt = value
     this.setState({ story: { ...this.state.story, actions: newActions } })
@@ -166,17 +182,39 @@ export default class StoryBuilderView extends React.Component<
           </View>
           {this.state.story.actions.map((action, i) => (
             <View key={i}>
-              <StoryActionPromptInput
-                value={action.prompt}
-                onChange={this.updateActionPrompt.bind(this, i)}
-              />
+              <Swipeout
+                backgroundColor={colors.black}
+                right={[
+                  {
+                    text: "Remove",
+                    onPress: this.removeActionPrompt.bind(this, i),
+                    backgroundColor: "#FE3A2F"
+                  }
+                ]}
+              >
+                <StoryActionPromptInput
+                  value={action.prompt}
+                  onChange={this.updateActionPrompt.bind(this, i)}
+                />
+              </Swipeout>
               {action.options
                 ? action.options.map((action, k) => (
-                    <StoryActionOptionInput
-                      key={k}
-                      value={action.title}
-                      onChange={this.updateActionOption.bind(this, i, k)}
-                    />
+                    <Swipeout
+                      backgroundColor={colors.black}
+                      right={[
+                        {
+                          text: "Remove",
+                          onPress: this.removeActionOption.bind(this, i, k),
+                          backgroundColor: "#FE3A2F"
+                        }
+                      ]}
+                    >
+                      <StoryActionOptionInput
+                        key={k}
+                        value={action.title}
+                        onChange={this.updateActionOption.bind(this, i, k)}
+                      />
+                    </Swipeout>
                   ))
                 : null}
               <LightHeroButton

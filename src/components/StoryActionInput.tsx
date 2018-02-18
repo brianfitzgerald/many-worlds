@@ -18,7 +18,7 @@ import { Story } from "../types/Story"
 
 type StoryActionInputProps = {
   value: string
-  onChange: () => void
+  onChange: (text: string) => void
   placeholder?: string
 }
 
@@ -29,7 +29,7 @@ const StoryActionPromptInput: React.SFC<StoryActionInputProps> = props => {
         placeholder={props.placeholder}
         placeholderTextColor={colors.grey}
         value={props.value}
-        onChange={props.onChange}
+        onChange={event => props.onChange(event.nativeEvent.text)}
         style={styles.prompt}
       />
     </View>
@@ -45,7 +45,7 @@ export const StoryActionOptionInput: React.SFC<
         placeholder={props.placeholder}
         placeholderTextColor={colors.grey}
         value={props.value}
-        onChange={props.onChange}
+        onChange={event => props.onChange(event.nativeEvent.text)}
         style={styles.option}
       />
     </View>
