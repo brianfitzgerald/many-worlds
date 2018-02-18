@@ -46,6 +46,18 @@ export const LightHeroButton: React.SFC<HeroButtonProps> = ({
   )
 }
 
+export type NewsItemProps = {
+  contents: string
+}
+
+export const NewsItem: React.SFC<{ contents: string }> = ({ contents }) => (
+  <View style={[styles.HeroButton, { backgroundColor: "#33333E" }]}>
+    <Text style={[styles.HeroButtonTitle, styles.LightHeroButtonTitle]}>
+      {contents}
+    </Text>
+  </View>
+)
+
 const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
   HeroButton: {
     flexDirection: "row",
