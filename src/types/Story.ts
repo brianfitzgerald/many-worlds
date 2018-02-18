@@ -4,6 +4,7 @@ export type Story = {
   id: string
   name: string
   averageRating: number
+  author: string
   description: string
   actions: StoryAction[]
   defaultState: StoryState
@@ -31,7 +32,7 @@ export type StoryAction = {
   type?: "boolean" | "end"
   prompt: string
   filter?: StoryState
-  options?: StoryOption[]
+  options: StoryOption[]
 }
 
 type PlayerStateChange = {

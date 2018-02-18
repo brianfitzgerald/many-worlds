@@ -2,6 +2,7 @@ import { StoryState, StoryAction, Story } from "../types/Story"
 import { next } from "../actions/Story"
 
 const story: Story = {
+  author: "Brian Fitzgerald",
   id: "820ebcfa-547e-4809-93c8-ad7008d782a8",
   name: "Brimblewood",
   averageRating: 4.1,
@@ -154,30 +155,6 @@ const story: Story = {
       options: [
         {
           title: "->"
-        }
-      ]
-    },
-    {
-      prompt: "Your stomach begins to rumble, but it's probably not serious..",
-      filter: {
-        appleEaten: true
-      }
-    },
-    {
-      filter: {
-        slimeGivenFood: true
-      },
-      prompt:
-        "You awake to several slimes crowding around your tent. 'Consume! Consume! Consume! they chant.",
-      options: [
-        {
-          title: "Give them more food",
-          response: "They ooze away, for now."
-        },
-        {
-          title: "Swing your sword at them",
-          response: "They suffocate you to death.",
-          type: "end"
         }
       ]
     }

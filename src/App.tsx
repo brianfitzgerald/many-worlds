@@ -23,6 +23,7 @@ import { joinRoom, createRoom, roomDefaultState } from "./firebaseFunctions"
 import { getStory } from "./actions/StoryDB"
 import colors from "./styles/colors"
 import RoomSetupView from "./pages/RoomSetupView"
+import StoryBuilderView from "./pages/StoryBuilderView"
 
 type AppState = {
   playerName: string
@@ -30,6 +31,7 @@ type AppState = {
   story?: Story
   inRoom: boolean
   createRoomModalVisible: boolean
+  storyBuilderVisible: boolean
   selectedStoryID: string
 }
 
@@ -44,6 +46,7 @@ export default class App extends React.Component<AppProps, AppState> {
       roomCode: "",
       inRoom: false,
       createRoomModalVisible: false,
+      storyBuilderVisible: false,
       selectedStoryID: ""
     }
   }
@@ -90,12 +93,16 @@ export default class App extends React.Component<AppProps, AppState> {
     })
   }
 
+  showStoryBuilder() {
+    this.setState({ storyBuilderVisible: true })
+  }
+
   showRoomSetup() {
     this.setState({ createRoomModalVisible: true })
   }
 
   hideRoomSetup() {
-    this.setState({ createRoomModalVisible: false })
+    this.setState({ createRoomModalVisible: false, storyBuilderVisible: false })
   }
 
   createRoom(storyID: string) {
@@ -130,6 +137,9 @@ export default class App extends React.Component<AppProps, AppState> {
               onCloseModal={this.hideRoomSetup.bind(this)}
             />
           </Modal>
+          <Modal visible={this.state.storyBuilderVisible}>
+            <StoryBuilderView onCloseModal={this.hideRoomSetup.bind(this)} />
+          </Modal>
           <Text style={commonStyles.headerText}>What is your name?</Text>
           <TextInput
             placeholder="Name"
@@ -152,8 +162,13 @@ export default class App extends React.Component<AppProps, AppState> {
             onPress={this.joinRoom.bind(this)}
           />
           <HeroButton
+            style={commonStyles.heroButtonMargins}
             title="Start New Game"
             onPress={this.showRoomSetup.bind(this)}
+          />
+          <HeroButton
+            title="Story Builder"
+            onPress={this.showStoryBuilder.bind(this)}
           />
         </View>
       )
