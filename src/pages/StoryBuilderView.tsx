@@ -48,10 +48,10 @@ type StoryBuilderState = {
   story: Story
   filterModeActive: boolean
   filterModeTargetIndex: number
-  filters: NewFilter[]
+  filters: FilterPair[]
 }
 
-type NewFilter = {
+export type FilterPair = {
   actionIndex: number
   optionIndex: number
   targetIndex: number
@@ -179,7 +179,7 @@ export default class StoryBuilderView extends React.Component<
     )
 
     if (existingFilterIndex === -1) {
-      const newFilter: NewFilter = {
+      const newFilter: FilterPair = {
         actionIndex,
         optionIndex,
         targetIndex,
