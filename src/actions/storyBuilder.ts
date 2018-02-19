@@ -1,5 +1,7 @@
 import { FilterPair } from "../pages/StoryBuilderView"
 import { Story } from "../types/Story"
+import brimblewood from "../stories/brimblewood"
+import * as util from "util"
 
 export const buildStory = (story: Story, filters: FilterPair[]): Story => {
   const formattedStory = story
@@ -23,9 +25,22 @@ export const buildStory = (story: Story, filters: FilterPair[]): Story => {
       }
     })
   })
-  console.log(formattedStory)
   return formattedStory
 }
+
+// const dummyFilters: FilterPair[] = [
+//   {
+//     actionIndex: 1,
+//     optionIndex: 0,
+//     targetIndex: 2,
+//     filterBooleanValue: true
+//   }
+// ]
+
+// const story = buildStory(brimblewood, dummyFilters)
+// console.log(story.actions.filter(f => f.filter !== undefined))
+
+// console.log()
 
 // action: {
 //     544: true
