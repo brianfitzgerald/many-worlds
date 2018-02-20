@@ -31,7 +31,7 @@ import {
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
-import { getAllStories } from "../actions/StoryDB"
+import { getAllStories, updateStory } from "../actions/StoryDB"
 import StoryActionInput, {
   PromptButtonBaseStyle,
   PromptButtonTextStyle,
@@ -71,7 +71,7 @@ export default class StoryBuilderView extends React.Component<
         name: "",
         author: "",
         description: "",
-        averageRating: 0,
+        published: false,
         actions: [],
         defaultState: {}
       },
@@ -163,6 +163,13 @@ export default class StoryBuilderView extends React.Component<
 
   leaveFilterMode() {
     this.setState({ filterModeActive: false, filterModeTargetIndex: 0 })
+  }
+
+  publishStory() {
+    updateStory(this.state.story, true).then(() => {
+      alert("Your story is published!")
+      // once navigation is implemented, go to the story here
+    })
   }
 
   updateActionFilterSelection(
@@ -291,7 +298,7 @@ export default class StoryBuilderView extends React.Component<
               <Button
                 title="Publish"
                 color={colors.white}
-                onPress={this.saveAndExit.bind(this)}
+                onPress={this.publishStory.bind(this)}
               />
             ) : null}
           </View>

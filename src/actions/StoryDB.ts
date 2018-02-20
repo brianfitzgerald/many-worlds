@@ -50,3 +50,20 @@ export const getAllStories = () =>
       }
     )
   })
+
+export const updateStory = (story: Story, publish: boolean) =>
+  new Promise((resolve, reject) => {
+    const params: DocumentClient.PutItemInput = {
+      TableName: "midnight_sun-stories",
+      Item: { ...story, publish }
+    }
+    documentClient.put(
+      params,
+      (err: AWS.AWSError, data: DocumentClient.QueryOutput) => {
+        if (err) {
+          reject(err)
+        }
+        resolve()
+      }
+    )
+  })

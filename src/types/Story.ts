@@ -3,7 +3,7 @@ import { InventoryItem, Condition, Ability } from "./Player"
 export type Story = {
   id: string
   name: string
-  averageRating: number
+  published: boolean
   author: string
   description: string
   actions: StoryAction[]
