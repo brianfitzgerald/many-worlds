@@ -41,6 +41,8 @@ type StartpageState = {
   selectedStory?: Story
 }
 
+const userID = "Brian Fitzgerald"
+
 export default class StartPageView extends React.Component<
   StartPageProps,
   StartpageState
@@ -61,13 +63,14 @@ export default class StartPageView extends React.Component<
       })
       .catch(err => console.log(err))
 
-    const userID = "Brian Fitzgerald"
     getMyStories(userID)
       .then(myStories => {
         this.setState({ myStories })
       })
       .catch(err => console.log(err))
   }
+
+  beginEditing() {}
 
   selectStory(story: Story) {
     this.setState({
@@ -100,6 +103,19 @@ export default class StartPageView extends React.Component<
                 title="Play this story with friends"
                 onPress={() => {}}
               />
+              <HeroButton
+                title="Play this story by yourself"
+                onPress={() => {}}
+              />
+              {this.state.selectedStory.author === userID ? (
+                <HeroButton
+                  title="Edit this story"
+                  onPress={this.beginEditing.bind(
+                    this,
+                    this.state.selectedStory
+                  )}
+                />
+              ) : null}
               <HeroButton
                 title="Play this story by yourself"
                 onPress={() => {}}
