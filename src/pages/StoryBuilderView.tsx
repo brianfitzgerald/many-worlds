@@ -9,7 +9,10 @@ import {
   ScrollViewProps,
   ScrollViewStatic,
   Button,
-  TextInput
+  TextInput,
+  ViewStyle,
+  TouchableOpacity,
+  TextStyle
 } from "react-native"
 import Swipeout from "react-native-swipeout"
 
@@ -18,7 +21,7 @@ import HeroButton, { LightHeroButton } from "../components/HeroButton"
 import colors from "../styles/colors"
 
 import { dbInstance } from "../firebaseRef"
-import { Story, StoryOption, StoryAction } from "../types/Story"
+import { Story, StoryOption, StoryAction, StoryState } from "../types/Story"
 import { Player } from "../types/Player"
 import {
   getNextActionIndex,
@@ -28,9 +31,12 @@ import {
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
-import { getAllStories } from "../actions/StoryDB"
-import StoryActionPromptInput, {
-  StoryActionOptionInput
+import { getAllStories, updateStory } from "../actions/StoryDB"
+import StoryActionInput, {
+  PromptButtonBaseStyle,
+  PromptButtonTextStyle,
+  OptionButtonBaseStyle,
+  OptionButtonTextStyle
 } from "../components/StoryActionInput"
 
 type StoryBuilderProps = {
@@ -40,6 +46,16 @@ type StoryBuilderProps = {
 type StoryBuilderState = {
   hasMadeChanges: boolean
   story: Story
+  filterModeActive: boolean
+  filterModeTargetIndex: number
+  filters: FilterPair[]
+}
+
+export type FilterPair = {
+  actionIndex: number
+  optionIndex: number
+  targetIndex: number
+  filterBooleanValue: boolean
 }
 
 export default class StoryBuilderView extends React.Component<
@@ -55,10 +71,13 @@ export default class StoryBuilderView extends React.Component<
         name: "",
         author: "",
         description: "",
-        averageRating: 0,
+        published: false,
         actions: [],
         defaultState: {}
       },
+      filterModeTargetIndex: 0,
+      filterModeActive: false,
+      filters: [],
       hasMadeChanges: false
     }
   }
@@ -133,7 +152,144 @@ export default class StoryBuilderView extends React.Component<
     this.setState({ story: { ...this.state.story, actions: newActions } })
   }
 
+  enterFilterMode(actionIndex: number, optionIndex: number) {
+    if (!optionIndex) {
+      this.setState({
+        filterModeActive: true,
+        filterModeTargetIndex: actionIndex
+      })
+    }
+  }
+
+  leaveFilterMode() {
+    this.setState({ filterModeActive: false, filterModeTargetIndex: 0 })
+  }
+
+  publishStory() {
+    updateStory(this.state.story, true).then(() => {
+      alert("Your story is published!")
+      // once navigation is implemented, go to the story here
+    })
+  }
+
+  testStory() {
+    updateStory(this.state.story, false).then(() => {
+      alert(
+        "Your story is ready for testing. Go to My Stories on the main menu to play it."
+      )
+      // once navigation is implemented, go to the story here
+    })
+  }
+
+  updateActionFilterSelection(
+    actionIndex: number,
+    optionIndex: number,
+    targetIndex: number
+  ) {
+    const newFilterState = this.state.filters
+    const existingFilterIndex = newFilterState.findIndex(
+      f =>
+        f.optionIndex === optionIndex &&
+        f.actionIndex === actionIndex &&
+        f.targetIndex === targetIndex
+    )
+
+    if (existingFilterIndex === -1) {
+      const newFilter: FilterPair = {
+        actionIndex,
+        optionIndex,
+        targetIndex,
+        filterBooleanValue: true
+      }
+      newFilterState.push(newFilter)
+    } else if (existingFilterIndex !== -1) {
+      const currentValue =
+        newFilterState[existingFilterIndex].filterBooleanValue
+      if (currentValue === false) {
+        newFilterState.splice(existingFilterIndex, 1)
+      } else {
+        newFilterState[
+          existingFilterIndex
+        ].filterBooleanValue = !newFilterState[existingFilterIndex]
+          .filterBooleanValue
+      }
+    }
+    this.setState({ filters: newFilterState })
+  }
+
   render() {
+    console.log(this.state)
+
+    if (this.state.filterModeActive) {
+      const targetIndex = this.state.filterModeTargetIndex
+      const target = this.state.story.actions[targetIndex]
+      const newFilter = this.state.filters
+      const validActionsToFilterBy = this.state.story.actions.filter(
+        (a, i) => i !== targetIndex
+      )
+      return (
+        <View style={[commonStyles.container, styles.partyContainer]}>
+          <StatusBar backgroundColor={colors.black} barStyle="light-content" />
+          <View style={styles.topBar}>
+            <Button
+              title="Cancel"
+              color={colors.white}
+              onPress={this.leaveFilterMode.bind(this)}
+            />
+          </View>
+          <Text style={{ color: colors.white, textAlign: "left" }}>Target</Text>
+          <StoryActionInput
+            value={target.prompt}
+            onChange={this.updateActionPrompt.bind(this, targetIndex)}
+            hasFilter={target.filter !== undefined}
+            suppressFilterIcon={true}
+            onFilterPressed={this.enterFilterMode.bind(this, targetIndex)}
+            inputType="prompt"
+          />
+          <Text style={{ color: colors.white, textAlign: "left" }}>
+            Filtering Options
+          </Text>
+          {validActionsToFilterBy.map((action, i) => (
+            <View key={i}>
+              <View style={PromptButtonBaseStyle}>
+                <Text style={PromptButtonTextStyle}>{action.prompt}</Text>
+              </View>
+              {action.options
+                ? action.options.map((action, k) => {
+                    const isInFilter = newFilter.find(
+                      f => f.optionIndex === k && f.actionIndex === i
+                    )
+                    return (
+                      <View>
+                        {isInFilter ? (
+                          <Text style={FilterLabelStyle}>
+                            {isInFilter.filterBooleanValue ? "True" : "False"}
+                          </Text>
+                        ) : null}
+                        <TouchableOpacity
+                          onPress={this.updateActionFilterSelection.bind(
+                            this,
+                            i,
+                            k,
+                            targetIndex
+                          )}
+                        >
+                          <View style={OptionButtonBaseStyle}>
+                            <Text style={OptionButtonTextStyle}>
+                              {action.title}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+                    )
+                  })
+                : null}
+            </View>
+          ))}
+        </View>
+      )
+    }
+
     const hasMadeChanges = this.state.hasMadeChanges
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
@@ -151,7 +307,7 @@ export default class StoryBuilderView extends React.Component<
               <Button
                 title="Publish"
                 color={colors.white}
-                onPress={this.saveAndExit.bind(this)}
+                onPress={this.publishStory.bind(this)}
               />
             ) : null}
           </View>
@@ -159,12 +315,12 @@ export default class StoryBuilderView extends React.Component<
             <Button
               title="Test"
               color={colors.white}
-              onPress={this.saveAndExit.bind(this)}
+              onPress={this.testStory.bind(this)}
             />
           </View>
         </View>
         <ScrollView>
-          <View style={{ flexDirection: "column", width: 300 }}>
+          <View style={{ flexDirection: "column", width: 320 }}>
             <TextInput
               placeholder="Enter a title"
               value={this.state.story.name || ""}
@@ -179,51 +335,57 @@ export default class StoryBuilderView extends React.Component<
               onChange={this.setAuthor.bind(this)}
               style={styles.nameInput}
             />
-          </View>
-          {this.state.story.actions.map((action, i) => (
-            <View key={i}>
-              <Swipeout
-                backgroundColor={colors.black}
-                right={[
-                  {
-                    text: "Remove",
-                    onPress: this.removeActionPrompt.bind(this, i),
-                    backgroundColor: "#FE3A2F"
-                  }
-                ]}
-              >
-                <StoryActionPromptInput
-                  value={action.prompt}
-                  onChange={this.updateActionPrompt.bind(this, i)}
-                />
-              </Swipeout>
-              {action.options
-                ? action.options.map((action, k) => (
-                    <Swipeout
-                      backgroundColor={colors.black}
-                      right={[
-                        {
-                          text: "Remove",
-                          onPress: this.removeActionOption.bind(this, i, k),
-                          backgroundColor: "#FE3A2F"
-                        }
-                      ]}
-                    >
-                      <StoryActionOptionInput
+            {this.state.story.actions.map((action, i) => (
+              <View key={i}>
+                <Swipeout
+                  backgroundColor={colors.black}
+                  right={[
+                    {
+                      text: "Remove",
+                      onPress: this.removeActionPrompt.bind(this, i),
+                      backgroundColor: "#FE3A2F"
+                    }
+                  ]}
+                >
+                  <StoryActionInput
+                    value={action.prompt}
+                    onChange={this.updateActionPrompt.bind(this, i)}
+                    hasFilter={action.filter !== undefined}
+                    onFilterPressed={this.enterFilterMode.bind(this, i, null)}
+                    inputType="prompt"
+                  />
+                </Swipeout>
+                {action.options
+                  ? action.options.map((action, k) => (
+                      <Swipeout
                         key={k}
-                        value={action.title}
-                        onChange={this.updateActionOption.bind(this, i, k)}
-                      />
-                    </Swipeout>
-                  ))
-                : null}
-              <LightHeroButton
-                title="Add an option"
-                onPress={this.addOption.bind(this, i)}
-                style={{ minWidth: 100, alignSelf: "flex-end" }}
-              />
-            </View>
-          ))}
+                        backgroundColor={colors.black}
+                        right={[
+                          {
+                            text: "Remove",
+                            onPress: this.removeActionOption.bind(this, i, k),
+                            backgroundColor: "#FE3A2F"
+                          }
+                        ]}
+                      >
+                        <StoryActionInput
+                          value={action.title}
+                          hasFilter={action.filter !== undefined}
+                          onChange={this.updateActionOption.bind(this, i, k)}
+                          suppressFilterIcon={true}
+                          inputType="option"
+                        />
+                      </Swipeout>
+                    ))
+                  : null}
+                <LightHeroButton
+                  title="Add an option"
+                  onPress={this.addOption.bind(this, i)}
+                  style={{ minWidth: 100, alignSelf: "flex-end" }}
+                />
+              </View>
+            ))}
+          </View>
         </ScrollView>
         <LightHeroButton
           title={
@@ -237,6 +399,10 @@ export default class StoryBuilderView extends React.Component<
       </View>
     )
   }
+}
+
+const FilterLabelStyle: TextStyle = {
+  color: colors.blue
 }
 
 const styles = StyleSheet.create({

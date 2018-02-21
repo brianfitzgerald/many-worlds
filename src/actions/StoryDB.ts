@@ -12,6 +12,10 @@ AWS.config.update(awsKeys)
 
 const documentClient = new AWS.DynamoDB.DocumentClient()
 
+const tableNames = {
+  stories: "midnight_sun-stories"
+}
+
 export const getStory = (id: string) =>
   new Promise<Story>((resolve, reject) => {
     const params: DocumentClient.GetItemInput = {
@@ -33,7 +37,7 @@ export const getStory = (id: string) =>
 export const getAllStories = () =>
   new Promise<Story[]>((resolve, reject) => {
     const params: DocumentClient.ScanInput = {
-      TableName: "midnight_sun-stories"
+      TableName: tableNames.stories
     }
     documentClient.scan(
       params,
@@ -47,6 +51,25 @@ export const getAllStories = () =>
 
         const stories = data.Items as Story[]
         resolve(stories)
+      }
+    )
+  })
+
+export const updateStory = (story: Story, publish: boolean) =>
+  new Promise((resolve, reject) => {
+    const storyToPublish = story
+    storyToPublish.published = publish
+    const params: DocumentClient.PutItemInput = {
+      TableName: tableNames.stories,
+      Item: storyToPublish
+    }
+    documentClient.put(
+      params,
+      (err: AWS.AWSError, data: DocumentClient.QueryOutput) => {
+        if (err) {
+          reject(err)
+        }
+        resolve()
       }
     )
   })

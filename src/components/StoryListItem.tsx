@@ -30,10 +30,8 @@ const StoryListItem: React.SFC<StoryListItemProps> = ({
     <TouchableOpacity onPress={onPress}>
       <View style={styles.ItemBase}>
         <Text style={styles.StoryName}>{story.name}</Text>
+        <Text style={styles.StoryDescription}>By {story.author}</Text>
         <Text style={styles.StoryDescription}>{story.description}</Text>
-        <Text style={styles.StoryDescription}>
-          Average rating: {story.averageRating} / 10
-        </Text>
       </View>
       {selected ? <Text style={{ color: colors.white }}>Selected</Text> : null}
     </TouchableOpacity>

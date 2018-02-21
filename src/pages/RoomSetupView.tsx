@@ -41,9 +41,6 @@ type RoomSetupViewState = {
 }
 
 const sortStories = (stories: Story[], option: SortOption): Story[] => {
-  if (option === "AverageRating") {
-    return stories.sort((a, b) => a.averageRating - b.averageRating)
-  }
   if (option === "Alphabetical") {
     return stories.sort((a, b) => {
       if (a.name < b.name) return -1
