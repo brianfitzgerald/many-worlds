@@ -172,6 +172,15 @@ export default class StoryBuilderView extends React.Component<
     })
   }
 
+  testStory() {
+    updateStory(this.state.story, false).then(() => {
+      alert(
+        "Your story is ready for testing. Go to My Stories on the main menu to play it."
+      )
+      // once navigation is implemented, go to the story here
+    })
+  }
+
   updateActionFilterSelection(
     actionIndex: number,
     optionIndex: number,
@@ -306,7 +315,7 @@ export default class StoryBuilderView extends React.Component<
             <Button
               title="Test"
               color={colors.white}
-              onPress={this.saveAndExit.bind(this)}
+              onPress={this.testStory.bind(this)}
             />
           </View>
         </View>
