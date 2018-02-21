@@ -9,7 +9,8 @@ import {
   ScrollViewProps,
   ScrollViewStatic,
   Button,
-  TextInput
+  TextInput,
+  Modal
 } from "react-native"
 import Swipeout from "react-native-swipeout"
 
@@ -28,15 +29,16 @@ import {
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
-import { getAllStories } from "../actions/StoryDB"
-import StoryActionPromptInput, {
-  StoryActionOptionInput
-} from "../components/StoryActionInput"
+import { getFeaturedStories, getMyStories } from "../actions/StoryDB"
+import StoryActionPromptInput from "../components/StoryActionInput"
 import NewsItems from "../newsItems"
 
 type StartPageProps = {}
 type StartpageState = {
-  stories: Story[]
+  featuredStories: Story[]
+  myStories: Story[]
+  showSelectStoryModal: boolean
+  selectedStory?: Story
 }
 
 export default class StartPageView extends React.Component<
@@ -46,25 +48,36 @@ export default class StartPageView extends React.Component<
   constructor(props: StartPageProps) {
     super(props)
     this.state = {
-      stories: []
+      featuredStories: [],
+      myStories: [],
+      showSelectStoryModal: false
     }
   }
 
   componentDidMount() {
-    getAllStories()
-      .then(stories => {
-        this.setState({ stories })
+    getFeaturedStories()
+      .then(featuredStories => {
+        this.setState({ featuredStories })
+      })
+      .catch(err => console.log(err))
+
+    const userID = "Brian Fitzgerald"
+    getMyStories(userID)
+      .then(myStories => {
+        this.setState({ myStories })
       })
       .catch(err => console.log(err))
   }
 
-  selectStory(story: Story) {}
+  selectStory(story: Story) {
+    this.setState({
+      selectedStory: story,
+      showSelectStoryModal: true
+    })
+  }
 
   render() {
-    const featuredStories = this.state.stories
-    const myStories = this.state.stories
-
-    if (featuredStories.length < 1) {
+    if (this.state.featuredStories.length < 1) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <Text style={styles.promptButton}>Loading...</Text>
@@ -75,6 +88,31 @@ export default class StartPageView extends React.Component<
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
+        <Modal visible={this.state.showSelectStoryModal}>
+          {this.state.selectedStory ? (
+            <View>
+              <StoryListItem
+                story={this.state.selectedStory}
+                selected={false}
+                onPress={() => {}}
+              />
+              <HeroButton
+                title="Play this story with friends"
+                onPress={() => {}}
+              />
+              <HeroButton
+                title="Play this story by yourself"
+                onPress={() => {}}
+              />
+            </View>
+          ) : null}
+          <Button
+            title="Cancel"
+            onPress={() => {
+              this.setState({ showSelectStoryModal: false })
+            }}
+          />
+        </Modal>
         <ScrollView>
           <Text style={styles.appTitle}>Midnight Sun</Text>
           <HeroButton
@@ -85,7 +123,7 @@ export default class StartPageView extends React.Component<
           <Text style={styles.header}>News</Text>
           {NewsItems.map((item, key) => <NewsItem {...item} key={key} />)}
           <Text style={styles.header}>Featured Stories</Text>
-          {featuredStories.map((story: Story, i) => (
+          {this.state.featuredStories.map((story: Story, i) => (
             <StoryListItem
               key={i}
               story={story}
@@ -94,7 +132,7 @@ export default class StartPageView extends React.Component<
             />
           ))}
           <Text style={styles.header}>My Stories</Text>
-          {myStories.map((story: Story, i) => (
+          {this.state.myStories.map((story: Story, i) => (
             <StoryListItem
               key={i}
               story={story}

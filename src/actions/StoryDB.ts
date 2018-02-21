@@ -6,20 +6,18 @@ import brimblewood from "../stories/brimblewood"
 import { awsKeys } from "../secrets"
 import { DocumentClient } from "aws-sdk/lib/dynamodb/document_client"
 
-export const storiesTableName = "midnight_sun-stories"
-
 AWS.config.update(awsKeys)
 
 const documentClient = new AWS.DynamoDB.DocumentClient()
 
 const tableNames = {
-  stories: "midnight_sun-stories"
+  stories: "midnight-sun-stories"
 }
 
 export const getStory = (id: string) =>
   new Promise<Story>((resolve, reject) => {
     const params: DocumentClient.GetItemInput = {
-      TableName: storiesTableName,
+      TableName: tableNames.stories,
       Key: { id }
     }
     documentClient.get(
@@ -34,12 +32,37 @@ export const getStory = (id: string) =>
     )
   })
 
-export const getAllStories = () =>
+export const getFeaturedStories = () =>
   new Promise<Story[]>((resolve, reject) => {
     const params: DocumentClient.ScanInput = {
       TableName: tableNames.stories
     }
     documentClient.scan(
+      params,
+      (err: AWS.AWSError, data: DocumentClient.QueryOutput) => {
+        if (err) {
+          reject(err)
+        }
+        if (data.Count === 0) {
+          reject()
+        }
+
+        const stories = data.Items as Story[]
+        resolve(stories)
+      }
+    )
+  })
+
+export const getMyStories = (userId: string) =>
+  new Promise<Story[]>((resolve, reject) => {
+    const params: DocumentClient.QueryInput = {
+      TableName: tableNames.stories,
+      KeyConditionExpression: "author = :author",
+      ExpressionAttributeValues: {
+        ":author": userId
+      }
+    }
+    documentClient.query(
       params,
       (err: AWS.AWSError, data: DocumentClient.QueryOutput) => {
         if (err) {

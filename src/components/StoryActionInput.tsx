@@ -17,15 +17,13 @@ import commonStyles from "../styles/commonStyles"
 import colors from "../styles/colors"
 import { Story } from "../types/Story"
 
-type InputType = "prompt" | "option"
-
 type StoryInputProps = {
   value: string
   onChange: (text: string) => void
   placeholder?: string
   hasFilter: boolean
   onFilterPressed?: () => void
-  inputType: InputType
+  inputType: "prompt" | "option"
   suppressFilterIcon?: boolean
 }
 
