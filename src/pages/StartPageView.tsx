@@ -156,6 +156,11 @@ export default class StartPageView extends React.Component<
               onPress={this.selectStory.bind(this, story)}
             />
           ))}
+          <HeroButton
+            style={commonStyles.heroButtonMargins}
+            title="Create a Story"
+            onPress={() => {}}
+          />
         </ScrollView>
       </View>
     )
