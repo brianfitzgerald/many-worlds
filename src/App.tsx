@@ -126,65 +126,6 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   render() {
-    let page = null
-
     return <StartPageView />
-
-    if (!this.state.inRoom) {
-      page = (
-        <View style={commonStyles.container}>
-          <StatusBar backgroundColor={colors.black} barStyle="light-content" />
-          <Modal visible={this.state.createRoomModalVisible}>
-            <RoomSetupView
-              onStoryBeginPressed={this.createRoom.bind(this)}
-              onCloseModal={this.hideRoomSetup.bind(this)}
-            />
-          </Modal>
-          <Modal visible={this.state.storyBuilderVisible}>
-            <StoryBuilderView onCloseModal={this.hideRoomSetup.bind(this)} />
-          </Modal>
-          <Text style={commonStyles.headerText}>What is your name?</Text>
-          <TextInput
-            placeholder="Name"
-            placeholderTextColor={colors.grey}
-            style={commonStyles.textInput}
-            value={this.state.playerName}
-            onChangeText={val => this.setState({ playerName: val })}
-          />
-          <Text style={commonStyles.headerText}>Where are you going?</Text>
-          <TextInput
-            placeholder="Room Code"
-            placeholderTextColor={colors.grey}
-            style={commonStyles.textInput}
-            value={this.state.roomCode}
-            onChangeText={val => this.setState({ roomCode: val })}
-          />
-          <HeroButton
-            style={commonStyles.heroButtonMargins}
-            title="Join Game"
-            onPress={this.joinRoom.bind(this)}
-          />
-          <HeroButton
-            style={commonStyles.heroButtonMargins}
-            title="Start New Game"
-            onPress={this.showRoomSetup.bind(this)}
-          />
-          <HeroButton
-            title="Story Builder"
-            onPress={this.showStoryBuilder.bind(this)}
-          />
-        </View>
-      )
-    } else {
-      page = (
-        <PartyView
-          currentPlayerName={this.state.playerName}
-          story={this.state.story}
-          roomCode={this.state.roomCode}
-        />
-      )
-    }
-
-    return page
   }
 }
