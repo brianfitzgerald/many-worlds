@@ -45,7 +45,6 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
     padding: 15,
     minHeight: 50,
     marginBottom: 5,
-    marginTop: 15,
     backgroundColor: colors.white,
     borderRadius: 10,
     minWidth: 300

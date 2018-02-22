@@ -9,15 +9,15 @@ provider "aws" {
 
 variable "project_name" {
   type    = "string"
-  default = "midnight_sun"
+  default = "midnight-sun"
 }
 
 output "access_key_id" {
-  value = "${aws_iam_access_key.user_client.id}"
+  value = "${aws_iam_access_key.user_client_key.id}"
 }
 
 output "access_key_secret" {
-  value = "${aws_iam_access_key.user_client.secret}"
+  value = "${aws_iam_access_key.user_client_key.secret}"
 }
 
 # Resources
@@ -27,9 +27,15 @@ resource "aws_dynamodb_table" "stories" {
   read_capacity  = 20
   write_capacity = 20
   hash_key       = "id"
+  range_key      = "author"
 
   attribute {
     name = "id"
+    type = "S"
+  }
+
+  attribute {
+    name = "author"
     type = "S"
   }
 }
@@ -39,7 +45,7 @@ resource "aws_iam_user" "user_client" {
   path = "/"
 }
 
-resource "aws_iam_access_key" "user_client" {
+resource "aws_iam_access_key" "user_client_key" {
   user = "${aws_iam_user.user_client.name}"
 }
 

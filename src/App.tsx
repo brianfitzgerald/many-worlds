@@ -24,6 +24,7 @@ import { getStory } from "./actions/StoryDB"
 import colors from "./styles/colors"
 import RoomSetupView from "./pages/RoomSetupView"
 import StoryBuilderView from "./pages/StoryBuilderView"
+import StartPageView from "./pages/StartPageView"
 
 type AppState = {
   playerName: string
@@ -126,6 +127,8 @@ export default class App extends React.Component<AppProps, AppState> {
 
   render() {
     let page = null
+
+    return <StartPageView />
 
     if (!this.state.inRoom) {
       page = (

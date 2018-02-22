@@ -25,7 +25,7 @@ import {
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
-import { getAllStories } from "../actions/StoryDB"
+import { getFeaturedStories } from "../actions/StoryDB"
 
 type RoomSetupViewProps = {
   onStoryBeginPressed: () => void
@@ -67,7 +67,7 @@ export default class PartyView extends React.Component<
   }
 
   componentDidMount() {
-    getAllStories()
+    getFeaturedStories()
       .then(stories => {
         console.log(stories)
         this.setState({ stories })

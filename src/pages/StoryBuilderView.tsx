@@ -31,7 +31,7 @@ import {
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
-import { getAllStories, updateStory } from "../actions/StoryDB"
+import { updateStory } from "../actions/StoryDB"
 import StoryActionInput, {
   PromptButtonBaseStyle,
   PromptButtonTextStyle,
