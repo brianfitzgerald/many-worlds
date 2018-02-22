@@ -40,14 +40,13 @@ export const getFeaturedStories = () =>
     documentClient.scan(
       params,
       (err: AWS.AWSError, data: DocumentClient.QueryOutput) => {
-        if (err) {
+        if (err != null) {
           reject(err)
-        }
-        if (data.Count === 0) {
-          reject()
         }
 
         const stories = data.Items as Story[]
+        console.log(stories)
+
         resolve(stories)
       }
     )
@@ -55,24 +54,24 @@ export const getFeaturedStories = () =>
 
 export const getMyStories = (userId: string) =>
   new Promise<Story[]>((resolve, reject) => {
-    const params: DocumentClient.QueryInput = {
+    const params: DocumentClient.ScanInput = {
       TableName: tableNames.stories,
-      KeyConditionExpression: "author = :author",
+      FilterExpression: "author = :author",
       ExpressionAttributeValues: {
         ":author": userId
       }
     }
-    documentClient.query(
+    documentClient.scan(
       params,
-      (err: AWS.AWSError, data: DocumentClient.QueryOutput) => {
-        if (err) {
+      (err: AWS.AWSError, data: DocumentClient.ScanOutput) => {
+        console.log(err)
+
+        if (err != null) {
           reject(err)
-        }
-        if (data.Count === 0) {
-          reject()
         }
 
         const stories = data.Items as Story[]
+        console.log(stories)
         resolve(stories)
       }
     )

@@ -10,7 +10,10 @@ import {
   ScrollViewStatic,
   Button,
   TextInput,
-  Modal
+  Modal,
+  TextStyle,
+  ViewStyle,
+  ImageStyle
 } from "react-native"
 import Swipeout from "react-native-swipeout"
 
@@ -37,6 +40,7 @@ type StartPageProps = {}
 type StartpageState = {
   featuredStories: Story[]
   myStories: Story[]
+  storiesLoaded: boolean
   showSelectStoryModal: boolean
   selectedStory?: Story
 }
@@ -52,6 +56,7 @@ export default class StartPageView extends React.Component<
     this.state = {
       featuredStories: [],
       myStories: [],
+      storiesLoaded: false,
       showSelectStoryModal: false
     }
   }
@@ -59,13 +64,13 @@ export default class StartPageView extends React.Component<
   componentDidMount() {
     getFeaturedStories()
       .then(featuredStories => {
-        this.setState({ featuredStories })
+        this.setState({ featuredStories, storiesLoaded: true })
       })
       .catch(err => console.log(err))
 
     getMyStories(userID)
       .then(myStories => {
-        this.setState({ myStories })
+        this.setState({ myStories, storiesLoaded: true })
       })
       .catch(err => console.log(err))
   }
@@ -80,7 +85,7 @@ export default class StartPageView extends React.Component<
   }
 
   render() {
-    if (this.state.featuredStories.length < 1) {
+    if (!this.state.storiesLoaded) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <Text style={styles.promptButton}>Loading...</Text>
@@ -167,12 +172,13 @@ export default class StartPageView extends React.Component<
   }
 }
 
-const styles = StyleSheet.create({
+const styles: { [key: string]: ViewStyle | TextStyle | ImageStyle } = {
   appTitle: {
     fontSize: 48,
     color: colors.white,
     fontWeight: "bold",
-    textAlign: "center"
+    textAlign: "center",
+    marginTop: 15
   },
   header: {
     fontSize: 24,
@@ -225,4 +231,4 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginTop: 4
   }
-})
+}
