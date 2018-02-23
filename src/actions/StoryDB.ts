@@ -10,7 +10,7 @@ AWS.config.update(awsKeys)
 
 const documentClient = new AWS.DynamoDB.DocumentClient()
 
-const tableNames = {
+export const tableNames = {
   stories: "midnight-sun-stories"
 }
 

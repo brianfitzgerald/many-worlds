@@ -3,7 +3,7 @@ import * as AWS from "aws-sdk"
 import { awsKeys } from "./secrets"
 import { readFileSync } from "fs"
 import brimblewood from "./stories/brimblewood"
-import { storiesTableName } from "./actions/StoryDB"
+import { tableNames } from "./actions/StoryDB"
 
 AWS.config.update(awsKeys)
 const documentClient = new AWS.DynamoDB.DocumentClient()
@@ -19,7 +19,7 @@ const storyJSONObject = JSON.parse(storyJSONString)
 
 documentClient.put(
   {
-    TableName: storiesTableName,
+    TableName: tableNames.stories,
     Item: storyJSONObject
   },
   (err, data) => {
