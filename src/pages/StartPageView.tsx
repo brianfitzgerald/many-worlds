@@ -16,6 +16,7 @@ import {
   ImageStyle
 } from "react-native"
 import Swipeout from "react-native-swipeout"
+import { observer } from "mobx-react"
 
 import commonStyles from "../styles/commonStyles"
 import HeroButton, { LightHeroButton, NewsItem } from "../components/HeroButton"
@@ -47,6 +48,7 @@ type StartpageState = {
 
 const userID = "Brian Fitzgerald"
 
+@observer
 export default class StartPageView extends React.Component<
   StartPageProps,
   StartpageState

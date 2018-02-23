@@ -38,10 +38,9 @@ import StoryActionInput, {
   OptionButtonBaseStyle,
   OptionButtonTextStyle
 } from "../components/StoryActionInput"
+import { appStore } from "../stores/AppStore"
 
-type StoryBuilderProps = {
-  onCloseModal: () => {}
-}
+type StoryBuilderProps = {}
 
 type StoryBuilderState = {
   hasMadeChanges: boolean
@@ -83,7 +82,7 @@ export default class StoryBuilderView extends React.Component<
   }
 
   saveAndExit() {
-    this.props.onCloseModal()
+    appStore.closeModal()
   }
 
   setAuthor(value: any) {

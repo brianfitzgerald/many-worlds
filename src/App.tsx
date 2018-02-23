@@ -25,6 +25,8 @@ import colors from "./styles/colors"
 import RoomSetupView from "./pages/RoomSetupView"
 import StoryBuilderView from "./pages/StoryBuilderView"
 import StartPageView from "./pages/StartPageView"
+import { appStore } from "./stores/AppStore"
+import { observer } from "mobx-react"
 
 type AppState = {
   playerName: string
@@ -38,18 +40,10 @@ type AppState = {
 
 type AppProps = {}
 
-export default class App extends React.Component<AppProps, AppState> {
+@observer
+export default class App extends React.Component<AppProps> {
   constructor(props: any) {
     super(props)
-
-    this.state = {
-      playerName: "",
-      roomCode: "",
-      inRoom: false,
-      createRoomModalVisible: false,
-      storyBuilderVisible: false,
-      selectedStoryID: ""
-    }
   }
 
   componentWillMount() {
@@ -67,11 +61,11 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   _updateUsername() {
-    AsyncStorage.setItem(usernameStorageKey, this.state.playerName)
+    AsyncStorage.setItem(usernameStorageKey, appStore.playerName)
   }
 
   joinRoom() {
-    const { roomCode, playerName } = this.state
+    const { roomCode, playerName } = appStore
     joinRoom(roomCode, playerName).then((storyID: string) => {
       const story = getStory(storyID)
         .then((story: Story) => {
@@ -111,7 +105,7 @@ export default class App extends React.Component<AppProps, AppState> {
       alert("Select a story first.")
       return
     }
-    const { playerName } = this.state
+    const { playerName } = appStore
     const story = getStory(storyID).then((story: Story) => {
       createRoom(playerName, story).then((roomCode: string) => {
         this._updateUsername()

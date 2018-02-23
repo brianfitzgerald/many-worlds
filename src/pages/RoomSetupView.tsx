@@ -26,11 +26,9 @@ import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
 import { getFeaturedStories } from "../actions/StoryDB"
+import { appStore } from "../stores/AppStore"
 
-type RoomSetupViewProps = {
-  onStoryBeginPressed: () => void
-  onCloseModal: () => void
-}
+type RoomSetupViewProps = {}
 
 type SortOption = "AverageRating" | "Alphabetical"
 
@@ -120,7 +118,7 @@ export default class PartyView extends React.Component<
         <Button
           title="Cancel"
           color={colors.white}
-          onPress={this.props.onCloseModal}
+          onPress={appStore.closeModal}
         />
         {sortButtons}
         <ScrollView>
@@ -135,10 +133,7 @@ export default class PartyView extends React.Component<
         </ScrollView>
         <HeroButton
           title="Begin"
-          onPress={this.props.onStoryBeginPressed.bind(
-            this,
-            this.state.selectedStoryID
-          )}
+          onPress={appStore.closeModal.bind(this, this.state.selectedStoryID)}
         />
       </View>
     )

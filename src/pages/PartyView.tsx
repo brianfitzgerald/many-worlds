@@ -27,13 +27,9 @@ import {
 } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
+import { appStore } from "../stores/AppStore"
 
-type PartyViewProps = {
-  story?: Story
-  currentPlayerName: string
-  roomCode: string
-  dispatch?: (func: { type: string; value: RoomState }) => void
-}
+type PartyViewProps = {}
 
 type PartyViewState = {
   roomState: RoomState
@@ -78,7 +74,7 @@ export default class PartyView extends React.Component<
   }
 
   componentDidMount() {
-    const matchID = this.props.roomCode
+    const matchID = appStore.roomCode
     dbInstance.ref(`/rooms/${matchID}/`).on("value", snap => {
       const updatedRoomState: FirebaseRoomState = snap
         ? (snap.val() as RoomState)
@@ -98,12 +94,13 @@ export default class PartyView extends React.Component<
   }
 
   _executeAction(optionIndex: number) {
-    if (!this.props.story) return
+    const story = appStore.currentStory
+    if (!story) return
 
     const scrollRef = this.refs.scrollView as ScrollViewStatic
 
     const currentAction = getActionByIndex(
-      this.props.story,
+      story,
       this.state.roomState.currentStoryIndex
     )
 
@@ -119,20 +116,20 @@ export default class PartyView extends React.Component<
 
     const currentStoryIndex = this.state.roomState.currentStoryIndex
     const nextStoryIndex = getNextActionIndex(
-      this.props.story,
+      story,
       this.state.roomState.storyState,
       currentStoryIndex
     )
     const newState = doAction(
       this.state.roomState,
-      this.props.story,
+      story,
       currentStoryIndex,
       option
     )
 
     newState.currentStoryIndex = nextStoryIndex
 
-    updateRoomState(this.props.roomCode, newState).then(() => {
+    updateRoomState(appStore.roomCode, newState).then(() => {
       if (scrollRef) {
         scrollRef.scrollToEnd()
       }
@@ -154,7 +151,7 @@ export default class PartyView extends React.Component<
     } else {
       const newConnectedPlayersState = this.state.roomState.connectedPlayers.map(
         p => {
-          if (p.name === this.props.currentPlayerName) {
+          if (p.name === appStore.playerName) {
             p.selectedChoiceIndex = optionIndex
           }
           return p
@@ -164,14 +161,14 @@ export default class PartyView extends React.Component<
       const newRoomState = this.state.roomState
       newRoomState.connectedPlayers = newConnectedPlayersState
 
-      updateRoomState(this.props.roomCode, newRoomState)
+      updateRoomState(appStore.roomCode, newRoomState)
     }
   }
 
   _finishStory() {}
 
   render() {
-    if (!this.props.story) {
+    if (!appStore.currentStory) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <Text style={styles.roomCode}>Loading</Text>
@@ -180,7 +177,7 @@ export default class PartyView extends React.Component<
     }
 
     const currentAction = getActionByIndex(
-      this.props.story,
+      appStore.currentStory,
       this.state.roomState.currentStoryIndex
     )
 
@@ -188,7 +185,7 @@ export default class PartyView extends React.Component<
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <View style={styles.header}>
-          <Text style={styles.roomCode}>{this.props.roomCode}</Text>
+          <Text style={styles.roomCode}>{appStore.roomCode}</Text>
           <Text style={styles.timer}>
             {this.state.currentTimer} Seconds Left
           </Text>
