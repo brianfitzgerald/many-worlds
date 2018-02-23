@@ -28,15 +28,7 @@ import StartPageView from "./pages/StartPageView"
 import { appStore } from "./stores/AppStore"
 import { observer } from "mobx-react"
 
-type AppState = {
-  playerName: string
-  roomCode: string
-  story?: Story
-  inRoom: boolean
-  createRoomModalVisible: boolean
-  storyBuilderVisible: boolean
-  selectedStoryID: string
-}
+type AppState = {}
 
 type AppProps = {}
 
@@ -70,34 +62,12 @@ export default class App extends React.Component<AppProps> {
       const story = getStory(storyID)
         .then((story: Story) => {
           this._updateUsername()
-          this.setState({
-            inRoom: true,
-            story,
-            roomCode
-          })
+          appStore.enterRoom(roomCode, story)
         })
         .catch(e => {
           console.log(e)
         })
     })
-  }
-
-  onFinish() {
-    this.setState({
-      inRoom: false
-    })
-  }
-
-  showStoryBuilder() {
-    this.setState({ storyBuilderVisible: true })
-  }
-
-  showRoomSetup() {
-    this.setState({ createRoomModalVisible: true })
-  }
-
-  hideRoomSetup() {
-    this.setState({ createRoomModalVisible: false, storyBuilderVisible: false })
   }
 
   createRoom(storyID: string) {
@@ -109,17 +79,22 @@ export default class App extends React.Component<AppProps> {
     const story = getStory(storyID).then((story: Story) => {
       createRoom(playerName, story).then((roomCode: string) => {
         this._updateUsername()
-        this.setState({
-          inRoom: true,
-          createRoomModalVisible: false,
-          roomCode,
-          story
-        })
       })
     })
   }
 
   render() {
-    return <StartPageView />
+    switch (appStore.navigationLocation) {
+      case "roomSetup":
+        return <RoomSetupView />
+      case "storyBuilder":
+        return <StoryBuilderView />
+      case "party":
+        return <PartyView />
+      case "startPage":
+        return <StartPageView />
+      default:
+        return <StartPageView />
+    }
   }
 }

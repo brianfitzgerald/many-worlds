@@ -1,17 +1,16 @@
-import { observable, action } from "mobx"
+import { observable, action, useStrict } from "mobx"
 import { Story } from "../types/Story"
 
 export type NavigationLocation =
-  | "createRoom"
+  | "roomSetup"
   | "storyBuilder"
-  | "inGame"
+  | "party"
   | "startPage"
 
 export default class AppStore {
   @observable public playerName: string = ""
   @observable public roomCode: string = ""
   @observable public currentStory?: Story
-  @observable public inRoom?: boolean
   @observable public navigationLocation?: NavigationLocation
 
   @action
@@ -24,10 +23,17 @@ export default class AppStore {
   }
 
   @action
-  enterRoom() {
-    this.navigationLocation = "inGame"
-    this.currentStory = undefined
+  enterRoom(roomCode: string, story: Story) {
+    this.navigationLocation = "party"
+    this.roomCode = roomCode
+    this.currentStory = story
+  }
+
+  @action
+  enterStoryBuilder() {
+    this.navigationLocation = "storyBuilder"
   }
 }
 
+useStrict(true)
 export const appStore = new AppStore()
