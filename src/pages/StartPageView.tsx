@@ -36,6 +36,7 @@ import StoryListItem from "../components/StoryListItem"
 import { getFeaturedStories, getMyStories } from "../actions/StoryDB"
 import StoryActionPromptInput from "../components/StoryActionInput"
 import NewsItems from "../newsItems"
+import { appStore } from "../stores/AppStore"
 
 type StartPageProps = {}
 type StartpageState = {
@@ -77,7 +78,9 @@ export default class StartPageView extends React.Component<
       .catch(err => console.log(err))
   }
 
-  beginEditing() {}
+  beginEditing(story: Story) {
+    appStore.enterStoryBuilder(story)
+  }
 
   selectStory(story: Story) {
     this.setState({
@@ -125,7 +128,9 @@ export default class StartPageView extends React.Component<
               ) : null}
               <HeroButton
                 title="Play this story by yourself"
-                onPress={() => {}}
+                onPress={() =>
+                  appStore.enterSingleplayer(this.state.selectedStory)
+                }
               />
             </View>
           ) : null}

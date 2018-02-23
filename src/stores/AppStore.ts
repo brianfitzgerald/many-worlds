@@ -30,8 +30,18 @@ export default class AppStore {
   }
 
   @action
-  enterStoryBuilder() {
+  enterSingleplayer(story?: Story) {
+    if (!story) {
+      alert("no story chosen")
+    }
+    this.currentStory = story
+    this.navigationLocation = "party"
+  }
+
+  @action
+  enterStoryBuilder(story: Story) {
     this.navigationLocation = "storyBuilder"
+    this.currentStory = story
   }
 }
 
