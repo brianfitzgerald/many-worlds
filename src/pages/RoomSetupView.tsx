@@ -50,7 +50,7 @@ const sortStories = (stories: Story[], option: SortOption): Story[] => {
   return stories
 }
 
-export default class PartyView extends React.Component<
+export default class RoomSetupView extends React.Component<
   RoomSetupViewProps,
   RoomSetupViewState
 > {
@@ -64,27 +64,18 @@ export default class PartyView extends React.Component<
     }
   }
 
-  componentDidMount() {
-    getFeaturedStories()
-      .then(stories => {
-        console.log(stories)
-        this.setState({ stories })
-      })
-      .catch(err => console.log(err))
-  }
-
   selectStory(story: Story) {
     this.setState({
       selectedStoryID: story.id
     })
   }
 
-  changeSort(selectedSortOption: SortOption) {
-    this.setState({ selectedSortOption })
+  _beginStory() {
+    appStore.closeModal.bind(this, this.state.selectedStoryID)
   }
 
   render() {
-    if (this.state.stories.length < 1) {
+    if (!appStore.currentStory) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <Text style={styles.promptButton}>Loading...</Text>
@@ -97,21 +88,6 @@ export default class PartyView extends React.Component<
       this.state.selectedSortOption
     )
 
-    const sortButtons = (
-      <View>
-        <Button
-          color={colors.white}
-          title="Sort by Rating"
-          onPress={this.changeSort.bind(this, "AverageRating")}
-        />
-        <Button
-          color={colors.white}
-          title="Sort by Title"
-          onPress={this.changeSort.bind(this, "Alphabetical")}
-        />
-      </View>
-    )
-
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
@@ -120,21 +96,8 @@ export default class PartyView extends React.Component<
           color={colors.white}
           onPress={appStore.closeModal}
         />
-        {sortButtons}
-        <ScrollView>
-          {sortedStories.map((story: Story, i) => (
-            <StoryListItem
-              key={i}
-              story={story}
-              selected={story.id === this.state.selectedStoryID}
-              onPress={this.selectStory.bind(this, story)}
-            />
-          ))}
-        </ScrollView>
-        <HeroButton
-          title="Begin"
-          onPress={appStore.closeModal.bind(this, this.state.selectedStoryID)}
-        />
+        <StoryListItem story={appStore.currentStory} />
+        <HeroButton title="Begin" onPress={this._beginStory.bind(this)} />
       </View>
     )
   }

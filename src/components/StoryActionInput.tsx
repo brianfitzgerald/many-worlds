@@ -32,7 +32,7 @@ const StoryActionInput: React.SFC<StoryInputProps> = props => {
     props.suppressFilterIcon === true ? null : (
       <TouchableOpacity onPress={props.onFilterPressed}>
         <Text style={{ color: props.hasFilter ? colors.white : colors.grey }}>
-          FF
+          Filter
         </Text>
       </TouchableOpacity>
     )

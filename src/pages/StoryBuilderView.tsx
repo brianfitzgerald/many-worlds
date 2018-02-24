@@ -231,7 +231,7 @@ export default class StoryBuilderView extends React.Component<
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <View style={styles.topBar}>
             <Button
-              title="Cancel"
+              title="Done"
               color={colors.white}
               onPress={this.leaveFilterMode.bind(this)}
             />

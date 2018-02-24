@@ -17,8 +17,8 @@ import { Story } from "../types/Story"
 
 type StoryListItemProps = {
   story: Story
-  onPress: () => void
-  selected: boolean
+  onPress?: () => void
+  selected?: boolean
 }
 
 const StoryListItem: React.SFC<StoryListItemProps> = ({

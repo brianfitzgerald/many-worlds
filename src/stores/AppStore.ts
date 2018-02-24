@@ -39,9 +39,14 @@ export default class AppStore {
   }
 
   @action
-  enterStoryBuilder(story: Story) {
+  enterStoryBuilder(story?: Story) {
     this.navigationLocation = "storyBuilder"
     this.currentStory = story
+  }
+
+  @action
+  updatePlayerName(playerName: string) {
+    this.playerName = playerName
   }
 }
 
