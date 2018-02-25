@@ -63,6 +63,9 @@ export function getNextActionIndex(
 ): number {
   let nextStoryIndex = currentStoryIndex + 1
 
+  if (story.actions.length === nextStoryIndex) {
+    return nextStoryIndex
+  }
   while (!validateFilter(story.actions[nextStoryIndex].filter, currentState)) {
     nextStoryIndex++
   }

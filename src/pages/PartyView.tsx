@@ -176,6 +176,26 @@ export default class PartyView extends React.Component<
       )
     }
 
+    const isAtStoryEnd =
+      this.state.roomState.currentStoryIndex >=
+      appStore.currentStory.actions.length
+
+    console.log(this.state.roomState.currentStoryIndex)
+    console.log(appStore.currentStory.actions.length)
+    console.log(isAtStoryEnd)
+
+    if (isAtStoryEnd) {
+      return (
+        <View style={[commonStyles.container, styles.partyContainer]}>
+          <Text>The End</Text>
+          <HeroButton
+            title="Back to menu"
+            onPress={() => appStore.leaveRoom()}
+          />
+        </View>
+      )
+    }
+
     const currentAction = getActionByIndex(
       appStore.currentStory,
       this.state.roomState.currentStoryIndex
@@ -220,13 +240,6 @@ export default class PartyView extends React.Component<
               />
             </View>
           ))}
-          {currentAction.type === "end" ? (
-            <HeroButton
-              title="Finish Story"
-              onPress={this._finishStory.bind(this)}
-              style={styles.promptButton}
-            />
-          ) : null}
         </View>
       </View>
     )

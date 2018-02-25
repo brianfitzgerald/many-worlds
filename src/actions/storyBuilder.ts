@@ -8,20 +8,11 @@ export const buildStory = (
   story: Story,
   filters: FilterPair[],
   publish: boolean
-): Story | false => {
+): Story => {
   let formattedStory = addFiltersFromFilterPairs(story, filters)
   formattedStory.id = uuidv4()
   formattedStory.description = "A fun romp"
   formattedStory.published = publish
-  if (story.title === "") {
-    alert("Add a title to your story.")
-    return false
-  }
-  if (story.author === "") {
-    alert("Add the name of the author.")
-    return false
-  }
-
   return formattedStory
 }
 

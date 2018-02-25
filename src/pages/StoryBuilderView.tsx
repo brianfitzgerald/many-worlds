@@ -165,10 +165,16 @@ export default class StoryBuilderView extends React.Component<
       this.state.filterPairs,
       publish
     )
-    console.log(builtStory)
-    if (!builtStory) {
+
+    if (builtStory.title === "" && publish) {
+      alert("Add a title to your story.")
       return
     }
+    if (builtStory.author === "" && publish) {
+      alert("Add the name of the author.")
+      return
+    }
+
     if (this.state.hasMadeChanges) {
       updateStory(builtStory, false)
         .then(() => {

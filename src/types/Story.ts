@@ -35,7 +35,6 @@ export type StoryOption = {
     self?: PlayerStateChange
   }
   response?: string
-  type?: "end"
 }
 
 export type StoryAction = {

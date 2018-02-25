@@ -27,6 +27,13 @@ export default class AppStore {
   }
 
   @action
+  leaveRoom() {
+    this.navigationLocation = "start"
+    this.roomCode = ""
+    this.currentStory = undefined
+  }
+
+  @action
   enterSingleplayer(story?: Story) {
     if (!story) {
       alert("no story chosen")
