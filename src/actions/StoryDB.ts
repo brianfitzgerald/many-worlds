@@ -45,7 +45,6 @@ export const getFeaturedStories = () =>
         }
 
         const stories = data.Items as Story[]
-        console.log(stories)
 
         resolve(stories)
       }
@@ -68,6 +67,10 @@ export const getMyStories = (userId: string) =>
 
         if (err != null) {
           reject(err)
+        }
+
+        if (!data.Items) {
+          resolve([])
         }
 
         const stories = data.Items as Story[]

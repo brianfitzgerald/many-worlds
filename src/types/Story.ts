@@ -1,5 +1,15 @@
 import { InventoryItem, Condition, Ability } from "./Player"
 
+export const emptyStory: Story = {
+  id: "",
+  name: "",
+  published: false,
+  description: "",
+  author: "",
+  actions: [],
+  defaultState: {}
+}
+
 export type Story = {
   id: string
   name: string

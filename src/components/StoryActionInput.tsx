@@ -17,7 +17,7 @@ import commonStyles from "../styles/commonStyles"
 import colors from "../styles/colors"
 import { Story } from "../types/Story"
 
-type StoryInputProps = {
+type StoryActionInputProps = {
   value: string
   onChange: (text: string) => void
   placeholder?: string
@@ -27,12 +27,12 @@ type StoryInputProps = {
   suppressFilterIcon?: boolean
 }
 
-const StoryActionInput: React.SFC<StoryInputProps> = props => {
+const StoryActionInput: React.SFC<StoryActionInputProps> = props => {
   const filterButton =
     props.suppressFilterIcon === true ? null : (
       <TouchableOpacity onPress={props.onFilterPressed}>
         <Text style={{ color: props.hasFilter ? colors.white : colors.grey }}>
-          Filter
+          {props.hasFilter ? "Edit Filter" : "Add a Filter"}
         </Text>
       </TouchableOpacity>
     )

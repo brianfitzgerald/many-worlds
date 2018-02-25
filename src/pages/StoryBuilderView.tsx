@@ -39,6 +39,7 @@ import StoryActionInput, {
   OptionButtonTextStyle
 } from "../components/StoryActionInput"
 import { appStore } from "../stores/AppStore"
+import { buildStory } from "../actions/storyBuilder"
 
 type StoryBuilderProps = {}
 
@@ -47,7 +48,7 @@ type StoryBuilderState = {
   story: Story
   filterModeActive: boolean
   filterModeTargetIndex: number
-  filters: FilterPair[]
+  filterPairs: FilterPair[]
 }
 
 export type FilterPair = {
@@ -76,13 +77,9 @@ export default class StoryBuilderView extends React.Component<
       },
       filterModeTargetIndex: 0,
       filterModeActive: false,
-      filters: [],
+      filterPairs: [],
       hasMadeChanges: false
     }
-  }
-
-  saveAndExit() {
-    appStore.closeModal()
   }
 
   setAuthor(value: any) {
@@ -167,8 +164,21 @@ export default class StoryBuilderView extends React.Component<
   publishStory() {
     updateStory(this.state.story, true).then(() => {
       alert("Your story is published!")
-      // once navigation is implemented, go to the story here
+      appStore.leaveStoryBuilder()
     })
+  }
+
+  saveAndExit() {
+    const builtStory = buildStory(this.state.story, this.state.filterPairs)
+    if (this.state.hasMadeChanges) {
+      updateStory(builtStory, false)
+        .then(() => {
+          appStore.leaveStoryBuilder()
+        })
+        .catch(err => console.log(err))
+    } else {
+      appStore.leaveStoryBuilder()
+    }
   }
 
   testStory() {
@@ -176,7 +186,7 @@ export default class StoryBuilderView extends React.Component<
       alert(
         "Your story is ready for testing. Go to My Stories on the main menu to play it."
       )
-      // once navigation is implemented, go to the story here
+      appStore.enterSingleplayer(this.state.story)
     })
   }
 
@@ -185,7 +195,7 @@ export default class StoryBuilderView extends React.Component<
     optionIndex: number,
     targetIndex: number
   ) {
-    const newFilterState = this.state.filters
+    const newFilterState = this.state.filterPairs
     const existingFilterIndex = newFilterState.findIndex(
       f =>
         f.optionIndex === optionIndex &&
@@ -213,16 +223,14 @@ export default class StoryBuilderView extends React.Component<
           .filterBooleanValue
       }
     }
-    this.setState({ filters: newFilterState })
+    this.setState({ filterPairs: newFilterState })
   }
 
   render() {
-    console.log(this.state)
-
     if (this.state.filterModeActive) {
       const targetIndex = this.state.filterModeTargetIndex
       const target = this.state.story.actions[targetIndex]
-      const newFilter = this.state.filters
+      const newFilter = this.state.filterPairs
       const validActionsToFilterBy = this.state.story.actions.filter(
         (a, i) => i !== targetIndex
       )
@@ -240,7 +248,10 @@ export default class StoryBuilderView extends React.Component<
           <StoryActionInput
             value={target.prompt}
             onChange={this.updateActionPrompt.bind(this, targetIndex)}
-            hasFilter={target.filter !== undefined}
+            hasFilter={
+              target.filter !== undefined &&
+              Object.keys(target.filter).length > 0
+            }
             suppressFilterIcon={true}
             onFilterPressed={this.enterFilterMode.bind(this, targetIndex)}
             inputType="prompt"

@@ -27,7 +27,7 @@ import colors from "../styles/colors"
 import { joinRoom, createRoom, roomDefaultState } from "../firebaseFunctions"
 
 import { dbInstance } from "../firebaseRef"
-import { Story, StoryOption, StoryAction } from "../types/Story"
+import { Story, StoryOption, StoryAction, emptyStory } from "../types/Story"
 import { Player } from "../types/Player"
 import {
   getNextActionIndex,
@@ -51,8 +51,6 @@ type StartpageState = {
   selectedStory?: Story
   playerName: string
 }
-
-const userID = "Brian Fitzgerald"
 
 @observer
 export default class StartPageView extends React.Component<
@@ -95,11 +93,13 @@ export default class StartPageView extends React.Component<
       })
       .catch(err => console.log(err))
 
-    getMyStories(userID)
-      .then(myStories => {
-        this.setState({ myStories, storiesLoaded: true })
-      })
-      .catch(err => console.log(err))
+    if (appStore.playerName !== "") {
+      getMyStories(appStore.playerName)
+        .then(myStories => {
+          this.setState({ myStories, storiesLoaded: true })
+        })
+        .catch(err => console.log(err))
+    }
   }
 
   beginEditing(story: Story) {
@@ -141,12 +141,11 @@ export default class StartPageView extends React.Component<
     })
   }
 
-  _createRoom(storyID: string) {
+  _createRoom(selectedStory: Story) {
     const { playerName } = appStore
-    const story = getStory(storyID).then((story: Story) => {
-      createRoom(playerName, story).then((roomCode: string) => {
-        this._updateUsername()
-      })
+    createRoom(playerName, selectedStory).then((roomCode: string) => {
+      this._updateUsername()
+      appStore.enterRoom(roomCode, selectedStory)
     })
   }
 
@@ -159,48 +158,51 @@ export default class StartPageView extends React.Component<
       )
     }
 
+    const featuredStories = this.state.featuredStories.filter(
+      story => story.published
+    )
+    const myStories = this.state.myStories
+
+    const selectedStory = this.state.selectedStory || emptyStory
+
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <Modal visible={this.state.showSelectStoryModal}>
-          {this.state.selectedStory ? (
-            <View>
-              <StoryListItem
-                story={this.state.selectedStory}
-                selected={false}
-                onPress={() => {}}
+          <View style={[commonStyles.container, styles.partyContainer]}>
+            <StoryListItem
+              style={{ marginTop: 15 }}
+              story={selectedStory}
+              selected={false}
+              onPress={() => {}}
+            />
+            <Button
+              color={colors.white}
+              title="Play this story with friends"
+              onPress={() => this._createRoom(selectedStory)}
+            />
+            <Button
+              color={colors.white}
+              title="Play this story by yourself"
+              onPress={() =>
+                appStore.enterSingleplayer(this.state.selectedStory)
+              }
+            />
+            {selectedStory.author === appStore.playerName ? (
+              <Button
+                color={colors.white}
+                title="Edit this story"
+                onPress={this.beginEditing.bind(this, this.state.selectedStory)}
               />
-              <HeroButton
-                title="Play this story with friends"
-                onPress={() => {}}
-              />
-              <HeroButton
-                title="Play this story by yourself"
-                onPress={() => {}}
-              />
-              {this.state.selectedStory.author === userID ? (
-                <HeroButton
-                  title="Edit this story"
-                  onPress={this.beginEditing.bind(
-                    this,
-                    this.state.selectedStory
-                  )}
-                />
-              ) : null}
-              <HeroButton
-                title="Play this story by yourself"
-                onPress={() =>
-                  appStore.enterSingleplayer(this.state.selectedStory)
-                }
-              />
-            </View>
-          ) : null}
-          <Button
-            title="Cancel"
-            onPress={() => {
-              this.setState({ showSelectStoryModal: false })
-            }}
-          />
+            ) : null}
+            <Button
+              color={colors.white}
+              title="Cancel"
+              onPress={() => {
+                this.setState({ showSelectStoryModal: false })
+              }}
+            />
+          </View>
         </Modal>
         <ScrollView>
           <Text style={styles.appTitle}>Midnight Sun</Text>
@@ -213,7 +215,7 @@ export default class StartPageView extends React.Component<
           <Text style={styles.header}>News</Text>
           {NewsItems.map((item, key) => <NewsItem {...item} key={key} />)}
           <Text style={styles.header}>Featured Stories</Text>
-          {this.state.featuredStories.map((story: Story, i) => (
+          {featuredStories.map((story: Story, i) => (
             <StoryListItem
               key={i}
               story={story}

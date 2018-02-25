@@ -43,7 +43,7 @@ export default class App extends React.Component<AppProps> {
         return <StoryBuilderView />
       case "party":
         return <PartyView />
-      case "startPage":
+      case "start":
         return <StartPageView />
       default:
         return <StartPageView />

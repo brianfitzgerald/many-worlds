@@ -19,16 +19,18 @@ type StoryListItemProps = {
   story: Story
   onPress?: () => void
   selected?: boolean
+  style?: ViewStyle
 }
 
 const StoryListItem: React.SFC<StoryListItemProps> = ({
   story,
   onPress,
-  selected
+  selected,
+  style
 }) => {
   return (
     <TouchableOpacity onPress={onPress}>
-      <View style={styles.ItemBase}>
+      <View style={[styles.ItemBase, style]}>
         <Text style={styles.StoryName}>{story.name}</Text>
         <Text style={styles.StoryDescription}>By {story.author}</Text>
         <Text style={styles.StoryDescription}>{story.description}</Text>

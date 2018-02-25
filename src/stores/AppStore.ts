@@ -5,7 +5,7 @@ export type NavigationLocation =
   | "roomSetup"
   | "storyBuilder"
   | "party"
-  | "startPage"
+  | "start"
 
 export default class AppStore {
   @observable public playerName: string = ""
@@ -14,11 +14,8 @@ export default class AppStore {
   @observable public navigationLocation?: NavigationLocation
 
   @action
-  public startGame() {}
-
-  @action
   closeModal() {
-    this.navigationLocation = "startPage"
+    this.navigationLocation = "start"
     this.currentStory = undefined
   }
 
@@ -47,6 +44,11 @@ export default class AppStore {
   @action
   updatePlayerName(playerName: string) {
     this.playerName = playerName
+  }
+
+  @action
+  leaveStoryBuilder() {
+    this.navigationLocation = "start"
   }
 }
 
