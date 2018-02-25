@@ -179,7 +179,12 @@ export default class PartyView extends React.Component<
 
   _leaveRoom() {
     if (this.firebaseListenerRef) {
-      this.firebaseListenerRef.off()
+      this.firebaseListenerRef.ref.off()
+      this.firebaseListenerRef.ref.remove()
+    }
+    if (this.intervalRef && this.timeoutRef) {
+      clearInterval(this.intervalRef)
+      clearTimeout(this.timeoutRef)
     }
     appStore.leaveRoom()
   }
@@ -200,7 +205,7 @@ export default class PartyView extends React.Component<
     if (isAtStoryEnd) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
-          <Text>The End</Text>
+          <Text style={styles.titleText}>The End</Text>
           <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
         </View>
       )
@@ -273,6 +278,13 @@ const styles = StyleSheet.create({
   playersWhoSelectedOption: {
     fontSize: 18,
     color: "white"
+  },
+  titleText: {
+    fontSize: 48,
+    color: colors.white,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 15
   },
   promptButton: {
     width: "100%",
