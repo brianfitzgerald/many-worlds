@@ -115,7 +115,6 @@ export default class StartPageView extends React.Component<
 
   _joinGamePressed() {
     const { playerName } = appStore
-    console.log(playerName)
     if (!playerName || playerName === "") {
       AlertIOS.prompt("What is your name?", undefined, (nameInput: string) => {
         appStore.updatePlayerName(nameInput)

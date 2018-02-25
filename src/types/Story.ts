@@ -2,7 +2,7 @@ import { InventoryItem, Condition, Ability } from "./Player"
 
 export const emptyStory: Story = {
   id: "",
-  name: "",
+  title: "",
   published: false,
   description: "",
   author: "",
@@ -12,7 +12,7 @@ export const emptyStory: Story = {
 
 export type Story = {
   id: string
-  name: string
+  title: string
   published: boolean
   author: string
   description: string

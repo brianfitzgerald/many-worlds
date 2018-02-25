@@ -3,7 +3,7 @@ import { StoryState, StoryAction, Story } from "../types/Story"
 const story: Story = {
   author: "Brian",
   id: "820ebcfa-547e-4809-93c8-ad7008d782a8",
-  name: "Brimblewood",
+  title: "Brimblewood",
   published: true,
   description: "A fun romp",
   actions: [

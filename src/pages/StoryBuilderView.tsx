@@ -21,7 +21,13 @@ import HeroButton, { LightHeroButton } from "../components/HeroButton"
 import colors from "../styles/colors"
 
 import { dbInstance } from "../firebaseRef"
-import { Story, StoryOption, StoryAction, StoryState } from "../types/Story"
+import {
+  Story,
+  StoryOption,
+  StoryAction,
+  StoryState,
+  emptyStory
+} from "../types/Story"
 import { Player } from "../types/Player"
 import {
   getNextActionIndex,
@@ -66,15 +72,7 @@ export default class StoryBuilderView extends React.Component<
     super(props)
 
     this.state = {
-      story: {
-        id: "",
-        name: "",
-        author: "",
-        description: "",
-        published: false,
-        actions: [],
-        defaultState: {}
-      },
+      story: emptyStory,
       filterModeTargetIndex: 0,
       filterModeActive: false,
       filterPairs: [],
@@ -82,16 +80,16 @@ export default class StoryBuilderView extends React.Component<
     }
   }
 
-  setAuthor(value: any) {
+  setAuthor(value: string) {
     this.setState({
       story: { ...this.state.story, author: value },
       hasMadeChanges: true
     })
   }
 
-  setTitle(value: any) {
+  setTitle(value: string) {
     this.setState({
-      story: { ...this.state.story, name: value },
+      story: { ...this.state.story, title: value },
       hasMadeChanges: true
     })
   }
@@ -161,15 +159,16 @@ export default class StoryBuilderView extends React.Component<
     this.setState({ filterModeActive: false, filterModeTargetIndex: 0 })
   }
 
-  publishStory() {
-    updateStory(this.state.story, true).then(() => {
-      alert("Your story is published!")
-      appStore.leaveStoryBuilder()
-    })
-  }
-
-  saveAndExit() {
-    const builtStory = buildStory(this.state.story, this.state.filterPairs)
+  updateStoryAndExit(publish: boolean) {
+    const builtStory = buildStory(
+      this.state.story,
+      this.state.filterPairs,
+      publish
+    )
+    console.log(builtStory)
+    if (!builtStory) {
+      return
+    }
     if (this.state.hasMadeChanges) {
       updateStory(builtStory, false)
         .then(() => {
@@ -309,7 +308,7 @@ export default class StoryBuilderView extends React.Component<
             <Button
               title={hasMadeChanges ? "Save and Exit" : "Exit"}
               color={colors.white}
-              onPress={this.saveAndExit.bind(this)}
+              onPress={() => this.updateStoryAndExit(false)}
             />
           </View>
           <View style={{ flex: 1 }}>
@@ -317,7 +316,7 @@ export default class StoryBuilderView extends React.Component<
               <Button
                 title="Publish"
                 color={colors.white}
-                onPress={this.publishStory.bind(this)}
+                onPress={() => this.updateStoryAndExit(true)}
               />
             ) : null}
           </View>
@@ -333,8 +332,8 @@ export default class StoryBuilderView extends React.Component<
           <View style={{ flexDirection: "column", width: 320 }}>
             <TextInput
               placeholder="Enter a title"
-              value={this.state.story.name || ""}
-              onChange={this.setTitle.bind(this)}
+              value={this.state.story.title || ""}
+              onChange={value => this.setTitle(value.nativeEvent.text)}
               placeholderTextColor={colors.grey}
               style={styles.titleInput}
             />
@@ -342,7 +341,7 @@ export default class StoryBuilderView extends React.Component<
               placeholder="Enter your name"
               placeholderTextColor={colors.grey}
               value={this.state.story.author || ""}
-              onChange={this.setAuthor.bind(this)}
+              onChange={value => this.setAuthor(value.nativeEvent.text)}
               style={styles.nameInput}
             />
             {this.state.story.actions.map((action, i) => (

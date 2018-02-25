@@ -27,18 +27,16 @@ const StoryListItem: React.SFC<StoryListItemProps> = ({
   onPress,
   selected,
   style
-}) => {
-  return (
-    <TouchableOpacity onPress={onPress}>
-      <View style={[styles.ItemBase, style]}>
-        <Text style={styles.StoryName}>{story.name}</Text>
-        <Text style={styles.StoryDescription}>By {story.author}</Text>
-        <Text style={styles.StoryDescription}>{story.description}</Text>
-      </View>
-      {selected ? <Text style={{ color: colors.white }}>Selected</Text> : null}
-    </TouchableOpacity>
-  )
-}
+}) => (
+  <TouchableOpacity onPress={onPress}>
+    <View style={[styles.ItemBase, style]}>
+      <Text style={styles.StoryName}>{story.title}</Text>
+      <Text style={styles.StoryDescription}>By {story.author}</Text>
+      <Text style={styles.StoryDescription}>{story.description}</Text>
+    </View>
+    {selected ? <Text style={{ color: colors.white }}>Selected</Text> : null}
+  </TouchableOpacity>
+)
 
 const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
   ItemBase: {

@@ -36,7 +36,7 @@ type PartyViewState = {
   currentTimer: number
 }
 
-const TIMER_AMOUNT = 14000
+const TIMER_AMOUNT = 15
 
 export default class PartyView extends React.Component<
   PartyViewProps,

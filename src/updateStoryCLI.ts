@@ -12,7 +12,7 @@ const storyName = process.argv[2]
 
 const stories = [brimblewood]
 
-const story = stories.find(s => s.name === storyName)
+const story = stories.find(s => s.title === storyName)
 
 const storyJSONString = JSON.stringify(story)
 const storyJSONObject = JSON.parse(storyJSONString)

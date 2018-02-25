@@ -2,9 +2,31 @@ import { FilterPair } from "../pages/StoryBuilderView"
 import { Story } from "../types/Story"
 import brimblewood from "../stories/brimblewood"
 import * as util from "util"
+import { uuidv4 } from "../utils"
 
-export const buildStory = (story: Story, filters: FilterPair[]): Story => {
-  const formattedStory = story
+export const buildStory = (
+  story: Story,
+  filters: FilterPair[],
+  publish: boolean
+): Story | false => {
+  let formattedStory = addFiltersFromFilterPairs(story, filters)
+  formattedStory.id = uuidv4()
+  formattedStory.description = "A fun romp"
+  formattedStory.published = publish
+  if (story.title === "") {
+    alert("Add a title to your story.")
+    return false
+  }
+  if (story.author === "") {
+    alert("Add the name of the author.")
+    return false
+  }
+
+  return formattedStory
+}
+
+const addFiltersFromFilterPairs = (story: Story, filters: FilterPair[]) => {
+  let formattedStory = story
   filters.forEach(filter => {
     formattedStory.actions.forEach((action, actionIndex) => {
       if (actionIndex === filter.targetIndex) {

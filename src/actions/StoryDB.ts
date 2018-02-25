@@ -63,8 +63,6 @@ export const getMyStories = (userId: string) =>
     documentClient.scan(
       params,
       (err: AWS.AWSError, data: DocumentClient.ScanOutput) => {
-        console.log(err)
-
         if (err != null) {
           reject(err)
         }
@@ -74,7 +72,6 @@ export const getMyStories = (userId: string) =>
         }
 
         const stories = data.Items as Story[]
-        console.log(stories)
         resolve(stories)
       }
     )
