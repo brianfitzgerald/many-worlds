@@ -45,6 +45,8 @@ export default class PartyView extends React.Component<
   private intervalRef: NodeJS.Timer | undefined
   private timeoutRef: NodeJS.Timer | undefined
 
+  private firebaseListenerRef: firebase.database.Reference | undefined
+
   refs: any
 
   constructor(props: PartyViewProps) {
@@ -75,10 +77,20 @@ export default class PartyView extends React.Component<
 
   componentDidMount() {
     const matchID = appStore.roomCode
-    dbInstance.ref(`/rooms/${matchID}/`).on("value", snap => {
+    this.firebaseListenerRef = dbInstance.ref(`/rooms/${matchID}/`)
+    this.firebaseListenerRef.on("value", snap => {
       const updatedRoomState: FirebaseRoomState = snap
         ? (snap.val() as RoomState)
         : roomDefaultState
+
+      if (
+        appStore.currentStory &&
+        updatedRoomState.currentStoryIndex ===
+          appStore.currentStory.actions.length
+      ) {
+        return
+      }
+
       // this should be the only place where room state is updated
       const safeRoomState: RoomState = {
         status: updatedRoomState.status,
@@ -165,7 +177,12 @@ export default class PartyView extends React.Component<
     }
   }
 
-  _finishStory() {}
+  _leaveRoom() {
+    if (this.firebaseListenerRef) {
+      this.firebaseListenerRef.off()
+    }
+    appStore.leaveRoom()
+  }
 
   render() {
     if (!appStore.currentStory) {
@@ -180,18 +197,11 @@ export default class PartyView extends React.Component<
       this.state.roomState.currentStoryIndex >=
       appStore.currentStory.actions.length
 
-    console.log(this.state.roomState.currentStoryIndex)
-    console.log(appStore.currentStory.actions.length)
-    console.log(isAtStoryEnd)
-
     if (isAtStoryEnd) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <Text>The End</Text>
-          <HeroButton
-            title="Back to menu"
-            onPress={() => appStore.leaveRoom()}
-          />
+          <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
         </View>
       )
     }

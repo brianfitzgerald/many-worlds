@@ -15,7 +15,8 @@ import {
   ViewStyle,
   ImageStyle,
   AsyncStorage,
-  AlertIOS
+  AlertIOS,
+  TouchableOpacity
 } from "react-native"
 import Swipeout from "react-native-swipeout"
 import { observer } from "mobx-react"
@@ -73,9 +74,11 @@ export default class StartPageView extends React.Component<
   }
 
   _loadUsername() {
-    const storedUsername = AsyncStorage.getItem(usernameStorageKey)
+    AsyncStorage.getItem(usernameStorageKey)
       .then(value => {
         if (value !== null) {
+          console.log(value)
+          appStore.updatePlayerName(value)
           this.setState({ playerName: value })
         }
       })
@@ -118,11 +121,19 @@ export default class StartPageView extends React.Component<
     if (!playerName || playerName === "") {
       AlertIOS.prompt("What is your name?", undefined, (nameInput: string) => {
         appStore.updatePlayerName(nameInput)
+        AsyncStorage.setItem(usernameStorageKey, nameInput)
         this._joinRoom(nameInput)
       })
     } else {
       this._joinRoom(playerName)
     }
+  }
+
+  _updateName() {
+    AlertIOS.prompt("What is your name?", undefined, (nameInput: string) => {
+      appStore.updatePlayerName(nameInput)
+      AsyncStorage.setItem(usernameStorageKey, nameInput)
+    })
   }
 
   _joinRoom(playerName: string) {
@@ -147,6 +158,8 @@ export default class StartPageView extends React.Component<
       appStore.enterRoom(roomCode, selectedStory)
     })
   }
+
+  _deleteStory() {}
 
   render() {
     if (!this.state.storiesLoaded) {
@@ -205,15 +218,20 @@ export default class StartPageView extends React.Component<
         </Modal>
         <ScrollView>
           <Text style={styles.appTitle}>Midnight Sun</Text>
-          <Text style={styles.header}>Your name: {appStore.playerName}</Text>
+          <TouchableOpacity onPress={() => this._updateName()}>
+            <Text style={styles.header}>Your name: {appStore.playerName}</Text>
+            <Text
+              style={{ color: colors.white, marginTop: -5, marginBottom: 10 }}
+            >
+              (tap to change)
+            </Text>
+          </TouchableOpacity>
           <HeroButton
             style={commonStyles.heroButtonMargins}
-            title="Join a Game"
+            title="Join a Room"
             onPress={this._joinGamePressed.bind(this)}
           />
-          <Text style={styles.header}>News</Text>
-          {NewsItems.map((item, key) => <NewsItem {...item} key={key} />)}
-          <Text style={styles.header}>Featured Stories</Text>
+          <Text style={styles.header}>Play a Story</Text>
           {featuredStories.map((story: Story, i) => (
             <StoryListItem
               key={i}
@@ -223,19 +241,32 @@ export default class StartPageView extends React.Component<
             />
           ))}
           <Text style={styles.header}>My Stories</Text>
-          {this.state.myStories.map((story: Story, i) => (
-            <StoryListItem
+          {myStories.map((story: Story, i) => (
+            <Swipeout
+              backgroundColor={colors.black}
               key={i}
-              story={story}
-              selected={false}
-              onPress={this.selectStory.bind(this, story)}
-            />
+              right={[
+                {
+                  text: "Remove",
+                  onPress: this._deleteStory.bind(this, story),
+                  backgroundColor: "#FE3A2F"
+                }
+              ]}
+            >
+              <StoryListItem
+                story={story}
+                selected={false}
+                onPress={this.selectStory.bind(this, story)}
+              />
+            </Swipeout>
           ))}
           <HeroButton
-            style={commonStyles.heroButtonMargins}
+            style={{ marginBottom: 5, marginTop: 15 }}
             title="Create a Story"
             onPress={() => appStore.enterStoryBuilder()}
           />
+          <Text style={styles.header}>News</Text>
+          {NewsItems.map((item, key) => <NewsItem {...item} key={key} />)}
         </ScrollView>
       </View>
     )

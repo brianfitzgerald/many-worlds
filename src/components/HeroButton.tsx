@@ -51,7 +51,12 @@ export type NewsItemProps = {
 }
 
 export const NewsItem: React.SFC<{ contents: string }> = ({ contents }) => (
-  <View style={[styles.HeroButton, { backgroundColor: "#33333E" }]}>
+  <View
+    style={[
+      styles.HeroButton,
+      { backgroundColor: "#33333E", paddingTop: 10, paddingBottom: 10 }
+    ]}
+  >
     <Text style={[styles.HeroButtonTitle, styles.LightHeroButtonTitle]}>
       {contents}
     </Text>
