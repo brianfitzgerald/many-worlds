@@ -204,7 +204,7 @@ StartpageState
           </View>
         </Modal>
         <ScrollView>
-          <Text style={styles.appTitle}>Midnight Sun</Text>
+          <Text style={styles.appTitle}>Many Worlds</Text>
           <TouchableOpacity onPress={() => this._updateName()}>
             <Text style={styles.header}>Your name: {appStore.playerName}</Text>
             <Text
