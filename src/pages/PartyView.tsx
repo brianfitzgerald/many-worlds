@@ -230,7 +230,9 @@ export default class PartyView extends React.Component<
     if (isAtStoryEnd) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
-          <Text style={styles.titleText}>The End</Text>
+          <StatusBar backgroundColor={colors.black} barStyle="light-content" />
+          <Text style={[styles.titleText]}>The End</Text>
+          <Text style={styles.currentPromptText}>Thank you for playing.</Text>
           <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
         </View>
       )
