@@ -13,6 +13,7 @@ export type Ability = {
 }
 
 export const playerDefaultState: Player = {
+    id: '',
     name: '',
     ready: false,
     conditions: [],
@@ -21,6 +22,7 @@ export const playerDefaultState: Player = {
 }
 
 export type Player = {
+    id: string
     name: string
     ready: boolean
     conditions: Condition[]

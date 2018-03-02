@@ -3,6 +3,8 @@ import { Alert } from "react-native"
 import { StoryAction, StoryState, Story } from "./types/Story"
 import { Player, playerDefaultState } from "./types/Player"
 import { RoomState } from "./types/Network"
+import { uuidv4 } from "./utils";
+import { appStore } from "./stores/AppStore";
 
 const dummySelectedStoryID = "820ebcfa-547e-4809-93c8-ad7008d782a8"
 
@@ -27,8 +29,20 @@ export const joinRoom = (roomCode: string, username: string) =>
         return
       }
 
+      if (username === "") {
+        Alert.alert(
+          "Please set a username"
+        )
+        return
+      }
+
       const newPlayer = playerDefaultState
       newPlayer.name = username
+
+      const id = uuidv4()
+      newPlayer.id = id
+      appStore.selfID = id
+
       const newRoomState = currentRoomState
       newRoomState.connectedPlayers.push(newPlayer)
 
@@ -52,6 +66,10 @@ export const createRoom = (username: string, story: Story) =>
     const newPlayer = playerDefaultState
     newPlayer.name = username
 
+    const id = uuidv4()
+    newPlayer.id = id
+    appStore.selfID = id
+
     roomDefaultState.connectedPlayers.push(newPlayer)
     roomDefaultState.storyState = story.defaultState
 
@@ -66,4 +84,12 @@ export const createRoom = (username: string, story: Story) =>
 // update the remote state of the room
 export function updateRoomState(roomCode: string, newState: RoomState) {
   return dbInstance.ref(`/rooms/${roomCode}`).update(newState)
+}
+
+export const getSelf = (players: Player[]): Player | undefined => {
+  const self = players.find((p) => p.id === appStore.selfID)
+  if (self) {
+    return self
+  }
+  return undefined
 }

@@ -26,7 +26,7 @@ import {
   getPlayersWhoSelectedOption
 } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
-import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
+import { roomDefaultState, updateRoomState, getSelf } from "../firebaseFunctions"
 import { appStore } from "../stores/AppStore"
 
 type PartyViewProps = {}
@@ -191,7 +191,7 @@ export default class PartyView extends React.Component<
 
   _readyUp() {
     const newRoomState = this.state.roomState
-    const self = newRoomState.connectedPlayers.find((p) => p.name === appStore.playerName)
+    const self = getSelf(newRoomState.connectedPlayers)
     if (self) {
       self.ready = true
     }

@@ -10,6 +10,7 @@ export type NavigationLocation =
 
 export default class AppStore {
   @observable public playerName: string = ""
+  @observable public selfID: string = ""
   @observable public roomCode: string = ""
   @observable public currentStory?: Story
   @observable public navigationLocation?: NavigationLocation
