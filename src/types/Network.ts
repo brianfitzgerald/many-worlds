@@ -1,8 +1,10 @@
 import { Player } from "./Player";
 import { StoryState, StoryAction, HistoryItem } from "./Story";
 
+type RoomStatus = 'in_game' | 'ended' | 'pregame'
+
 export type FirebaseRoomState = {
-    status: 'in_game' | 'ended' | 'pregame'
+    status: RoomStatus
     currentStoryIndex: number
     connectedPlayers?: Player[]
     storyState?: StoryState
@@ -10,7 +12,7 @@ export type FirebaseRoomState = {
     storyID: string
 }
 export type RoomState = {
-    status: 'in_game' | 'ended' | 'pregame'
+    status: RoomStatus
     currentStoryIndex: number
     storyID: string
     connectedPlayers: Player[]

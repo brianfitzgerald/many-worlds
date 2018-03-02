@@ -45,9 +45,7 @@ import { usernameStorageKey } from "../utils"
 
 type StartPageProps = {}
 type StartpageState = {
-  featuredStories: Story[]
   myStories: Story[]
-  storiesLoaded: boolean
   showSelectStoryModal: boolean
   selectedStory?: Story
   playerName: string
@@ -55,15 +53,13 @@ type StartpageState = {
 
 @observer
 export default class StartPageView extends React.Component<
-  StartPageProps,
-  StartpageState
+StartPageProps,
+StartpageState
 > {
   constructor(props: StartPageProps) {
     super(props)
     this.state = {
-      featuredStories: [],
       myStories: [],
-      storiesLoaded: false,
       showSelectStoryModal: false,
       playerName: ""
     }
@@ -90,19 +86,10 @@ export default class StartPageView extends React.Component<
   }
 
   componentDidMount() {
-    getFeaturedStories()
-      .then(featuredStories => {
-        this.setState({ featuredStories, storiesLoaded: true })
-      })
-      .catch(err => console.log(err))
 
-    if (appStore.playerName !== "") {
-      getMyStories(appStore.playerName)
-        .then(myStories => {
-          this.setState({ myStories, storiesLoaded: true })
-        })
-        .catch(err => console.log(err))
-    }
+    appStore.getStories()
+    appStore.getMyStories()
+
   }
 
   beginEditing(story: Story) {
@@ -159,10 +146,10 @@ export default class StartPageView extends React.Component<
     })
   }
 
-  _deleteStory() {}
+  _deleteStory() { }
 
   render() {
-    if (!this.state.storiesLoaded) {
+    if (!appStore.storiesLoaded) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <Text style={styles.promptButton}>Loading...</Text>
@@ -170,7 +157,7 @@ export default class StartPageView extends React.Component<
       )
     }
 
-    const featuredStories = this.state.featuredStories.filter(
+    const featuredStories = appStore.featuredStories.filter(
       story => story.published
     )
     const myStories = this.state.myStories
@@ -186,20 +173,20 @@ export default class StartPageView extends React.Component<
               style={{ marginTop: 15 }}
               story={selectedStory}
               selected={false}
-              onPress={() => {}}
+              onPress={() => { }}
             />
             <Button
               color={colors.white}
               title="Play this story with friends"
               onPress={() => this._createRoom(selectedStory)}
             />
-            <Button
+            {/* <Button
               color={colors.white}
               title="Play this story by yourself"
               onPress={() =>
                 appStore.enterSingleplayer(this.state.selectedStory)
               }
-            />
+            /> */}
             {selectedStory.author === appStore.playerName ? (
               <Button
                 color={colors.white}

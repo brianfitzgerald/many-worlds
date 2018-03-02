@@ -1,5 +1,6 @@
-import { observable, action, useStrict } from "mobx"
+import { observable, action, useStrict, computed } from "mobx"
 import { Story } from "../types/Story"
+import { getFeaturedStories, getMyStories } from "../actions/StoryDB";
 
 export type NavigationLocation =
   | "roomSetup"
@@ -12,6 +13,33 @@ export default class AppStore {
   @observable public roomCode: string = ""
   @observable public currentStory?: Story
   @observable public navigationLocation?: NavigationLocation
+
+  @observable public featuredStories: Story[] = []
+  @observable public myStories: Story[] = []
+  @observable public storiesLoaded: boolean = false
+
+  @action
+  getStories() {
+    getFeaturedStories()
+      .then(featuredStories => {
+        this.featuredStories = featuredStories
+        this.storiesLoaded = true
+      })
+      .catch(err => console.log(err))
+  }
+
+  @action
+  getMyStories() {
+    if (this.playerName !== "") {
+      getMyStories(appStore.playerName)
+        .then(myStories => {
+          this.myStories = myStories
+          this.storiesLoaded = true
+        })
+        .catch(err => console.log(err))
+    }
+
+  }
 
   @action
   closeModal() {
@@ -59,5 +87,4 @@ export default class AppStore {
   }
 }
 
-useStrict(true)
 export const appStore = new AppStore()

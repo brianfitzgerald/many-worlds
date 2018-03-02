@@ -41,7 +41,7 @@ const TIMER_AMOUNT = 15
 export default class PartyView extends React.Component<
   PartyViewProps,
   PartyViewState
-> {
+  > {
   private intervalRef: NodeJS.Timer | undefined
   private timeoutRef: NodeJS.Timer | undefined
 
@@ -86,7 +86,7 @@ export default class PartyView extends React.Component<
       if (
         appStore.currentStory &&
         updatedRoomState.currentStoryIndex ===
-          appStore.currentStory.actions.length
+        appStore.currentStory.actions.length
       ) {
         return
       }
@@ -97,7 +97,7 @@ export default class PartyView extends React.Component<
         storyID: updatedRoomState.storyID,
         currentStoryIndex: updatedRoomState.currentStoryIndex,
         connectedPlayers: updatedRoomState.connectedPlayers || [],
-        storyState: updatedRoomState.storyState || { status: "in_play" },
+        storyState: updatedRoomState.storyState || {},
         history: updatedRoomState.history || []
       }
       this.setState({ roomState: safeRoomState })
@@ -189,11 +189,36 @@ export default class PartyView extends React.Component<
     appStore.leaveRoom()
   }
 
+  _readyUp() {
+    const newRoomState = this.state.roomState
+    const self = newRoomState.connectedPlayers.find((p) => p.name === appStore.playerName)
+    if (self) {
+      self.ready = true
+    }
+    if (newRoomState.connectedPlayers.filter((p) => !p.ready).length < 1) {
+      newRoomState.status = "in_game"
+    }
+    updateRoomState(appStore.roomCode, newRoomState)
+  }
+
   render() {
+
     if (!appStore.currentStory) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <Text style={styles.roomCode}>Loading</Text>
+        </View>
+      )
+    }
+
+    if (this.state.roomState.status === "pregame") {
+      return (
+        <View style={[commonStyles.container, styles.partyContainer]}>
+          <StatusBar backgroundColor={colors.black} barStyle="light-content" />
+          {this.state.roomState.connectedPlayers.map((player) => {
+            <Text style={styles.promptText}>{player.name}: {player.ready}</Text>
+          })}
+          <HeroButton title="Ready Up" onPress={() => this._readyUp()} />
         </View>
       )
     }

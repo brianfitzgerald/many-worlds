@@ -14,6 +14,7 @@ export type Ability = {
 
 export const playerDefaultState: Player = {
     name: '',
+    ready: false,
     conditions: [],
     inventory: [],
     abilities: []
@@ -21,6 +22,7 @@ export const playerDefaultState: Player = {
 
 export type Player = {
     name: string
+    ready: boolean
     conditions: Condition[]
     inventory: InventoryItem[]
     abilities: Ability[]
