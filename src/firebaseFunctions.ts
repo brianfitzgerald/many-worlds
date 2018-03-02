@@ -1,9 +1,9 @@
 import { dbInstance } from "./firebaseRef"
-import { Alert } from "react-native"
+import { Alert, AsyncStorage, AlertIOS } from "react-native"
 import { StoryAction, StoryState, Story } from "./types/Story"
 import { Player, playerDefaultState } from "./types/Player"
 import { RoomState } from "./types/Network"
-import { uuidv4 } from "./utils";
+import { uuidv4, usernameStorageKey } from "./utils";
 import { appStore } from "./stores/AppStore";
 
 const dummySelectedStoryID = "820ebcfa-547e-4809-93c8-ad7008d782a8"
@@ -30,9 +30,11 @@ export const joinRoom = (roomCode: string, username: string) =>
       }
 
       if (username === "") {
-        Alert.alert(
-          "Please set a username"
-        )
+        AlertIOS.prompt("What is your name?", undefined, (nameInput: string) => {
+          username = nameInput
+          appStore.updatePlayerName(nameInput)
+          AsyncStorage.setItem(usernameStorageKey, nameInput)
+        })
         return
       }
 
