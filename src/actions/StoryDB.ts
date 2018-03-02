@@ -10,7 +10,7 @@ AWS.config.update(awsKeys)
 
 const documentClient = new AWS.DynamoDB.DocumentClient()
 
-const tableNames = {
+export const tableNames = {
   stories: "midnight-sun-stories"
 }
 
@@ -45,7 +45,6 @@ export const getFeaturedStories = () =>
         }
 
         const stories = data.Items as Story[]
-        console.log(stories)
 
         resolve(stories)
       }
@@ -64,14 +63,15 @@ export const getMyStories = (userId: string) =>
     documentClient.scan(
       params,
       (err: AWS.AWSError, data: DocumentClient.ScanOutput) => {
-        console.log(err)
-
         if (err != null) {
           reject(err)
         }
 
+        if (!data.Items) {
+          resolve([])
+        }
+
         const stories = data.Items as Story[]
-        console.log(stories)
         resolve(stories)
       }
     )

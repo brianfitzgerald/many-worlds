@@ -1,8 +1,18 @@
 import { InventoryItem, Condition, Ability } from "./Player"
 
+export const emptyStory: Story = {
+  id: "",
+  title: "",
+  published: false,
+  description: "",
+  author: "",
+  actions: [],
+  defaultState: {}
+}
+
 export type Story = {
   id: string
-  name: string
+  title: string
   published: boolean
   author: string
   description: string
@@ -25,7 +35,6 @@ export type StoryOption = {
     self?: PlayerStateChange
   }
   response?: string
-  type?: "end"
 }
 
 export type StoryAction = {

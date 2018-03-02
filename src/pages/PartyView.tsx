@@ -26,28 +26,26 @@ import {
   getPlayersWhoSelectedOption
 } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
-import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
+import { roomDefaultState, updateRoomState, getSelf } from "../firebaseFunctions"
+import { appStore } from "../stores/AppStore"
 
-type PartyViewProps = {
-  story?: Story
-  currentPlayerName: string
-  roomCode: string
-  dispatch?: (func: { type: string; value: RoomState }) => void
-}
+type PartyViewProps = {}
 
 type PartyViewState = {
   roomState: RoomState
   currentTimer: number
 }
 
-const TIMER_AMOUNT = 14000
+const TIMER_AMOUNT = 15
 
 export default class PartyView extends React.Component<
   PartyViewProps,
   PartyViewState
-> {
+  > {
   private intervalRef: NodeJS.Timer | undefined
   private timeoutRef: NodeJS.Timer | undefined
+
+  private firebaseListenerRef: firebase.database.Reference | undefined
 
   refs: any
 
@@ -78,18 +76,28 @@ export default class PartyView extends React.Component<
   }
 
   componentDidMount() {
-    const matchID = this.props.roomCode
-    dbInstance.ref(`/rooms/${matchID}/`).on("value", snap => {
+    const matchID = appStore.roomCode
+    this.firebaseListenerRef = dbInstance.ref(`/rooms/${matchID}/`)
+    this.firebaseListenerRef.on("value", snap => {
       const updatedRoomState: FirebaseRoomState = snap
         ? (snap.val() as RoomState)
         : roomDefaultState
+
+      if (
+        appStore.currentStory &&
+        updatedRoomState.currentStoryIndex ===
+        appStore.currentStory.actions.length
+      ) {
+        return
+      }
+
       // this should be the only place where room state is updated
       const safeRoomState: RoomState = {
         status: updatedRoomState.status,
         storyID: updatedRoomState.storyID,
         currentStoryIndex: updatedRoomState.currentStoryIndex,
         connectedPlayers: updatedRoomState.connectedPlayers || [],
-        storyState: updatedRoomState.storyState || { status: "in_play" },
+        storyState: updatedRoomState.storyState || {},
         history: updatedRoomState.history || []
       }
       this.setState({ roomState: safeRoomState })
@@ -98,12 +106,13 @@ export default class PartyView extends React.Component<
   }
 
   _executeAction(optionIndex: number) {
-    if (!this.props.story) return
+    const story = appStore.currentStory
+    if (!story) return
 
     const scrollRef = this.refs.scrollView as ScrollViewStatic
 
     const currentAction = getActionByIndex(
-      this.props.story,
+      story,
       this.state.roomState.currentStoryIndex
     )
 
@@ -119,20 +128,20 @@ export default class PartyView extends React.Component<
 
     const currentStoryIndex = this.state.roomState.currentStoryIndex
     const nextStoryIndex = getNextActionIndex(
-      this.props.story,
+      story,
       this.state.roomState.storyState,
       currentStoryIndex
     )
     const newState = doAction(
       this.state.roomState,
-      this.props.story,
+      story,
       currentStoryIndex,
       option
     )
 
     newState.currentStoryIndex = nextStoryIndex
 
-    updateRoomState(this.props.roomCode, newState).then(() => {
+    updateRoomState(appStore.roomCode, newState).then(() => {
       if (scrollRef) {
         scrollRef.scrollToEnd()
       }
@@ -154,7 +163,7 @@ export default class PartyView extends React.Component<
     } else {
       const newConnectedPlayersState = this.state.roomState.connectedPlayers.map(
         p => {
-          if (p.name === this.props.currentPlayerName) {
+          if (p.name === appStore.playerName) {
             p.selectedChoiceIndex = optionIndex
           }
           return p
@@ -164,14 +173,37 @@ export default class PartyView extends React.Component<
       const newRoomState = this.state.roomState
       newRoomState.connectedPlayers = newConnectedPlayersState
 
-      updateRoomState(this.props.roomCode, newRoomState)
+      updateRoomState(appStore.roomCode, newRoomState)
     }
   }
 
-  _finishStory() {}
+  _leaveRoom() {
+    if (this.firebaseListenerRef) {
+      this.firebaseListenerRef.ref.off()
+      this.firebaseListenerRef.ref.remove()
+    }
+    if (this.intervalRef && this.timeoutRef) {
+      clearInterval(this.intervalRef)
+      clearTimeout(this.timeoutRef)
+    }
+    appStore.leaveRoom()
+  }
+
+  _readyUp() {
+    const newRoomState = this.state.roomState
+    const self = getSelf(newRoomState.connectedPlayers)
+    if (self) {
+      self.ready = true
+    }
+    if (newRoomState.connectedPlayers.filter((p) => !p.ready).length < 1) {
+      newRoomState.status = "in_game"
+    }
+    updateRoomState(appStore.roomCode, newRoomState)
+  }
 
   render() {
-    if (!this.props.story) {
+
+    if (!appStore.currentStory) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <Text style={styles.roomCode}>Loading</Text>
@@ -179,8 +211,33 @@ export default class PartyView extends React.Component<
       )
     }
 
+    if (this.state.roomState.status === "pregame") {
+      return (
+        <View style={[commonStyles.container, styles.partyContainer]}>
+          <StatusBar backgroundColor={colors.black} barStyle="light-content" />
+          {this.state.roomState.connectedPlayers.map((player) => {
+            <Text style={styles.promptText}>{player.name}: {player.ready}</Text>
+          })}
+          <HeroButton title="Ready Up" onPress={() => this._readyUp()} />
+        </View>
+      )
+    }
+
+    const isAtStoryEnd =
+      this.state.roomState.currentStoryIndex >=
+      appStore.currentStory.actions.length
+
+    if (isAtStoryEnd) {
+      return (
+        <View style={[commonStyles.container, styles.partyContainer]}>
+          <Text style={styles.titleText}>The End</Text>
+          <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
+        </View>
+      )
+    }
+
     const currentAction = getActionByIndex(
-      this.props.story,
+      appStore.currentStory,
       this.state.roomState.currentStoryIndex
     )
 
@@ -188,7 +245,7 @@ export default class PartyView extends React.Component<
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <View style={styles.header}>
-          <Text style={styles.roomCode}>{this.props.roomCode}</Text>
+          <Text style={styles.roomCode}>{appStore.roomCode}</Text>
           <Text style={styles.timer}>
             {this.state.currentTimer} Seconds Left
           </Text>
@@ -223,13 +280,6 @@ export default class PartyView extends React.Component<
               />
             </View>
           ))}
-          {currentAction.type === "end" ? (
-            <HeroButton
-              title="Finish Story"
-              onPress={this._finishStory.bind(this)}
-              style={styles.promptButton}
-            />
-          ) : null}
         </View>
       </View>
     )
@@ -253,6 +303,13 @@ const styles = StyleSheet.create({
   playersWhoSelectedOption: {
     fontSize: 18,
     color: "white"
+  },
+  titleText: {
+    fontSize: 48,
+    color: colors.white,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 15
   },
   promptButton: {
     width: "100%",

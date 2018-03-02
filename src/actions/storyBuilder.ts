@@ -2,9 +2,22 @@ import { FilterPair } from "../pages/StoryBuilderView"
 import { Story } from "../types/Story"
 import brimblewood from "../stories/brimblewood"
 import * as util from "util"
+import { uuidv4 } from "../utils"
 
-export const buildStory = (story: Story, filters: FilterPair[]): Story => {
-  const formattedStory = story
+export const buildStory = (
+  story: Story,
+  filters: FilterPair[],
+  publish: boolean
+): Story => {
+  let formattedStory = addFiltersFromFilterPairs(story, filters)
+  formattedStory.id = uuidv4()
+  formattedStory.description = "A fun romp"
+  formattedStory.published = publish
+  return formattedStory
+}
+
+const addFiltersFromFilterPairs = (story: Story, filters: FilterPair[]) => {
+  let formattedStory = story
   filters.forEach(filter => {
     formattedStory.actions.forEach((action, actionIndex) => {
       if (actionIndex === filter.targetIndex) {
@@ -27,28 +40,3 @@ export const buildStory = (story: Story, filters: FilterPair[]): Story => {
   })
   return formattedStory
 }
-
-// const dummyFilters: FilterPair[] = [
-//   {
-//     actionIndex: 1,
-//     optionIndex: 0,
-//     targetIndex: 2,
-//     filterBooleanValue: true
-//   }
-// ]
-
-// const story = buildStory(brimblewood, dummyFilters)
-// console.log(story.actions.filter(f => f.filter !== undefined))
-
-// console.log()
-
-// action: {
-//     544: true
-// }
-
-// {
-//     filter: {
-//         544: true
-//     }
-//     prompt: ""
-// }

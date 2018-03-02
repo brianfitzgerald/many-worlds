@@ -21,7 +21,13 @@ import HeroButton, { LightHeroButton } from "../components/HeroButton"
 import colors from "../styles/colors"
 
 import { dbInstance } from "../firebaseRef"
-import { Story, StoryOption, StoryAction, StoryState } from "../types/Story"
+import {
+  Story,
+  StoryOption,
+  StoryAction,
+  StoryState,
+  emptyStory
+} from "../types/Story"
 import { Player } from "../types/Player"
 import {
   getNextActionIndex,
@@ -38,17 +44,17 @@ import StoryActionInput, {
   OptionButtonBaseStyle,
   OptionButtonTextStyle
 } from "../components/StoryActionInput"
+import { appStore } from "../stores/AppStore"
+import { buildStory } from "../actions/storyBuilder"
 
-type StoryBuilderProps = {
-  onCloseModal: () => {}
-}
+type StoryBuilderProps = {}
 
 type StoryBuilderState = {
   hasMadeChanges: boolean
   story: Story
   filterModeActive: boolean
   filterModeTargetIndex: number
-  filters: FilterPair[]
+  filterPairs: FilterPair[]
 }
 
 export type FilterPair = {
@@ -66,36 +72,24 @@ export default class StoryBuilderView extends React.Component<
     super(props)
 
     this.state = {
-      story: {
-        id: "",
-        name: "",
-        author: "",
-        description: "",
-        published: false,
-        actions: [],
-        defaultState: {}
-      },
+      story: emptyStory,
       filterModeTargetIndex: 0,
       filterModeActive: false,
-      filters: [],
+      filterPairs: [],
       hasMadeChanges: false
     }
   }
 
-  saveAndExit() {
-    this.props.onCloseModal()
-  }
-
-  setAuthor(value: any) {
+  setAuthor(value: string) {
     this.setState({
       story: { ...this.state.story, author: value },
       hasMadeChanges: true
     })
   }
 
-  setTitle(value: any) {
+  setTitle(value: string) {
     this.setState({
-      story: { ...this.state.story, name: value },
+      story: { ...this.state.story, title: value },
       hasMadeChanges: true
     })
   }
@@ -165,11 +159,31 @@ export default class StoryBuilderView extends React.Component<
     this.setState({ filterModeActive: false, filterModeTargetIndex: 0 })
   }
 
-  publishStory() {
-    updateStory(this.state.story, true).then(() => {
-      alert("Your story is published!")
-      // once navigation is implemented, go to the story here
-    })
+  updateStoryAndExit(publish: boolean) {
+    const builtStory = buildStory(
+      this.state.story,
+      this.state.filterPairs,
+      publish
+    )
+
+    if (builtStory.title === "" && publish) {
+      alert("Add a title to your story.")
+      return
+    }
+    if (builtStory.author === "" && publish) {
+      alert("Add the name of the author.")
+      return
+    }
+
+    if (this.state.hasMadeChanges) {
+      updateStory(builtStory, false)
+        .then(() => {
+          appStore.leaveStoryBuilder()
+        })
+        .catch(err => console.log(err))
+    } else {
+      appStore.leaveStoryBuilder()
+    }
   }
 
   testStory() {
@@ -177,7 +191,7 @@ export default class StoryBuilderView extends React.Component<
       alert(
         "Your story is ready for testing. Go to My Stories on the main menu to play it."
       )
-      // once navigation is implemented, go to the story here
+      appStore.enterSingleplayer(this.state.story)
     })
   }
 
@@ -186,7 +200,7 @@ export default class StoryBuilderView extends React.Component<
     optionIndex: number,
     targetIndex: number
   ) {
-    const newFilterState = this.state.filters
+    const newFilterState = this.state.filterPairs
     const existingFilterIndex = newFilterState.findIndex(
       f =>
         f.optionIndex === optionIndex &&
@@ -214,16 +228,14 @@ export default class StoryBuilderView extends React.Component<
           .filterBooleanValue
       }
     }
-    this.setState({ filters: newFilterState })
+    this.setState({ filterPairs: newFilterState })
   }
 
   render() {
-    console.log(this.state)
-
     if (this.state.filterModeActive) {
       const targetIndex = this.state.filterModeTargetIndex
       const target = this.state.story.actions[targetIndex]
-      const newFilter = this.state.filters
+      const newFilter = this.state.filterPairs
       const validActionsToFilterBy = this.state.story.actions.filter(
         (a, i) => i !== targetIndex
       )
@@ -232,7 +244,7 @@ export default class StoryBuilderView extends React.Component<
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <View style={styles.topBar}>
             <Button
-              title="Cancel"
+              title="Done"
               color={colors.white}
               onPress={this.leaveFilterMode.bind(this)}
             />
@@ -241,7 +253,10 @@ export default class StoryBuilderView extends React.Component<
           <StoryActionInput
             value={target.prompt}
             onChange={this.updateActionPrompt.bind(this, targetIndex)}
-            hasFilter={target.filter !== undefined}
+            hasFilter={
+              target.filter !== undefined &&
+              Object.keys(target.filter).length > 0
+            }
             suppressFilterIcon={true}
             onFilterPressed={this.enterFilterMode.bind(this, targetIndex)}
             inputType="prompt"
@@ -299,7 +314,7 @@ export default class StoryBuilderView extends React.Component<
             <Button
               title={hasMadeChanges ? "Save and Exit" : "Exit"}
               color={colors.white}
-              onPress={this.saveAndExit.bind(this)}
+              onPress={() => this.updateStoryAndExit(false)}
             />
           </View>
           <View style={{ flex: 1 }}>
@@ -307,7 +322,7 @@ export default class StoryBuilderView extends React.Component<
               <Button
                 title="Publish"
                 color={colors.white}
-                onPress={this.publishStory.bind(this)}
+                onPress={() => this.updateStoryAndExit(true)}
               />
             ) : null}
           </View>
@@ -323,8 +338,8 @@ export default class StoryBuilderView extends React.Component<
           <View style={{ flexDirection: "column", width: 320 }}>
             <TextInput
               placeholder="Enter a title"
-              value={this.state.story.name || ""}
-              onChange={this.setTitle.bind(this)}
+              value={this.state.story.title || ""}
+              onChange={value => this.setTitle(value.nativeEvent.text)}
               placeholderTextColor={colors.grey}
               style={styles.titleInput}
             />
@@ -332,7 +347,7 @@ export default class StoryBuilderView extends React.Component<
               placeholder="Enter your name"
               placeholderTextColor={colors.grey}
               value={this.state.story.author || ""}
-              onChange={this.setAuthor.bind(this)}
+              onChange={value => this.setAuthor(value.nativeEvent.text)}
               style={styles.nameInput}
             />
             {this.state.story.actions.map((action, i) => (

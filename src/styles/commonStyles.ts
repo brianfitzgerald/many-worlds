@@ -21,10 +21,7 @@ const styles: StyleSheet.NamedStyles<any> = StyleSheet.create({
     width: 250,
     color: colors.white
   },
-  heroButtonMargins: {
-    marginBottom: 25,
-    marginTop: 15
-  },
+  heroButtonMargins: {},
   headerText: {
     fontSize: 28,
     fontWeight: "bold",

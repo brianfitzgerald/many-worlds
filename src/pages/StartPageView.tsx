@@ -13,16 +13,22 @@ import {
   Modal,
   TextStyle,
   ViewStyle,
-  ImageStyle
+  ImageStyle,
+  AsyncStorage,
+  AlertIOS,
+  TouchableOpacity
 } from "react-native"
 import Swipeout from "react-native-swipeout"
+import { observer } from "mobx-react"
 
 import commonStyles from "../styles/commonStyles"
 import HeroButton, { LightHeroButton, NewsItem } from "../components/HeroButton"
 import colors from "../styles/colors"
 
+import { joinRoom, createRoom, roomDefaultState } from "../firebaseFunctions"
+
 import { dbInstance } from "../firebaseRef"
-import { Story, StoryOption, StoryAction } from "../types/Story"
+import { Story, StoryOption, StoryAction, emptyStory } from "../types/Story"
 import { Player } from "../types/Player"
 import {
   getNextActionIndex,
@@ -30,52 +36,65 @@ import {
   getActionByIndex
 } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
-import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
-import { getFeaturedStories, getMyStories } from "../actions/StoryDB"
+import { getFeaturedStories, getMyStories, getStory } from "../actions/StoryDB"
 import StoryActionPromptInput from "../components/StoryActionInput"
 import NewsItems from "../newsItems"
+import { appStore } from "../stores/AppStore"
+import { usernameStorageKey } from "../utils"
 
 type StartPageProps = {}
 type StartpageState = {
-  featuredStories: Story[]
   myStories: Story[]
-  storiesLoaded: boolean
   showSelectStoryModal: boolean
   selectedStory?: Story
+  playerName: string
 }
 
-const userID = "Brian Fitzgerald"
-
+@observer
 export default class StartPageView extends React.Component<
-  StartPageProps,
-  StartpageState
+StartPageProps,
+StartpageState
 > {
   constructor(props: StartPageProps) {
     super(props)
     this.state = {
-      featuredStories: [],
       myStories: [],
-      storiesLoaded: false,
-      showSelectStoryModal: false
+      showSelectStoryModal: false,
+      playerName: ""
     }
   }
 
-  componentDidMount() {
-    getFeaturedStories()
-      .then(featuredStories => {
-        this.setState({ featuredStories, storiesLoaded: true })
-      })
-      .catch(err => console.log(err))
-
-    getMyStories(userID)
-      .then(myStories => {
-        this.setState({ myStories, storiesLoaded: true })
-      })
-      .catch(err => console.log(err))
+  componentWillMount() {
+    this._loadUsername()
   }
 
-  beginEditing() {}
+  _loadUsername() {
+    AsyncStorage.getItem(usernameStorageKey)
+      .then(value => {
+        if (value !== null) {
+          console.log(value)
+          appStore.updatePlayerName(value)
+          this.setState({ playerName: value })
+        }
+      })
+      .catch(error => console.warn(error))
+  }
+
+  _updateUsername() {
+    AsyncStorage.setItem(usernameStorageKey, appStore.playerName)
+  }
+
+  componentDidMount() {
+
+    appStore.getStories()
+    appStore.getMyStories()
+
+  }
+
+  beginEditing(story: Story) {
+    appStore.enterStoryBuilder(story)
+  }
 
   selectStory(story: Story) {
     this.setState({
@@ -84,8 +103,53 @@ export default class StartPageView extends React.Component<
     })
   }
 
+  _joinGamePressed() {
+    const { playerName } = appStore
+    if (!playerName || playerName === "") {
+      AlertIOS.prompt("What is your name?", undefined, (nameInput: string) => {
+        appStore.updatePlayerName(nameInput)
+        AsyncStorage.setItem(usernameStorageKey, nameInput)
+        this._joinRoom(nameInput)
+      })
+    } else {
+      this._joinRoom(playerName)
+    }
+  }
+
+  _updateName() {
+    AlertIOS.prompt("What is your name?", undefined, (nameInput: string) => {
+      appStore.updatePlayerName(nameInput)
+      AsyncStorage.setItem(usernameStorageKey, nameInput)
+    })
+  }
+
+  _joinRoom(playerName: string) {
+    AlertIOS.prompt("Enter a room code", undefined, roomCodeInput => {
+      joinRoom(roomCodeInput, playerName).then((storyID: string) => {
+        const story = getStory(storyID)
+          .then((story: Story) => {
+            this._updateUsername()
+            appStore.enterRoom(roomCodeInput, story)
+          })
+          .catch(e => {
+            console.log(e)
+          })
+      })
+    })
+  }
+
+  _createRoom(selectedStory: Story) {
+    const { playerName } = appStore
+    createRoom(playerName, selectedStory).then((roomCode: string) => {
+      this._updateUsername()
+      appStore.enterRoom(roomCode, selectedStory)
+    })
+  }
+
+  _deleteStory() { }
+
   render() {
-    if (!this.state.storiesLoaded) {
+    if (!appStore.storiesLoaded) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <Text style={styles.promptButton}>Loading...</Text>
@@ -93,58 +157,69 @@ export default class StartPageView extends React.Component<
       )
     }
 
+    const featuredStories = appStore.featuredStories.filter(
+      story => story.published
+    )
+    const myStories = this.state.myStories
+
+    const selectedStory = this.state.selectedStory || emptyStory
+
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <Modal visible={this.state.showSelectStoryModal}>
-          {this.state.selectedStory ? (
-            <View>
-              <StoryListItem
-                story={this.state.selectedStory}
-                selected={false}
-                onPress={() => {}}
+          <View style={[commonStyles.container, styles.partyContainer]}>
+            <StoryListItem
+              style={{ marginTop: 15 }}
+              story={selectedStory}
+              selected={false}
+              onPress={() => { }}
+            />
+            <Button
+              color={colors.white}
+              title="Play this story with friends"
+              onPress={() => this._createRoom(selectedStory)}
+            />
+            {/* <Button
+              color={colors.white}
+              title="Play this story by yourself"
+              onPress={() =>
+                appStore.enterSingleplayer(this.state.selectedStory)
+              }
+            /> */}
+            {selectedStory.author === appStore.playerName ? (
+              <Button
+                color={colors.white}
+                title="Edit this story"
+                onPress={this.beginEditing.bind(this, this.state.selectedStory)}
               />
-              <HeroButton
-                title="Play this story with friends"
-                onPress={() => {}}
-              />
-              <HeroButton
-                title="Play this story by yourself"
-                onPress={() => {}}
-              />
-              {this.state.selectedStory.author === userID ? (
-                <HeroButton
-                  title="Edit this story"
-                  onPress={this.beginEditing.bind(
-                    this,
-                    this.state.selectedStory
-                  )}
-                />
-              ) : null}
-              <HeroButton
-                title="Play this story by yourself"
-                onPress={() => {}}
-              />
-            </View>
-          ) : null}
-          <Button
-            title="Cancel"
-            onPress={() => {
-              this.setState({ showSelectStoryModal: false })
-            }}
-          />
+            ) : null}
+            <Button
+              color={colors.white}
+              title="Cancel"
+              onPress={() => {
+                this.setState({ showSelectStoryModal: false })
+              }}
+            />
+          </View>
         </Modal>
         <ScrollView>
           <Text style={styles.appTitle}>Midnight Sun</Text>
+          <TouchableOpacity onPress={() => this._updateName()}>
+            <Text style={styles.header}>Your name: {appStore.playerName}</Text>
+            <Text
+              style={{ color: colors.white, marginTop: -5, marginBottom: 10 }}
+            >
+              (tap to change)
+            </Text>
+          </TouchableOpacity>
           <HeroButton
             style={commonStyles.heroButtonMargins}
-            title="Join a Game"
-            onPress={() => {}}
+            title="Join a Room"
+            onPress={this._joinGamePressed.bind(this)}
           />
-          <Text style={styles.header}>News</Text>
-          {NewsItems.map((item, key) => <NewsItem {...item} key={key} />)}
-          <Text style={styles.header}>Featured Stories</Text>
-          {this.state.featuredStories.map((story: Story, i) => (
+          <Text style={styles.header}>Play a Story</Text>
+          {featuredStories.map((story: Story, i) => (
             <StoryListItem
               key={i}
               story={story}
@@ -153,19 +228,32 @@ export default class StartPageView extends React.Component<
             />
           ))}
           <Text style={styles.header}>My Stories</Text>
-          {this.state.myStories.map((story: Story, i) => (
-            <StoryListItem
+          {myStories.map((story: Story, i) => (
+            <Swipeout
+              backgroundColor={colors.black}
               key={i}
-              story={story}
-              selected={false}
-              onPress={this.selectStory.bind(this, story)}
-            />
+              right={[
+                {
+                  text: "Remove",
+                  onPress: this._deleteStory.bind(this, story),
+                  backgroundColor: "#FE3A2F"
+                }
+              ]}
+            >
+              <StoryListItem
+                story={story}
+                selected={false}
+                onPress={this.selectStory.bind(this, story)}
+              />
+            </Swipeout>
           ))}
           <HeroButton
-            style={commonStyles.heroButtonMargins}
+            style={{ marginBottom: 5, marginTop: 15 }}
             title="Create a Story"
-            onPress={() => {}}
+            onPress={() => appStore.enterStoryBuilder()}
           />
+          <Text style={styles.header}>News</Text>
+          {NewsItems.map((item, key) => <NewsItem {...item} key={key} />)}
         </ScrollView>
       </View>
     )
@@ -203,9 +291,7 @@ const styles: { [key: string]: ViewStyle | TextStyle | ImageStyle } = {
     justifyContent: "flex-start"
   },
   nameInput: {
-    height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
+    height: 20,
     fontSize: 18,
     color: colors.white
   },

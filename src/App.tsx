@@ -10,8 +10,6 @@ import {
   AsyncStorage
 } from "react-native"
 
-const usernameStorageKey = "username_entry"
-
 import PartyView from "./pages/PartyView"
 
 import commonStyles from "./styles/commonStyles"
@@ -19,172 +17,36 @@ import commonStyles from "./styles/commonStyles"
 import { Player } from "./types/Player"
 import { Story } from "./types/Story"
 import HeroButton from "./components/HeroButton"
-import { joinRoom, createRoom, roomDefaultState } from "./firebaseFunctions"
 import { getStory } from "./actions/StoryDB"
 import colors from "./styles/colors"
 import RoomSetupView from "./pages/RoomSetupView"
 import StoryBuilderView from "./pages/StoryBuilderView"
 import StartPageView from "./pages/StartPageView"
+import { appStore } from "./stores/AppStore"
+import { observer } from "mobx-react"
 
-type AppState = {
-  playerName: string
-  roomCode: string
-  story?: Story
-  inRoom: boolean
-  createRoomModalVisible: boolean
-  storyBuilderVisible: boolean
-  selectedStoryID: string
-}
+type AppState = {}
 
 type AppProps = {}
 
-export default class App extends React.Component<AppProps, AppState> {
+@observer
+export default class App extends React.Component<AppProps> {
   constructor(props: any) {
     super(props)
-
-    this.state = {
-      playerName: "",
-      roomCode: "",
-      inRoom: false,
-      createRoomModalVisible: false,
-      storyBuilderVisible: false,
-      selectedStoryID: ""
-    }
-  }
-
-  componentWillMount() {
-    this._loadUsername()
-  }
-
-  _loadUsername() {
-    const storedUsername = AsyncStorage.getItem(usernameStorageKey)
-      .then(value => {
-        if (value !== null) {
-          this.setState({ playerName: value })
-        }
-      })
-      .catch(error => console.warn(error))
-  }
-
-  _updateUsername() {
-    AsyncStorage.setItem(usernameStorageKey, this.state.playerName)
-  }
-
-  joinRoom() {
-    const { roomCode, playerName } = this.state
-    joinRoom(roomCode, playerName).then((storyID: string) => {
-      const story = getStory(storyID)
-        .then((story: Story) => {
-          this._updateUsername()
-          this.setState({
-            inRoom: true,
-            story,
-            roomCode
-          })
-        })
-        .catch(e => {
-          console.log(e)
-        })
-    })
-  }
-
-  onFinish() {
-    this.setState({
-      inRoom: false
-    })
-  }
-
-  showStoryBuilder() {
-    this.setState({ storyBuilderVisible: true })
-  }
-
-  showRoomSetup() {
-    this.setState({ createRoomModalVisible: true })
-  }
-
-  hideRoomSetup() {
-    this.setState({ createRoomModalVisible: false, storyBuilderVisible: false })
-  }
-
-  createRoom(storyID: string) {
-    if (storyID === "") {
-      alert("Select a story first.")
-      return
-    }
-    const { playerName } = this.state
-    const story = getStory(storyID).then((story: Story) => {
-      createRoom(playerName, story).then((roomCode: string) => {
-        this._updateUsername()
-        this.setState({
-          inRoom: true,
-          createRoomModalVisible: false,
-          roomCode,
-          story
-        })
-      })
-    })
   }
 
   render() {
-    let page = null
-
-    return <StartPageView />
-
-    if (!this.state.inRoom) {
-      page = (
-        <View style={commonStyles.container}>
-          <StatusBar backgroundColor={colors.black} barStyle="light-content" />
-          <Modal visible={this.state.createRoomModalVisible}>
-            <RoomSetupView
-              onStoryBeginPressed={this.createRoom.bind(this)}
-              onCloseModal={this.hideRoomSetup.bind(this)}
-            />
-          </Modal>
-          <Modal visible={this.state.storyBuilderVisible}>
-            <StoryBuilderView onCloseModal={this.hideRoomSetup.bind(this)} />
-          </Modal>
-          <Text style={commonStyles.headerText}>What is your name?</Text>
-          <TextInput
-            placeholder="Name"
-            placeholderTextColor={colors.grey}
-            style={commonStyles.textInput}
-            value={this.state.playerName}
-            onChangeText={val => this.setState({ playerName: val })}
-          />
-          <Text style={commonStyles.headerText}>Where are you going?</Text>
-          <TextInput
-            placeholder="Room Code"
-            placeholderTextColor={colors.grey}
-            style={commonStyles.textInput}
-            value={this.state.roomCode}
-            onChangeText={val => this.setState({ roomCode: val })}
-          />
-          <HeroButton
-            style={commonStyles.heroButtonMargins}
-            title="Join Game"
-            onPress={this.joinRoom.bind(this)}
-          />
-          <HeroButton
-            style={commonStyles.heroButtonMargins}
-            title="Start New Game"
-            onPress={this.showRoomSetup.bind(this)}
-          />
-          <HeroButton
-            title="Story Builder"
-            onPress={this.showStoryBuilder.bind(this)}
-          />
-        </View>
-      )
-    } else {
-      page = (
-        <PartyView
-          currentPlayerName={this.state.playerName}
-          story={this.state.story}
-          roomCode={this.state.roomCode}
-        />
-      )
+    switch (appStore.navigationLocation) {
+      case "roomSetup":
+        return <RoomSetupView />
+      case "storyBuilder":
+        return <StoryBuilderView />
+      case "party":
+        return <PartyView />
+      case "start":
+        return <StartPageView />
+      default:
+        return <StartPageView />
     }
-
-    return page
   }
 }
