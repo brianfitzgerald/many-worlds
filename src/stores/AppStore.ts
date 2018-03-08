@@ -13,6 +13,7 @@ export default class AppStore {
   @observable public selfID: string = ""
   @observable public roomCode: string = ""
   @observable public currentStory?: Story
+  @observable public singleplayer: boolean = false
   @observable public navigationLocation?: NavigationLocation
 
   @observable public featuredStories: Story[] = []
@@ -69,6 +70,7 @@ export default class AppStore {
     }
     this.currentStory = story
     this.navigationLocation = "party"
+    this.singleplayer = true
   }
 
   @action

@@ -29,18 +29,18 @@ import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState, getSelf } from "../firebaseFunctions"
 import { appStore } from "../stores/AppStore"
 
-type PartyViewProps = {}
+type StoryViewProps = {}
 
-type PartyViewState = {
+type StoryViewState = {
   roomState: RoomState
   currentTimer: number
 }
 
 const TIMER_AMOUNT = 15
 
-export default class PartyView extends React.Component<
-  PartyViewProps,
-  PartyViewState
+export default class StoryView extends React.Component<
+  StoryViewProps,
+  StoryViewState
   > {
   private intervalRef: NodeJS.Timer | undefined
   private timeoutRef: NodeJS.Timer | undefined
@@ -49,7 +49,7 @@ export default class PartyView extends React.Component<
 
   refs: any
 
-  constructor(props: PartyViewProps) {
+  constructor(props: StoryViewProps) {
     super(props)
 
     this.state = {
@@ -76,6 +76,9 @@ export default class PartyView extends React.Component<
   }
 
   componentDidMount() {
+    if (appStore.singleplayer) {
+      return
+    }
     const matchID = appStore.roomCode
     this.firebaseListenerRef = dbInstance.ref(`/rooms/${matchID}/`)
     this.firebaseListenerRef.on("value", snap => {
@@ -141,6 +144,14 @@ export default class PartyView extends React.Component<
 
     newState.currentStoryIndex = nextStoryIndex
 
+    if (appStore.singleplayer) {
+      this.setState({ roomState: newState })
+      if (scrollRef) {
+        scrollRef.scrollToEnd()
+      }
+      return
+    }
+
     updateRoomState(appStore.roomCode, newState).then(() => {
       if (scrollRef) {
         scrollRef.scrollToEnd()
@@ -150,6 +161,12 @@ export default class PartyView extends React.Component<
   }
 
   _chooseAction(optionIndex: number) {
+
+    if (appStore.singleplayer) {
+      this._executeAction(optionIndex)
+      return
+    }
+
     const numPlayersWhoConcur = getPlayersWhoSelectedOption(
       optionIndex,
       this.state.roomState
