@@ -1,6 +1,7 @@
 import { observable, action, useStrict, computed } from "mobx"
 import { Story } from "../types/Story"
-import { getFeaturedStories, getMyStories } from "../actions/StoryDB";
+import { fetchFeaturedStoriesRequest, fetchMyStoriesRequest } from "../actions/StoryDB";
+import { fromPromise } from "mobx-utils";
 
 export type NavigationLocation =
   | "roomSetup"
@@ -16,30 +17,22 @@ export default class AppStore {
   @observable public navigationLocation?: NavigationLocation
 
   @observable public featuredStories: Story[] = []
-  @observable public myStories: Story[] = []
-  @observable public storiesLoaded: boolean = false
 
-  @action
-  getStories() {
-    getFeaturedStories()
+  fetchStories() {
+    fetchFeaturedStoriesRequest()
       .then(featuredStories => {
         this.featuredStories = featuredStories
-        this.storiesLoaded = true
       })
       .catch(err => console.log(err))
   }
 
-  @action
-  getMyStories() {
+  @computed
+  get myStories() {
     if (this.playerName !== "") {
-      getMyStories(appStore.playerName)
-        .then(myStories => {
-          this.myStories = myStories
-          this.storiesLoaded = true
-        })
-        .catch(err => console.log(err))
+      return fromPromise(fetchMyStoriesRequest(appStore.playerName))
+    } else {
+      return fromPromise.reject("No player name homie")
     }
-
   }
 
   @action

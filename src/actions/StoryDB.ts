@@ -32,7 +32,7 @@ export const getStory = (id: string) =>
     )
   })
 
-export const getFeaturedStories = () =>
+export const fetchFeaturedStoriesRequest = () =>
   new Promise<Story[]>((resolve, reject) => {
     const params: DocumentClient.ScanInput = {
       TableName: tableNames.stories
@@ -51,7 +51,7 @@ export const getFeaturedStories = () =>
     )
   })
 
-export const getMyStories = (userId: string) =>
+export const fetchMyStoriesRequest = (userId: string) =>
   new Promise<Story[]>((resolve, reject) => {
     const params: DocumentClient.ScanInput = {
       TableName: tableNames.stories,

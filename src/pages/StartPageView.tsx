@@ -37,7 +37,7 @@ import {
 } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import StoryListItem from "../components/StoryListItem"
-import { getFeaturedStories, getMyStories, getStory } from "../actions/StoryDB"
+import { fetchFeaturedStoriesRequest, fetchMyStoriesRequest, getStory } from "../actions/StoryDB"
 import StoryActionPromptInput from "../components/StoryActionInput"
 import NewsItems from "../newsItems"
 import { appStore } from "../stores/AppStore"
@@ -87,8 +87,7 @@ StartpageState
 
   componentDidMount() {
 
-    appStore.getStories()
-    appStore.getMyStories()
+    appStore.fetchStories()
 
   }
 
@@ -149,7 +148,7 @@ StartpageState
   _deleteStory() { }
 
   render() {
-    if (!appStore.storiesLoaded) {
+    if (appStore.myStories.state === "pending") {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <Text style={styles.promptButton}>Loading...</Text>
@@ -180,13 +179,13 @@ StartpageState
               title="Play this story with friends"
               onPress={() => this._createRoom(selectedStory)}
             />
-            {/* <Button
+            <Button
               color={colors.white}
               title="Play this story by yourself"
               onPress={() =>
                 appStore.enterSingleplayer(this.state.selectedStory)
               }
-            /> */}
+            />
             {selectedStory.author === appStore.playerName ? (
               <Button
                 color={colors.white}

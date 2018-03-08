@@ -25,7 +25,7 @@ import {
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
-import { getFeaturedStories } from "../actions/StoryDB"
+import { fetchFeaturedStoriesRequest } from "../actions/StoryDB"
 import { appStore } from "../stores/AppStore"
 
 type RoomSetupViewProps = {}
@@ -53,7 +53,7 @@ const sortStories = (stories: Story[], option: SortOption): Story[] => {
 export default class RoomSetupView extends React.Component<
   RoomSetupViewProps,
   RoomSetupViewState
-> {
+  > {
   constructor(props: RoomSetupViewProps) {
     super(props)
 
