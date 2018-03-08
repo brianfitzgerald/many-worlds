@@ -52,8 +52,14 @@ export default class StoryView extends React.Component<
   constructor(props: StoryViewProps) {
     super(props)
 
+    const roomInitState = roomDefaultState
+
+    if (appStore.singleplayer) {
+      roomInitState.status = "in_game"
+    }
+
     this.state = {
-      roomState: roomDefaultState,
+      roomState: roomInitState,
       currentTimer: 0
     }
 
@@ -195,6 +201,10 @@ export default class StoryView extends React.Component<
   }
 
   _leaveRoom() {
+    if (!appStore.singleplayer) {
+      appStore.leaveRoom()
+      return
+    }
     if (this.firebaseListenerRef) {
       this.firebaseListenerRef.ref.off()
       this.firebaseListenerRef.ref.remove()

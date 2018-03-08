@@ -61,6 +61,7 @@ export default class AppStore {
     this.navigationLocation = "start"
     this.roomCode = ""
     this.currentStory = undefined
+    this.singleplayer = false
   }
 
   @action
