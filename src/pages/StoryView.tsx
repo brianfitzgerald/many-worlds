@@ -28,6 +28,7 @@ import {
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState, getSelf } from "../firebaseFunctions"
 import { appStore } from "../stores/AppStore"
+import StoryListItem from "../components/StoryListItem";
 
 type StoryViewProps = {}
 
@@ -228,6 +229,19 @@ export default class StoryView extends React.Component<
     updateRoomState(appStore.roomCode, newRoomState)
   }
 
+  _selectAnotherStory(story: Story) {
+    appStore.updateStory(story)
+    const newRoomState = this.state.roomState
+    newRoomState.storyState = {}
+    newRoomState.currentStoryIndex = 0
+    newRoomState.history = []
+    if (appStore.singleplayer) {
+      this.setState({ roomState: newRoomState })
+      return
+    }
+    updateRoomState(appStore.roomCode, newRoomState)
+  }
+
   render() {
 
     if (!appStore.currentStory) {
@@ -254,12 +268,15 @@ export default class StoryView extends React.Component<
       this.state.roomState.currentStoryIndex >=
       appStore.currentStory.actions.length
 
+    const moreStories = appStore.featuredStories.slice(0, 2)
+
     if (isAtStoryEnd) {
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <Text style={[styles.titleText]}>The End</Text>
-          <Text style={styles.currentPromptText}>Thank you for playing.</Text>
+          <Text style={styles.currentPromptText}>Here are some more stories:</Text>
+          {moreStories.map((story) => <StoryListItem story={story} onPress={this._selectAnotherStory.bind(this, story)} />)}
           <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
         </View>
       )

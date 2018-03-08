@@ -65,6 +65,11 @@ export default class AppStore {
   }
 
   @action
+  updateStory(story: Story) {
+    this.currentStory = story
+  }
+
+  @action
   enterSingleplayer(story?: Story) {
     if (!story) {
       alert("no story chosen")
