@@ -36,9 +36,9 @@ export const getFeaturedStories = () =>
   new Promise<Story[]>((resolve, reject) => {
     const params: DocumentClient.ScanInput = {
       TableName: tableNames.stories,
-      FilterExpression: "published = :false",
+      FilterExpression: "published = :true",
       ExpressionAttributeValues: {
-        ":false": false
+        ":true": false
       }
     }
     documentClient.scan(

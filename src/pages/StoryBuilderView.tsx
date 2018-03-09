@@ -46,6 +46,7 @@ import StoryActionInput, {
 } from "../components/StoryActionInput"
 import { appStore } from "../stores/AppStore"
 import { buildStory } from "../actions/storyBuilder"
+import { uuidv4 } from "../utils";
 
 type StoryBuilderProps = {}
 
@@ -71,6 +72,7 @@ export default class StoryBuilderView extends React.Component<
   constructor(props: StoryBuilderProps) {
     super(props)
 
+    console.log(!appStore.currentStory)
     const initialStory = appStore.currentStory ? appStore.currentStory : emptyStory
 
     this.state = {
@@ -163,21 +165,30 @@ export default class StoryBuilderView extends React.Component<
 
   updateStory(publish: boolean, exit: boolean = true) {
 
-    const story = this.state.story
-    story.author = appStore.playerName
+    const formattedStory = this.state.story
+
+    formattedStory.author = appStore.playerName
+    if (formattedStory.id === '') {
+      formattedStory.id = uuidv4()
+    }
+    formattedStory.published = publish
 
     const builtStory = buildStory(
       this.state.story,
-      this.state.filterPairs,
-      publish
+      this.state.filterPairs
     )
 
-    if (builtStory.title === "" && publish) {
+    if (builtStory.actions.length === 0) {
+      alert("Add an action to your story.")
+      return
+    }
+
+    if (builtStory.title === "") {
       alert("Add a title to your story.")
       return
     }
 
-    if (builtStory.description === "" && publish) {
+    if (builtStory.description === "") {
       alert("Add a description to your story.")
       return
     }

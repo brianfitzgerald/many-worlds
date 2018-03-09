@@ -82,8 +82,8 @@ export default class AppStore {
 
   @action
   enterStoryBuilder(story?: Story) {
-    this.navigationLocation = "storyBuilder"
     this.currentStory = story
+    this.navigationLocation = "storyBuilder"
   }
 
   @action

@@ -2,16 +2,12 @@ import { FilterPair } from "../pages/StoryBuilderView"
 import { Story } from "../types/Story"
 import brimblewood from "../stories/brimblewood"
 import * as util from "util"
-import { uuidv4 } from "../utils"
 
 export const buildStory = (
   story: Story,
   filters: FilterPair[],
-  publish: boolean
 ): Story => {
   let formattedStory = addFiltersFromFilterPairs(story, filters)
-  formattedStory.id = uuidv4()
-  formattedStory.published = publish
   return formattedStory
 }
 
