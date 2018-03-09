@@ -47,6 +47,8 @@ import StoryActionInput, {
 import { appStore } from "../stores/AppStore"
 import { buildStory } from "../actions/storyBuilder"
 import { uuidv4 } from "../utils";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+
 
 type StoryBuilderProps = {}
 
@@ -326,7 +328,7 @@ export default class StoryBuilderView extends React.Component<
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
-        <ScrollView>
+        <KeyboardAwareScrollView>
           <View style={styles.topBar}>
             <View style={{ flex: 2 }}>
               <Button
@@ -418,7 +420,7 @@ export default class StoryBuilderView extends React.Component<
               </View>
             ))}
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
         <LightHeroButton
           title={
             this.state.story.actions.length > 0
