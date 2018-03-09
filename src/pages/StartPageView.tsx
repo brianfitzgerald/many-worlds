@@ -76,7 +76,6 @@ StartpageState
     AsyncStorage.getItem(usernameStorageKey)
       .then(value => {
         if (value !== null) {
-          console.log(value)
           appStore.updatePlayerName(value)
         }
       })

@@ -20,7 +20,7 @@ export default class AppStore {
   @observable public myStories: Story[] = []
   @observable public storiesLoaded: boolean = false
 
-  private testMode: boolean = false
+  public testMode: boolean = false
 
   @action
   getStories() {

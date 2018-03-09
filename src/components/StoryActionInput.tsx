@@ -20,7 +20,6 @@ import { Story } from "../types/Story"
 type StoryActionInputProps = {
   value: string
   onChange: (text: string) => void
-  placeholder?: string
   hasFilter: boolean
   onFilterPressed?: () => void
   inputType: "prompt" | "option"
@@ -37,14 +36,15 @@ const StoryActionInput: React.SFC<StoryActionInputProps> = props => {
       </TouchableOpacity>
     )
 
+  const isPrompt = props.inputType === "prompt"
 
-  let bodyStyle = props.inputType === "prompt" ? PromptButtonBaseStyle : OptionButtonBaseStyle
-  let textStyle = props.inputType === "prompt" ? PromptButtonTextStyle : OptionButtonTextStyle
+  let bodyStyle = isPrompt ? PromptButtonBaseStyle : OptionButtonBaseStyle
+  let textStyle = isPrompt ? PromptButtonTextStyle : OptionButtonTextStyle
 
   let body = (
     <View style={bodyStyle}>
       <TextInput
-        placeholder={props.placeholder}
+        placeholder={isPrompt ? "Enter a prompt" : "Enter an option"}
         placeholderTextColor={colors.grey}
         value={props.value}
         onChange={event => props.onChange(event.nativeEvent.text)}
@@ -76,7 +76,7 @@ export const PromptButtonBaseStyle: ViewStyle = {
 
 export const OptionButtonBaseStyle: ViewStyle = {
   padding: 15,
-  paddingTop: 10,
+  paddingTop: 5,
   paddingBottom: 10,
   marginBottom: 15,
   alignSelf: "flex-end",

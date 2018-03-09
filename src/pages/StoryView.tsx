@@ -271,16 +271,24 @@ export default class StoryView extends React.Component<
       this.state.roomState.currentStoryIndex >=
       appStore.currentStory.actions.length
 
-    const moreStories = appStore.featuredStories.slice(0, 2)
-
     if (isAtStoryEnd) {
+
+      const moreStories = appStore.featuredStories.slice(0, 2)
+      const isInTestMode = appStore.testMode
+
+      const finalContent = isInTestMode ? <HeroButton title="Back to testing" onPress={() => this._leaveRoom()} /> : (
+        <React.Fragment>
+          <Text style={styles.currentPromptText}>Here are some more stories:</Text>
+          {moreStories.map((story) => <StoryListItem story={story} onPress={this._selectAnotherStory.bind(this, story)} />)}
+          <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
+        </React.Fragment>
+      )
+
+
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <Text style={[styles.titleText]}>The End</Text>
-          <Text style={styles.currentPromptText}>Here are some more stories:</Text>
-          {moreStories.map((story) => <StoryListItem story={story} onPress={this._selectAnotherStory.bind(this, story)} />)}
-          <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
         </View>
       )
     }

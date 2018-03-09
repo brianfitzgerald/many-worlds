@@ -98,7 +98,7 @@ export default class StoryBuilderView extends React.Component<
 
   addAction() {
     const newAction: StoryAction = {
-      prompt: "Add a prompt",
+      prompt: "",
       options: []
     }
     const newActions = this.state.story.actions.concat(newAction)
@@ -126,7 +126,7 @@ export default class StoryBuilderView extends React.Component<
 
   addOption(actionIndex: number) {
     const newOption: StoryOption = {
-      title: "New option"
+      title: ""
     }
     const newActions = this.state.story.actions
     newActions[actionIndex].options.push(newOption)
@@ -178,7 +178,7 @@ export default class StoryBuilderView extends React.Component<
     }
 
     if (builtStory.description === "" && publish) {
-      alert("Add a title to your story.")
+      alert("Add a description to your story.")
       return
     }
 
@@ -319,7 +319,7 @@ export default class StoryBuilderView extends React.Component<
           <View style={styles.topBar}>
             <View style={{ flex: 2 }}>
               <Button
-                title="Save and Exit"
+                title={this.state.hasMadeChanges ? "Save and Exit" : "Exit"}
                 color={colors.white}
                 onPress={() => this.updateStory(false)}
               />
@@ -432,6 +432,7 @@ const styles = StyleSheet.create({
     color: colors.grey
   },
   topBar: {
+    minWidth: 200,
     flexDirection: "row",
     justifyContent: "space-between"
   },
