@@ -7,7 +7,8 @@ import {
   StatusBar,
   View,
   ScrollViewProps,
-  ScrollViewStatic
+  ScrollViewStatic,
+  TouchableOpacity
 } from "react-native"
 import commonStyles from "../styles/commonStyles"
 import HeroButton from "../components/HeroButton"
@@ -28,19 +29,22 @@ import {
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState, getSelf } from "../firebaseFunctions"
 import { appStore } from "../stores/AppStore"
+import StoryListItem from "../components/StoryListItem";
 
-type PartyViewProps = {}
+type StoryViewProps = {
+  testMode?: boolean
+}
 
-type PartyViewState = {
+type StoryViewState = {
   roomState: RoomState
   currentTimer: number
 }
 
 const TIMER_AMOUNT = 15
 
-export default class PartyView extends React.Component<
-  PartyViewProps,
-  PartyViewState
+export default class StoryView extends React.Component<
+  StoryViewProps,
+  StoryViewState
   > {
   private intervalRef: NodeJS.Timer | undefined
   private timeoutRef: NodeJS.Timer | undefined
@@ -49,11 +53,17 @@ export default class PartyView extends React.Component<
 
   refs: any
 
-  constructor(props: PartyViewProps) {
+  constructor(props: StoryViewProps) {
     super(props)
 
+    const roomInitState = roomDefaultState
+
+    if (appStore.singleplayer) {
+      roomInitState.status = "in_game"
+    }
+
     this.state = {
-      roomState: roomDefaultState,
+      roomState: roomInitState,
       currentTimer: 0
     }
 
@@ -76,6 +86,9 @@ export default class PartyView extends React.Component<
   }
 
   componentDidMount() {
+    if (appStore.singleplayer) {
+      return
+    }
     const matchID = appStore.roomCode
     this.firebaseListenerRef = dbInstance.ref(`/rooms/${matchID}/`)
     this.firebaseListenerRef.on("value", snap => {
@@ -141,6 +154,14 @@ export default class PartyView extends React.Component<
 
     newState.currentStoryIndex = nextStoryIndex
 
+    if (appStore.singleplayer) {
+      this.setState({ roomState: newState })
+      if (scrollRef) {
+        scrollRef.scrollToEnd()
+      }
+      return
+    }
+
     updateRoomState(appStore.roomCode, newState).then(() => {
       if (scrollRef) {
         scrollRef.scrollToEnd()
@@ -150,6 +171,12 @@ export default class PartyView extends React.Component<
   }
 
   _chooseAction(optionIndex: number) {
+
+    if (appStore.singleplayer) {
+      this._executeAction(optionIndex)
+      return
+    }
+
     const numPlayersWhoConcur = getPlayersWhoSelectedOption(
       optionIndex,
       this.state.roomState
@@ -178,6 +205,10 @@ export default class PartyView extends React.Component<
   }
 
   _leaveRoom() {
+    if (appStore.singleplayer) {
+      appStore.leaveRoom()
+      return
+    }
     if (this.firebaseListenerRef) {
       this.firebaseListenerRef.ref.off()
       this.firebaseListenerRef.ref.remove()
@@ -197,6 +228,19 @@ export default class PartyView extends React.Component<
     }
     if (newRoomState.connectedPlayers.filter((p) => !p.ready).length < 1) {
       newRoomState.status = "in_game"
+    }
+    updateRoomState(appStore.roomCode, newRoomState)
+  }
+
+  _selectAnotherStory(story: Story) {
+    appStore.updateStory(story)
+    const newRoomState = this.state.roomState
+    newRoomState.storyState = {}
+    newRoomState.currentStoryIndex = 0
+    newRoomState.history = []
+    if (appStore.singleplayer) {
+      this.setState({ roomState: newRoomState })
+      return
     }
     updateRoomState(appStore.roomCode, newRoomState)
   }
@@ -228,12 +272,23 @@ export default class PartyView extends React.Component<
       appStore.currentStory.actions.length
 
     if (isAtStoryEnd) {
+
+      const moreStories = appStore.featuredStories.slice(0, 2)
+      const isInTestMode = appStore.testMode
+
+      const finalContent = isInTestMode ? <HeroButton title="Back to testing" onPress={() => this._leaveRoom()} /> : (
+        <React.Fragment>
+          <Text style={styles.currentPromptText}>Here are some more stories:</Text>
+          {moreStories.map((story) => <StoryListItem story={story} onPress={this._selectAnotherStory.bind(this, story)} />)}
+          <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
+        </React.Fragment>
+      )
+
+
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <Text style={[styles.titleText]}>The End</Text>
-          <Text style={styles.currentPromptText}>Thank you for playing.</Text>
-          <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
         </View>
       )
     }
@@ -247,6 +302,9 @@ export default class PartyView extends React.Component<
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <View style={styles.header}>
+          <TouchableOpacity onPress={this._leaveRoom}>
+            <Text style={styles.roomCode}>Back</Text>
+          </TouchableOpacity>
           <Text style={styles.roomCode}>{appStore.roomCode}</Text>
           <Text style={styles.timer}>
             {this.state.currentTimer} Seconds Left
@@ -322,7 +380,8 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    paddingBottom: 10
   },
   timer: {
     paddingTop: 6,

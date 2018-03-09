@@ -35,7 +35,11 @@ export const getStory = (id: string) =>
 export const getFeaturedStories = () =>
   new Promise<Story[]>((resolve, reject) => {
     const params: DocumentClient.ScanInput = {
-      TableName: tableNames.stories
+      TableName: tableNames.stories,
+      FilterExpression: "published = :true",
+      ExpressionAttributeValues: {
+        ":true": false
+      }
     }
     documentClient.scan(
       params,
@@ -63,6 +67,7 @@ export const getMyStories = (userId: string) =>
     documentClient.scan(
       params,
       (err: AWS.AWSError, data: DocumentClient.ScanOutput) => {
+
         if (err != null) {
           reject(err)
         }
@@ -86,6 +91,24 @@ export const updateStory = (story: Story, publish: boolean) =>
       Item: storyToPublish
     }
     documentClient.put(
+      params,
+      (err: AWS.AWSError, data: DocumentClient.QueryOutput) => {
+        if (err) {
+          reject(err)
+        }
+        resolve()
+      }
+    )
+  })
+
+export const deleteStory = (story: Story) =>
+  new Promise((resolve, reject) => {
+    const id = story.id
+    const params: DocumentClient.DeleteItemInput = {
+      TableName: tableNames.stories,
+      Key: { id },
+    }
+    documentClient.delete(
       params,
       (err: AWS.AWSError, data: DocumentClient.QueryOutput) => {
         if (err) {

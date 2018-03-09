@@ -16,6 +16,7 @@ import {
   ImageStyle,
   AsyncStorage,
   AlertIOS,
+  AlertAndroid,
   TouchableOpacity
 } from "react-native"
 import Swipeout from "react-native-swipeout"
@@ -37,7 +38,7 @@ import {
 } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import StoryListItem from "../components/StoryListItem"
-import { getFeaturedStories, getMyStories, getStory } from "../actions/StoryDB"
+import { getFeaturedStories, getMyStories, getStory, deleteStory } from "../actions/StoryDB"
 import StoryActionPromptInput from "../components/StoryActionInput"
 import NewsItems from "../newsItems"
 import { appStore } from "../stores/AppStore"
@@ -47,8 +48,9 @@ type StartPageProps = {}
 type StartpageState = {
   myStories: Story[]
   showSelectStoryModal: boolean
+  showJoinGameModal: boolean
   selectedStory?: Story
-  playerName: string
+  roomCodeInput: string
 }
 
 @observer
@@ -61,7 +63,8 @@ StartpageState
     this.state = {
       myStories: [],
       showSelectStoryModal: false,
-      playerName: ""
+      showJoinGameModal: false,
+      roomCodeInput: ""
     }
   }
 
@@ -73,9 +76,7 @@ StartpageState
     AsyncStorage.getItem(usernameStorageKey)
       .then(value => {
         if (value !== null) {
-          console.log(value)
           appStore.updatePlayerName(value)
-          this.setState({ playerName: value })
         }
       })
       .catch(error => console.warn(error))
@@ -88,7 +89,6 @@ StartpageState
   componentDidMount() {
 
     appStore.getStories()
-    appStore.getMyStories()
 
   }
 
@@ -103,38 +103,27 @@ StartpageState
     })
   }
 
-  _joinGamePressed() {
-    const { playerName } = appStore
-    if (!playerName || playerName === "") {
+  _updateName() {
+    if (Platform.OS === "ios")
       AlertIOS.prompt("What is your name?", undefined, (nameInput: string) => {
         appStore.updatePlayerName(nameInput)
         AsyncStorage.setItem(usernameStorageKey, nameInput)
-        this._joinRoom(nameInput)
       })
-    } else {
-      this._joinRoom(playerName)
-    }
   }
 
-  _updateName() {
-    AlertIOS.prompt("What is your name?", undefined, (nameInput: string) => {
-      appStore.updatePlayerName(nameInput)
-      AsyncStorage.setItem(usernameStorageKey, nameInput)
-    })
-  }
+  _joinGamePressed(roomCodeInput: string) {
+    const { playerName } = appStore
+    AsyncStorage.setItem(usernameStorageKey, playerName)
 
-  _joinRoom(playerName: string) {
-    AlertIOS.prompt("Enter a room code", undefined, roomCodeInput => {
-      joinRoom(roomCodeInput, playerName).then((storyID: string) => {
-        const story = getStory(storyID)
-          .then((story: Story) => {
-            this._updateUsername()
-            appStore.enterRoom(roomCodeInput, story)
-          })
-          .catch(e => {
-            console.log(e)
-          })
-      })
+    joinRoom(roomCodeInput, playerName).then((storyID: string) => {
+      const story = getStory(storyID)
+        .then((story: Story) => {
+          this._updateUsername()
+          appStore.enterRoom(roomCodeInput, story)
+        })
+        .catch(e => {
+          console.log(e)
+        })
     })
   }
 
@@ -146,7 +135,11 @@ StartpageState
     })
   }
 
-  _deleteStory() { }
+  _deleteStory(story: Story) {
+    deleteStory(story).then(() => {
+      appStore.getStories()
+    })
+  }
 
   render() {
     if (!appStore.storiesLoaded) {
@@ -157,52 +150,90 @@ StartpageState
       )
     }
 
-    const featuredStories = appStore.featuredStories.filter(
-      story => story.published
-    )
-    const myStories = this.state.myStories
+    const featuredStories = appStore.featuredStories
+    const myStories = appStore.myStories
 
     const selectedStory = this.state.selectedStory || emptyStory
+
+    const selectStoryModal = (
+      <Modal visible={this.state.showSelectStoryModal}>
+        <View style={[commonStyles.container, styles.partyContainer]}>
+          <StoryListItem
+            style={{ marginTop: 15 }}
+            story={selectedStory}
+            selected={false}
+            onPress={() => { }}
+          />
+          <Button
+            color={colors.white}
+            title="Play this story with friends"
+            onPress={() => this._createRoom(selectedStory)}
+          />
+          <Button
+            color={colors.white}
+            title="Play this story by yourself"
+            onPress={() =>
+              this.state.selectedStory ? appStore.enterSingleplayer(this.state.selectedStory) : undefined
+            }
+          />
+          {selectedStory.author === appStore.playerName ? (
+            <Button
+              color={colors.white}
+              title="Edit this story"
+              onPress={this.beginEditing.bind(this, this.state.selectedStory)}
+            />
+          ) : null}
+          <Button
+            color={colors.white}
+            title="Cancel"
+            onPress={() => {
+              this.setState({ showSelectStoryModal: false })
+            }}
+          />
+        </View>
+      </Modal>
+    )
+
+    const validRoomCodeAndName = this.state.roomCodeInput !== '' && appStore.playerName !== ''
+
+    const joinGameModal = (
+      <Modal visible={this.state.showJoinGameModal}>
+        <View style={[commonStyles.container, styles.partyContainer]}>
+          <TextInput
+            placeholder="Enter your name"
+            value={appStore.playerName}
+            onChange={value => appStore.updatePlayerName(value.nativeEvent.text)}
+            placeholderTextColor={colors.grey}
+            style={styles.titleInput}
+          />
+          <TextInput
+            placeholder="Enter a room code"
+            value={this.state.roomCodeInput}
+            onChange={value => this.setState({ roomCodeInput: value.nativeEvent.text })}
+            placeholderTextColor={colors.grey}
+            style={styles.titleInput}
+          />
+          <Button
+            color={validRoomCodeAndName ? colors.white : colors.grey}
+            title="Join Room"
+            onPress={validRoomCodeAndName ? () => this._joinGamePressed(this.state.roomCodeInput) : () => { }}
+          />
+          <Button
+            color={colors.white}
+            title="Cancel"
+            onPress={() => {
+              this.setState({ showJoinGameModal: false })
+            }}
+          />
+        </View>
+      </Modal>
+    )
 
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
-        <Modal visible={this.state.showSelectStoryModal}>
-          <View style={[commonStyles.container, styles.partyContainer]}>
-            <StoryListItem
-              style={{ marginTop: 15 }}
-              story={selectedStory}
-              selected={false}
-              onPress={() => { }}
-            />
-            <Button
-              color={colors.white}
-              title="Play this story with friends"
-              onPress={() => this._createRoom(selectedStory)}
-            />
-            {/* <Button
-              color={colors.white}
-              title="Play this story by yourself"
-              onPress={() =>
-                appStore.enterSingleplayer(this.state.selectedStory)
-              }
-            /> */}
-            {selectedStory.author === appStore.playerName ? (
-              <Button
-                color={colors.white}
-                title="Edit this story"
-                onPress={this.beginEditing.bind(this, this.state.selectedStory)}
-              />
-            ) : null}
-            <Button
-              color={colors.white}
-              title="Cancel"
-              onPress={() => {
-                this.setState({ showSelectStoryModal: false })
-              }}
-            />
-          </View>
-        </Modal>
+        {selectStoryModal}
+        {joinGameModal}
         <ScrollView>
           <Text style={styles.appTitle}>Many Worlds</Text>
           <TouchableOpacity onPress={() => this._updateName()}>
@@ -216,12 +247,13 @@ StartpageState
           <HeroButton
             style={commonStyles.heroButtonMargins}
             title="Join a Room"
-            onPress={this._joinGamePressed.bind(this)}
+            onPress={() => this.setState({ showJoinGameModal: true })}
           />
           <Text style={styles.header}>Play a Story</Text>
           {featuredStories.map((story: Story, i) => (
             <StoryListItem
               key={i}
+              style={styles.StoryListItemStyle}
               story={story}
               selected={false}
               onPress={this.selectStory.bind(this, story)}
@@ -234,7 +266,7 @@ StartpageState
               key={i}
               right={[
                 {
-                  text: "Remove",
+                  text: "Delete",
                   onPress: this._deleteStory.bind(this, story),
                   backgroundColor: "#FE3A2F"
                 }
@@ -243,12 +275,13 @@ StartpageState
               <StoryListItem
                 story={story}
                 selected={false}
+                style={styles.StoryListItemStyle}
                 onPress={this.selectStory.bind(this, story)}
               />
             </Swipeout>
           ))}
           <HeroButton
-            style={{ marginBottom: 5, marginTop: 15 }}
+            style={{ marginBottom: 5 }}
             title="Create a Story"
             onPress={() => appStore.enterStoryBuilder()}
           />
@@ -316,5 +349,8 @@ const styles: { [key: string]: ViewStyle | TextStyle | ImageStyle } = {
     textAlign: "center",
     marginBottom: 12,
     marginTop: 4
+  },
+  StoryListItemStyle: {
+    marginBottom: 15
   }
 }

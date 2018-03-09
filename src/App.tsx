@@ -10,7 +10,7 @@ import {
   AsyncStorage
 } from "react-native"
 
-import PartyView from "./pages/PartyView"
+import StoryView from "./pages/StoryView"
 
 import commonStyles from "./styles/commonStyles"
 
@@ -42,7 +42,7 @@ export default class App extends React.Component<AppProps> {
       case "storyBuilder":
         return <StoryBuilderView />
       case "party":
-        return <PartyView />
+        return <StoryView />
       case "start":
         return <StartPageView />
       default:

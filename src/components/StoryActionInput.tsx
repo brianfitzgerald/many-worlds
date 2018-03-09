@@ -20,7 +20,6 @@ import { Story } from "../types/Story"
 type StoryActionInputProps = {
   value: string
   onChange: (text: string) => void
-  placeholder?: string
   hasFilter: boolean
   onFilterPressed?: () => void
   inputType: "prompt" | "option"
@@ -37,33 +36,23 @@ const StoryActionInput: React.SFC<StoryActionInputProps> = props => {
       </TouchableOpacity>
     )
 
-  let body = null
+  const isPrompt = props.inputType === "prompt"
 
-  if (props.inputType === "prompt") {
-    body = (
-      <View style={PromptButtonBaseStyle}>
-        <TextInput
-          placeholder={props.placeholder}
-          placeholderTextColor={colors.grey}
-          value={props.value}
-          onChange={event => props.onChange(event.nativeEvent.text)}
-          style={PromptButtonTextStyle}
-        />
-      </View>
-    )
-  } else if (props.inputType === "option") {
-    body = (
-      <View style={OptionButtonBaseStyle}>
-        <TextInput
-          placeholder={props.placeholder}
-          placeholderTextColor={colors.grey}
-          value={props.value}
-          onChange={event => props.onChange(event.nativeEvent.text)}
-          style={OptionButtonTextStyle}
-        />
-      </View>
-    )
-  }
+  let bodyStyle = isPrompt ? PromptButtonBaseStyle : OptionButtonBaseStyle
+  let textStyle = isPrompt ? PromptButtonTextStyle : OptionButtonTextStyle
+
+  let body = (
+    <View style={bodyStyle}>
+      <TextInput
+        placeholder={isPrompt ? "Enter a prompt" : "Enter an option"}
+        placeholderTextColor={colors.grey}
+        value={props.value}
+        onChange={event => props.onChange(event.nativeEvent.text)}
+        style={textStyle}
+        multiline={true}
+      />
+    </View>
+  )
 
   return (
     <View>
@@ -78,6 +67,7 @@ export const PromptButtonBaseStyle: ViewStyle = {
   padding: 15,
   minHeight: 50,
   marginBottom: 15,
+  paddingTop: 10,
   marginTop: 15,
   backgroundColor: colors.lightBlack,
   borderRadius: 10,
@@ -86,7 +76,7 @@ export const PromptButtonBaseStyle: ViewStyle = {
 
 export const OptionButtonBaseStyle: ViewStyle = {
   padding: 15,
-  paddingTop: 10,
+  paddingTop: 5,
   paddingBottom: 10,
   marginBottom: 15,
   alignSelf: "flex-end",
