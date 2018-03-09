@@ -35,7 +35,11 @@ export const getStory = (id: string) =>
 export const getFeaturedStories = () =>
   new Promise<Story[]>((resolve, reject) => {
     const params: DocumentClient.ScanInput = {
-      TableName: tableNames.stories
+      TableName: tableNames.stories,
+      FilterExpression: "published = :false",
+      ExpressionAttributeValues: {
+        ":false": false
+      }
     }
     documentClient.scan(
       params,
@@ -63,6 +67,7 @@ export const getMyStories = (userId: string) =>
     documentClient.scan(
       params,
       (err: AWS.AWSError, data: DocumentClient.ScanOutput) => {
+
         if (err != null) {
           reject(err)
         }

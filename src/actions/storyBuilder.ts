@@ -11,7 +11,6 @@ export const buildStory = (
 ): Story => {
   let formattedStory = addFiltersFromFilterPairs(story, filters)
   formattedStory.id = uuidv4()
-  formattedStory.description = "A fun romp"
   formattedStory.published = publish
   return formattedStory
 }

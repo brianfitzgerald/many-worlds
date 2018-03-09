@@ -70,10 +70,7 @@ export default class AppStore {
   }
 
   @action
-  enterSingleplayer(story?: Story) {
-    if (!story) {
-      alert("no story chosen")
-    }
+  enterSingleplayer(story: Story) {
     this.currentStory = story
     this.navigationLocation = "party"
     this.singleplayer = true

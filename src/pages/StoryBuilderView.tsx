@@ -67,12 +67,14 @@ export type FilterPair = {
 export default class StoryBuilderView extends React.Component<
   StoryBuilderProps,
   StoryBuilderState
-> {
+  > {
   constructor(props: StoryBuilderProps) {
     super(props)
 
+    const initialStory = appStore.currentStory ? appStore.currentStory : emptyStory
+
     this.state = {
-      story: emptyStory,
+      story: initialStory,
       filterModeTargetIndex: 0,
       filterModeActive: false,
       filterPairs: [],
@@ -80,9 +82,9 @@ export default class StoryBuilderView extends React.Component<
     }
   }
 
-  setAuthor(value: string) {
+  setDescription(value: string) {
     this.setState({
-      story: { ...this.state.story, author: value },
+      story: { ...this.state.story, description: value },
       hasMadeChanges: true
     })
   }
@@ -159,7 +161,11 @@ export default class StoryBuilderView extends React.Component<
     this.setState({ filterModeActive: false, filterModeTargetIndex: 0 })
   }
 
-  updateStoryAndExit(publish: boolean) {
+  updateStory(publish: boolean, exit: boolean = true) {
+
+    const story = this.state.story
+    story.author = appStore.playerName
+
     const builtStory = buildStory(
       this.state.story,
       this.state.filterPairs,
@@ -170,29 +176,29 @@ export default class StoryBuilderView extends React.Component<
       alert("Add a title to your story.")
       return
     }
-    if (builtStory.author === "" && publish) {
-      alert("Add the name of the author.")
+
+    if (builtStory.description === "" && publish) {
+      alert("Add a title to your story.")
       return
     }
 
     if (this.state.hasMadeChanges) {
       updateStory(builtStory, false)
         .then(() => {
-          appStore.leaveStoryBuilder()
+          if (exit) {
+            appStore.leaveStoryBuilder()
+          }
         })
         .catch(err => console.log(err))
     } else {
-      appStore.leaveStoryBuilder()
+      if (exit) {
+        appStore.leaveStoryBuilder()
+      }
     }
   }
 
   testStory() {
-    updateStory(this.state.story, false).then(() => {
-      alert(
-        "Your story is ready for testing. Go to My Stories on the main menu to play it."
-      )
-      appStore.enterSingleplayer(this.state.story)
-    })
+    appStore.enterSingleplayer(this.state.story)
   }
 
   updateActionFilterSelection(
@@ -271,33 +277,33 @@ export default class StoryBuilderView extends React.Component<
               </View>
               {action.options
                 ? action.options.map((action, k) => {
-                    const isInFilter = newFilter.find(
-                      f => f.optionIndex === k && f.actionIndex === i
-                    )
-                    return (
-                      <View>
-                        {isInFilter ? (
-                          <Text style={FilterLabelStyle}>
-                            {isInFilter.filterBooleanValue ? "True" : "False"}
+                  const isInFilter = newFilter.find(
+                    f => f.optionIndex === k && f.actionIndex === i
+                  )
+                  return (
+                    <View>
+                      {isInFilter ? (
+                        <Text style={FilterLabelStyle}>
+                          {isInFilter.filterBooleanValue ? "True" : "False"}
+                        </Text>
+                      ) : null}
+                      <TouchableOpacity
+                        onPress={this.updateActionFilterSelection.bind(
+                          this,
+                          i,
+                          k,
+                          targetIndex
+                        )}
+                      >
+                        <View style={OptionButtonBaseStyle}>
+                          <Text style={OptionButtonTextStyle}>
+                            {action.title}
                           </Text>
-                        ) : null}
-                        <TouchableOpacity
-                          onPress={this.updateActionFilterSelection.bind(
-                            this,
-                            i,
-                            k,
-                            targetIndex
-                          )}
-                        >
-                          <View style={OptionButtonBaseStyle}>
-                            <Text style={OptionButtonTextStyle}>
-                              {action.title}
-                            </Text>
-                          </View>
-                        </TouchableOpacity>
-                      </View>
-                    )
-                  })
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  )
+                })
                 : null}
             </View>
           ))}
@@ -309,32 +315,39 @@ export default class StoryBuilderView extends React.Component<
     return (
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
-        <View style={styles.topBar}>
-          <View style={{ flex: 2 }}>
-            <Button
-              title={hasMadeChanges ? "Save and Exit" : "Exit"}
-              color={colors.white}
-              onPress={() => this.updateStoryAndExit(false)}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            {hasMadeChanges ? (
-              <Button
-                title="Publish"
-                color={colors.white}
-                onPress={() => this.updateStoryAndExit(true)}
-              />
-            ) : null}
-          </View>
-          <View style={{ flex: 1 }}>
-            <Button
-              title="Test"
-              color={colors.white}
-              onPress={this.testStory.bind(this)}
-            />
-          </View>
-        </View>
         <ScrollView>
+          <View style={styles.topBar}>
+            <View style={{ flex: 2 }}>
+              <Button
+                title={hasMadeChanges ? "Save and Exit" : "Exit"}
+                color={colors.white}
+                onPress={() => this.updateStory(false)}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              {hasMadeChanges ? (
+                <Button
+                  title="Publish"
+                  color={colors.white}
+                  onPress={() => this.updateStory(true)}
+                />
+              ) : null}
+            </View>
+            <View style={{ flex: 1 }}>
+              <Button
+                title="Save"
+                color={colors.white}
+                onPress={() => this.updateStory(false, false)}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Button
+                title="Test"
+                color={colors.white}
+                onPress={this.testStory.bind(this)}
+              />
+            </View>
+          </View>
           <View style={{ flexDirection: "column", width: 320 }}>
             <TextInput
               placeholder="Enter a title"
@@ -344,10 +357,10 @@ export default class StoryBuilderView extends React.Component<
               style={styles.titleInput}
             />
             <TextInput
-              placeholder="Enter your name"
+              placeholder="Enter a description for your story"
               placeholderTextColor={colors.grey}
-              value={this.state.story.author || ""}
-              onChange={value => this.setAuthor(value.nativeEvent.text)}
+              value={this.state.story.description || ""}
+              onChange={value => this.setDescription(value.nativeEvent.text)}
               style={styles.nameInput}
             />
             {this.state.story.actions.map((action, i) => (
@@ -372,26 +385,26 @@ export default class StoryBuilderView extends React.Component<
                 </Swipeout>
                 {action.options
                   ? action.options.map((action, k) => (
-                      <Swipeout
-                        key={k}
-                        backgroundColor={colors.black}
-                        right={[
-                          {
-                            text: "Remove",
-                            onPress: this.removeActionOption.bind(this, i, k),
-                            backgroundColor: "#FE3A2F"
-                          }
-                        ]}
-                      >
-                        <StoryActionInput
-                          value={action.title}
-                          hasFilter={action.filter !== undefined}
-                          onChange={this.updateActionOption.bind(this, i, k)}
-                          suppressFilterIcon={true}
-                          inputType="option"
-                        />
-                      </Swipeout>
-                    ))
+                    <Swipeout
+                      key={k}
+                      backgroundColor={colors.black}
+                      right={[
+                        {
+                          text: "Remove",
+                          onPress: this.removeActionOption.bind(this, i, k),
+                          backgroundColor: "#FE3A2F"
+                        }
+                      ]}
+                    >
+                      <StoryActionInput
+                        value={action.title}
+                        hasFilter={action.filter !== undefined}
+                        onChange={this.updateActionOption.bind(this, i, k)}
+                        suppressFilterIcon={true}
+                        inputType="option"
+                      />
+                    </Swipeout>
+                  ))
                   : null}
                 <LightHeroButton
                   title="Add an option"
@@ -409,7 +422,7 @@ export default class StoryBuilderView extends React.Component<
               : "Add your first action"
           }
           onPress={this.addAction.bind(this)}
-          style={{ minWidth: 350 }}
+          style={{ minWidth: 350, marginTop: 15 }}
         />
       </View>
     )
@@ -438,7 +451,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start"
   },
   nameInput: {
-    height: 50,
+    height: 30,
     paddingLeft: 15,
     paddingRight: 15,
     fontSize: 18,

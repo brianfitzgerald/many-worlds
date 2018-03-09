@@ -148,10 +148,8 @@ StartpageState
       )
     }
 
-    const featuredStories = appStore.featuredStories.filter(
-      story => story.published
-    )
-    const myStories = this.state.myStories
+    const featuredStories = appStore.featuredStories
+    const myStories = appStore.myStories
 
     const selectedStory = this.state.selectedStory || emptyStory
 
@@ -173,7 +171,7 @@ StartpageState
             color={colors.white}
             title="Play this story by yourself"
             onPress={() =>
-              appStore.enterSingleplayer(this.state.selectedStory)
+              this.state.selectedStory ? appStore.enterSingleplayer(this.state.selectedStory) : undefined
             }
           />
           {selectedStory.author === appStore.playerName ? (
