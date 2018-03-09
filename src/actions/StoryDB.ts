@@ -100,3 +100,22 @@ export const updateStory = (story: Story, publish: boolean) =>
       }
     )
   })
+
+export const deleteStory = (story: Story) =>
+  new Promise((resolve, reject) => {
+    const id = story.id
+    console.log(id);
+    const params: DocumentClient.DeleteItemInput = {
+      TableName: tableNames.stories,
+      Key: { id },
+    }
+    documentClient.delete(
+      params,
+      (err: AWS.AWSError, data: DocumentClient.QueryOutput) => {
+        if (err) {
+          reject(err)
+        }
+        resolve()
+      }
+    )
+  })

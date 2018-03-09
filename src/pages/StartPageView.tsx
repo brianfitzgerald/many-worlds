@@ -38,7 +38,7 @@ import {
 } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import StoryListItem from "../components/StoryListItem"
-import { getFeaturedStories, getMyStories, getStory } from "../actions/StoryDB"
+import { getFeaturedStories, getMyStories, getStory, deleteStory } from "../actions/StoryDB"
 import StoryActionPromptInput from "../components/StoryActionInput"
 import NewsItems from "../newsItems"
 import { appStore } from "../stores/AppStore"
@@ -90,7 +90,6 @@ StartpageState
   componentDidMount() {
 
     appStore.getStories()
-    appStore.getMyStories()
 
   }
 
@@ -137,7 +136,11 @@ StartpageState
     })
   }
 
-  _deleteStory() { }
+  _deleteStory(story: Story) {
+    deleteStory(story).then(() => {
+      appStore.getStories()
+    })
+  }
 
   render() {
     if (!appStore.storiesLoaded) {
@@ -251,6 +254,7 @@ StartpageState
           {featuredStories.map((story: Story, i) => (
             <StoryListItem
               key={i}
+              style={styles.StoryListItemStyle}
               story={story}
               selected={false}
               onPress={this.selectStory.bind(this, story)}
@@ -263,7 +267,7 @@ StartpageState
               key={i}
               right={[
                 {
-                  text: "Remove",
+                  text: "Delete",
                   onPress: this._deleteStory.bind(this, story),
                   backgroundColor: "#FE3A2F"
                 }
@@ -272,12 +276,13 @@ StartpageState
               <StoryListItem
                 story={story}
                 selected={false}
+                style={styles.StoryListItemStyle}
                 onPress={this.selectStory.bind(this, story)}
               />
             </Swipeout>
           ))}
           <HeroButton
-            style={{ marginBottom: 5, marginTop: 15 }}
+            style={{ marginBottom: 5 }}
             title="Create a Story"
             onPress={() => appStore.enterStoryBuilder()}
           />
@@ -345,5 +350,8 @@ const styles: { [key: string]: ViewStyle | TextStyle | ImageStyle } = {
     textAlign: "center",
     marginBottom: 12,
     marginTop: 4
+  },
+  StoryListItemStyle: {
+    marginBottom: 15
   }
 }

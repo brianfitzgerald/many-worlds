@@ -198,7 +198,7 @@ export default class StoryBuilderView extends React.Component<
   }
 
   testStory() {
-    appStore.enterSingleplayer(this.state.story)
+    appStore.enterSingleplayer(this.state.story, true)
   }
 
   updateActionFilterSelection(
@@ -319,7 +319,7 @@ export default class StoryBuilderView extends React.Component<
           <View style={styles.topBar}>
             <View style={{ flex: 2 }}>
               <Button
-                title={hasMadeChanges ? "Save and Exit" : "Exit"}
+                title="Save and Exit"
                 color={colors.white}
                 onPress={() => this.updateStory(false)}
               />
@@ -335,20 +335,13 @@ export default class StoryBuilderView extends React.Component<
             </View>
             <View style={{ flex: 1 }}>
               <Button
-                title="Save"
-                color={colors.white}
-                onPress={() => this.updateStory(false, false)}
-              />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Button
                 title="Test"
                 color={colors.white}
                 onPress={this.testStory.bind(this)}
               />
             </View>
           </View>
-          <View style={{ flexDirection: "column", width: 320 }}>
+          <View style={{ flexDirection: "column" }}>
             <TextInput
               placeholder="Enter a title"
               value={this.state.story.title || ""}
@@ -444,16 +437,12 @@ const styles = StyleSheet.create({
   },
   titleInput: {
     height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
     fontSize: 36,
     color: colors.white,
     justifyContent: "flex-start"
   },
   nameInput: {
     height: 30,
-    paddingLeft: 15,
-    paddingRight: 15,
     fontSize: 18,
     color: colors.white
   },

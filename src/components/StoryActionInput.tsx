@@ -37,33 +37,22 @@ const StoryActionInput: React.SFC<StoryActionInputProps> = props => {
       </TouchableOpacity>
     )
 
-  let body = null
 
-  if (props.inputType === "prompt") {
-    body = (
-      <View style={PromptButtonBaseStyle}>
-        <TextInput
-          placeholder={props.placeholder}
-          placeholderTextColor={colors.grey}
-          value={props.value}
-          onChange={event => props.onChange(event.nativeEvent.text)}
-          style={PromptButtonTextStyle}
-        />
-      </View>
-    )
-  } else if (props.inputType === "option") {
-    body = (
-      <View style={OptionButtonBaseStyle}>
-        <TextInput
-          placeholder={props.placeholder}
-          placeholderTextColor={colors.grey}
-          value={props.value}
-          onChange={event => props.onChange(event.nativeEvent.text)}
-          style={OptionButtonTextStyle}
-        />
-      </View>
-    )
-  }
+  let bodyStyle = props.inputType === "prompt" ? PromptButtonBaseStyle : OptionButtonBaseStyle
+  let textStyle = props.inputType === "prompt" ? PromptButtonTextStyle : OptionButtonTextStyle
+
+  let body = (
+    <View style={bodyStyle}>
+      <TextInput
+        placeholder={props.placeholder}
+        placeholderTextColor={colors.grey}
+        value={props.value}
+        onChange={event => props.onChange(event.nativeEvent.text)}
+        style={textStyle}
+        multiline={true}
+      />
+    </View>
+  )
 
   return (
     <View>
@@ -78,6 +67,7 @@ export const PromptButtonBaseStyle: ViewStyle = {
   padding: 15,
   minHeight: 50,
   marginBottom: 15,
+  paddingTop: 10,
   marginTop: 15,
   backgroundColor: colors.lightBlack,
   borderRadius: 10,

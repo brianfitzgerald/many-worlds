@@ -7,7 +7,8 @@ import {
   StatusBar,
   View,
   ScrollViewProps,
-  ScrollViewStatic
+  ScrollViewStatic,
+  TouchableOpacity
 } from "react-native"
 import commonStyles from "../styles/commonStyles"
 import HeroButton from "../components/HeroButton"
@@ -30,7 +31,9 @@ import { roomDefaultState, updateRoomState, getSelf } from "../firebaseFunctions
 import { appStore } from "../stores/AppStore"
 import StoryListItem from "../components/StoryListItem";
 
-type StoryViewProps = {}
+type StoryViewProps = {
+  testMode?: boolean
+}
 
 type StoryViewState = {
   roomState: RoomState
@@ -202,7 +205,7 @@ export default class StoryView extends React.Component<
   }
 
   _leaveRoom() {
-    if (!appStore.singleplayer) {
+    if (appStore.singleplayer) {
       appStore.leaveRoom()
       return
     }
@@ -291,6 +294,9 @@ export default class StoryView extends React.Component<
       <View style={[commonStyles.container, styles.partyContainer]}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <View style={styles.header}>
+          <TouchableOpacity onPress={this._leaveRoom}>
+            <Text style={styles.roomCode}>Back</Text>
+          </TouchableOpacity>
           <Text style={styles.roomCode}>{appStore.roomCode}</Text>
           <Text style={styles.timer}>
             {this.state.currentTimer} Seconds Left
@@ -366,7 +372,8 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    paddingBottom: 10
   },
   timer: {
     paddingTop: 6,

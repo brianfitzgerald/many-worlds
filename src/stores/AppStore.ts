@@ -20,26 +20,23 @@ export default class AppStore {
   @observable public myStories: Story[] = []
   @observable public storiesLoaded: boolean = false
 
+  private testMode: boolean = false
+
   @action
   getStories() {
     getFeaturedStories()
       .then(featuredStories => {
         this.featuredStories = featuredStories
-        this.storiesLoaded = true
+        if (this.playerName !== "") {
+          getMyStories(appStore.playerName)
+            .then(myStories => {
+              this.myStories = myStories
+              this.storiesLoaded = true
+            })
+            .catch(err => console.log(err))
+        }
       })
       .catch(err => console.log(err))
-  }
-
-  @action
-  getMyStories() {
-    if (this.playerName !== "") {
-      getMyStories(appStore.playerName)
-        .then(myStories => {
-          this.myStories = myStories
-          this.storiesLoaded = true
-        })
-        .catch(err => console.log(err))
-    }
 
   }
 
@@ -58,10 +55,14 @@ export default class AppStore {
 
   @action
   leaveRoom() {
-    this.navigationLocation = "start"
     this.roomCode = ""
-    this.currentStory = undefined
     this.singleplayer = false
+    if (this.testMode) {
+      this.navigationLocation = "storyBuilder"
+    } else {
+      this.navigationLocation = "start"
+      this.currentStory = undefined
+    }
   }
 
   @action
@@ -70,10 +71,13 @@ export default class AppStore {
   }
 
   @action
-  enterSingleplayer(story: Story) {
+  enterSingleplayer(story: Story, testMode: boolean = false) {
     this.currentStory = story
     this.navigationLocation = "party"
     this.singleplayer = true
+    if (testMode) {
+      this.testMode = true
+    }
   }
 
   @action
