@@ -24,7 +24,10 @@ export type StoryState = {
   [key: string]: string | boolean
 }
 
-export type HistoryItem = string
+export type HistoryItem = {
+  body: string
+  type: "response" | "action"
+}
 
 export type StoryAction = {
   type?: "boolean" | "end"

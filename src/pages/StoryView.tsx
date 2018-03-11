@@ -319,8 +319,8 @@ export default class StoryView extends React.Component<
         </View>
         <ScrollView ref="scrollView">
           {this.state.roomState.history.map((p, i) => (
-            <Text key={i} style={styles.promptText}>
-              {p}
+            <Text key={i} style={p.type === "response" && i === this.state.roomState.history.length ? styles.currentPromptText : styles.promptText}>
+              {p.body}
             </Text>
           ))}
           <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
@@ -361,7 +361,6 @@ const styles = StyleSheet.create({
   currentPromptText: {
     fontSize: 24,
     color: colors.white,
-    textAlign: "left"
   },
   partyContainer: {
     flex: 1,
