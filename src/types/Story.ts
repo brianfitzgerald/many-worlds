@@ -26,6 +26,13 @@ export type StoryState = {
 
 export type HistoryItem = string
 
+export type StoryAction = {
+  type?: "boolean" | "end"
+  prompt: string
+  filter?: StoryState
+  options: StoryOption[]
+}
+
 export type StoryOption = {
   title: string
   action?: StoryState
@@ -37,12 +44,6 @@ export type StoryOption = {
   response?: string
 }
 
-export type StoryAction = {
-  type?: "boolean" | "end"
-  prompt: string
-  filter?: StoryState
-  options: StoryOption[]
-}
 
 type PlayerStateChange = {
   newItems?: InventoryItem[]

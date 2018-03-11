@@ -75,9 +75,7 @@ export default class AppStore {
     this.currentStory = story
     this.navigationLocation = "party"
     this.singleplayer = true
-    if (testMode) {
-      this.testMode = true
-    }
+    this.testMode = testMode
   }
 
   @action
@@ -94,6 +92,7 @@ export default class AppStore {
   @action
   leaveStoryBuilder() {
     this.navigationLocation = "start"
+    this.testMode = false
   }
 }
 

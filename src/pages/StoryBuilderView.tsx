@@ -334,7 +334,7 @@ export default class StoryBuilderView extends React.Component<
               <Button
                 title={this.state.hasMadeChanges ? "Save and Exit" : "Exit"}
                 color={colors.white}
-                onPress={() => this.updateStory(false)}
+                onPress={() => this.state.hasMadeChanges ? this.updateStory(false) : appStore.leaveStoryBuilder()}
               />
             </View>
             <View style={{ flex: 1 }}>

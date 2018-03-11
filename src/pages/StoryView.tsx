@@ -86,6 +86,7 @@ export default class StoryView extends React.Component<
   }
 
   componentDidMount() {
+    console.log(this.state)
     if (appStore.singleplayer) {
       return
     }
@@ -134,10 +135,6 @@ export default class StoryView extends React.Component<
     }
 
     const option = currentAction.options[optionIndex]
-
-    if (option.response) {
-      alert(option.response)
-    }
 
     const currentStoryIndex = this.state.roomState.currentStoryIndex
     const nextStoryIndex = getNextActionIndex(
@@ -205,7 +202,9 @@ export default class StoryView extends React.Component<
   }
 
   _leaveRoom() {
+    console.log('leaving room')
     if (appStore.singleplayer) {
+      console.log('is singleplayer')
       appStore.leaveRoom()
       return
     }
@@ -267,6 +266,9 @@ export default class StoryView extends React.Component<
       )
     }
 
+    console.log(this.state.roomState.currentStoryIndex)
+    console.log(appStore.currentStory)
+
     const isAtStoryEnd =
       this.state.roomState.currentStoryIndex >=
       appStore.currentStory.actions.length
@@ -289,9 +291,16 @@ export default class StoryView extends React.Component<
         <View style={[commonStyles.container, styles.partyContainer]}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <Text style={[styles.titleText]}>The End</Text>
+          <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
         </View>
       )
     }
+
+    const timer = appStore.singleplayer ? null : (
+      <Text style={styles.timer}>
+        {this.state.currentTimer} Seconds Left
+      </Text>
+    )
 
     const currentAction = getActionByIndex(
       appStore.currentStory,
@@ -306,9 +315,7 @@ export default class StoryView extends React.Component<
             <Text style={styles.roomCode}>Back</Text>
           </TouchableOpacity>
           <Text style={styles.roomCode}>{appStore.roomCode}</Text>
-          <Text style={styles.timer}>
-            {this.state.currentTimer} Seconds Left
-          </Text>
+          {timer}
         </View>
         <ScrollView ref="scrollView">
           {this.state.roomState.history.map((p, i) => (
@@ -381,20 +388,20 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingBottom: 10
+    paddingBottom: 10,
+    paddingTop: 6,
+    height: 50
   },
   timer: {
-    paddingTop: 6,
     flex: 2,
     color: colors.white,
     textAlign: "right",
     fontSize: 18
   },
   roomCode: {
-    paddingTop: 5,
     flex: 1,
     color: colors.white,
-    textAlign: "left",
+    textAlign: "center",
     fontSize: 20
   }
 })

@@ -20,7 +20,7 @@ type HeroButtonProps = {
   style?: StyleProp<ViewStyle>
 }
 
-const HeroButton: React.SFC<HeroButtonProps> = ({ title, onPress, style }) => {
+export const HeroButton: React.SFC<HeroButtonProps> = ({ title, onPress, style }) => {
   return (
     <TouchableOpacity style={style} onPress={onPress}>
       <View style={styles.HeroButton}>

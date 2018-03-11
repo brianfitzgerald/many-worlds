@@ -93,6 +93,10 @@ export function doAction(
     }
   })
 
+  if (selectedOption.response) {
+    roomState.history.push(selectedOption.response)
+  }
+
   const lastActionBeforeNewOne = getActionByIndex(story, currentStoryIndex)
     .prompt
   roomState.history.push(lastActionBeforeNewOne)
