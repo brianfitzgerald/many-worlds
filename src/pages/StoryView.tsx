@@ -56,11 +56,13 @@ export default class StoryView extends React.Component<
   constructor(props: StoryViewProps) {
     super(props)
 
-    const roomInitState = roomDefaultState
+    const roomInitState = Object.assign({}, roomDefaultState)
 
     if (appStore.singleplayer) {
       roomInitState.status = "in_game"
     }
+
+    roomInitState.history = []
 
     this.state = {
       roomState: roomInitState,
@@ -202,9 +204,7 @@ export default class StoryView extends React.Component<
   }
 
   _leaveRoom() {
-    console.log('leaving room')
     if (appStore.singleplayer) {
-      console.log('is singleplayer')
       appStore.leaveRoom()
       return
     }
@@ -265,9 +265,6 @@ export default class StoryView extends React.Component<
         </View>
       )
     }
-
-    console.log(this.state.roomState.currentStoryIndex)
-    console.log(appStore.currentStory)
 
     const isAtStoryEnd =
       this.state.roomState.currentStoryIndex >=
