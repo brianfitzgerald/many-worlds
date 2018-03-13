@@ -317,11 +317,14 @@ export default class StoryView extends React.Component<
           {timer}
         </View>
         <ScrollView ref="scrollView">
-          {this.state.roomState.history.map((p, i) => (
-            <Text key={i} style={p.type === "response" && i === this.state.roomState.history.length ? styles.currentPromptText : styles.promptText}>
-              {p.body}
-            </Text>
-          ))}
+          {this.state.roomState.history.map((p, i) => {
+            const style = p.type === "response" && i === this.state.roomState.history.length - 1 ? styles.currentPromptText : styles.promptText
+            return (
+              <Text key={i} style={style}>
+                {p.body}
+              </Text>
+            )
+          })}
           <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
         </ScrollView>
         <View>
