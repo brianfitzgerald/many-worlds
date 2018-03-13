@@ -276,22 +276,24 @@ export default class StoryView extends React.Component<
     if (isAtStoryEnd) {
 
       const moreStories = appStore.featuredStories.slice(0, 2)
-      const isInTestMode = appStore.testMode
 
-      const finalContent = isInTestMode ? <HeroButton title="Back to testing" onPress={() => this._leaveRoom()} /> : (
-        <React.Fragment>
-          <Text style={styles.currentPromptText}>Here are some more stories:</Text>
-          {moreStories.map((story) => <StoryListItem story={story} onPress={this._selectAnotherStory.bind(this, story)} />)}
-          <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
-        </React.Fragment>
-      )
+      let finalContent = null
 
+      if (appStore.testMode && !appStore.singleplayer) {
+        finalContent = (
+          <View>
+            <Text style={styles.currentPromptText}>Here are some more stories:</Text>
+            {moreStories.map((story, i) => <StoryListItem key={i} story={story} onPress={this._selectAnotherStory.bind(this, story)} />)}
+          </View>
+        )
+      }
 
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <Text style={[styles.titleText]}>The End</Text>
-          <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
+          {finalContent}
+          <HeroButton title="Leave" onPress={() => this._leaveRoom()} />
         </View>
       )
     }
@@ -308,7 +310,7 @@ export default class StoryView extends React.Component<
     )
 
     return (
-      <View style={[commonStyles.container, styles.partyContainer]}>
+      <View style={[commonStyles.container, styles.partyContainer]} >
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <View style={styles.header}>
           <TouchableOpacity onPress={this._leaveRoom}>
