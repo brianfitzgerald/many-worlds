@@ -56,11 +56,13 @@ export default class StoryView extends React.Component<
   constructor(props: StoryViewProps) {
     super(props)
 
-    const roomInitState = roomDefaultState
+    const roomInitState = Object.assign({}, roomDefaultState)
 
     if (appStore.singleplayer) {
       roomInitState.status = "in_game"
     }
+
+    roomInitState.history = []
 
     this.state = {
       roomState: roomInitState,
@@ -86,6 +88,7 @@ export default class StoryView extends React.Component<
   }
 
   componentDidMount() {
+    console.log(this.state)
     if (appStore.singleplayer) {
       return
     }
@@ -134,10 +137,6 @@ export default class StoryView extends React.Component<
     }
 
     const option = currentAction.options[optionIndex]
-
-    if (option.response) {
-      alert(option.response)
-    }
 
     const currentStoryIndex = this.state.roomState.currentStoryIndex
     const nextStoryIndex = getNextActionIndex(
@@ -274,24 +273,33 @@ export default class StoryView extends React.Component<
     if (isAtStoryEnd) {
 
       const moreStories = appStore.featuredStories.slice(0, 2)
-      const isInTestMode = appStore.testMode
 
-      const finalContent = isInTestMode ? <HeroButton title="Back to testing" onPress={() => this._leaveRoom()} /> : (
-        <React.Fragment>
-          <Text style={styles.currentPromptText}>Here are some more stories:</Text>
-          {moreStories.map((story) => <StoryListItem story={story} onPress={this._selectAnotherStory.bind(this, story)} />)}
-          <HeroButton title="Back to menu" onPress={() => this._leaveRoom()} />
-        </React.Fragment>
-      )
+      let finalContent = null
 
+      if (appStore.testMode && !appStore.singleplayer) {
+        finalContent = (
+          <View>
+            <Text style={styles.currentPromptText}>Here are some more stories:</Text>
+            {moreStories.map((story, i) => <StoryListItem key={i} story={story} onPress={this._selectAnotherStory.bind(this, story)} />)}
+          </View>
+        )
+      }
 
       return (
         <View style={[commonStyles.container, styles.partyContainer]}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <Text style={[styles.titleText]}>The End</Text>
+          {finalContent}
+          <HeroButton title="Leave" onPress={() => this._leaveRoom()} />
         </View>
       )
     }
+
+    const timer = appStore.singleplayer ? null : (
+      <Text style={styles.timer}>
+        {this.state.currentTimer} Seconds Left
+      </Text>
+    )
 
     const currentAction = getActionByIndex(
       appStore.currentStory,
@@ -299,23 +307,24 @@ export default class StoryView extends React.Component<
     )
 
     return (
-      <View style={[commonStyles.container, styles.partyContainer]}>
+      <View style={[commonStyles.container, styles.partyContainer]} >
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <View style={styles.header}>
           <TouchableOpacity onPress={this._leaveRoom}>
             <Text style={styles.roomCode}>Back</Text>
           </TouchableOpacity>
           <Text style={styles.roomCode}>{appStore.roomCode}</Text>
-          <Text style={styles.timer}>
-            {this.state.currentTimer} Seconds Left
-          </Text>
+          {timer}
         </View>
         <ScrollView ref="scrollView">
-          {this.state.roomState.history.map((p, i) => (
-            <Text key={i} style={styles.promptText}>
-              {p}
-            </Text>
-          ))}
+          {this.state.roomState.history.map((p, i) => {
+            const style = p.type === "response" && i === this.state.roomState.history.length - 1 ? styles.currentPromptText : styles.promptText
+            return (
+              <Text key={i} style={style}>
+                {p.body}
+              </Text>
+            )
+          })}
           <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
         </ScrollView>
         <View>
@@ -354,7 +363,6 @@ const styles = StyleSheet.create({
   currentPromptText: {
     fontSize: 24,
     color: colors.white,
-    textAlign: "left"
   },
   partyContainer: {
     flex: 1,
@@ -381,20 +389,20 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingBottom: 10
+    paddingBottom: 10,
+    paddingTop: 6,
+    height: 50
   },
   timer: {
-    paddingTop: 6,
     flex: 2,
     color: colors.white,
     textAlign: "right",
     fontSize: 18
   },
   roomCode: {
-    paddingTop: 5,
     flex: 1,
     color: colors.white,
-    textAlign: "left",
+    textAlign: "center",
     fontSize: 20
   }
 })

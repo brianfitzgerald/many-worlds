@@ -29,7 +29,8 @@ const story: Story = {
           }
         },
         {
-          title: "ignore it"
+          title: "ignore it",
+          response: "your loss m8"
         }
       ]
     },

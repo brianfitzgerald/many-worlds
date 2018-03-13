@@ -283,43 +283,45 @@ export default class StoryBuilderView extends React.Component<
           <Text style={{ color: colors.white, textAlign: "left" }}>
             Filtering Options
           </Text>
-          {validActionsToFilterBy.map((action, i) => (
-            <View key={i}>
-              <View style={PromptButtonBaseStyle}>
-                <Text style={PromptButtonTextStyle}>{action.prompt}</Text>
-              </View>
-              {action.options
-                ? action.options.map((action, k) => {
-                  const isInFilter = newFilter.find(
-                    f => f.optionIndex === k && f.actionIndex === i
-                  )
-                  return (
-                    <View>
-                      {isInFilter ? (
-                        <Text style={FilterLabelStyle}>
-                          {isInFilter.filterBooleanValue ? "True" : "False"}
-                        </Text>
-                      ) : null}
-                      <TouchableOpacity
-                        onPress={this.updateActionFilterSelection.bind(
-                          this,
-                          i,
-                          k,
-                          targetIndex
-                        )}
-                      >
-                        <View style={OptionButtonBaseStyle}>
-                          <Text style={OptionButtonTextStyle}>
-                            {action.title}
+          <KeyboardAwareScrollView>
+            {validActionsToFilterBy.map((action, i) => (
+              <View key={i}>
+                <View style={PromptButtonBaseStyle}>
+                  <Text style={PromptButtonTextStyle}>{action.prompt}</Text>
+                </View>
+                {action.options
+                  ? action.options.map((action, k) => {
+                    const isInFilter = newFilter.find(
+                      f => f.optionIndex === k && f.actionIndex === i
+                    )
+                    return (
+                      <View>
+                        {isInFilter ? (
+                          <Text style={FilterLabelStyle}>
+                            {isInFilter.filterBooleanValue ? "True" : "False"}
                           </Text>
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                  )
-                })
-                : null}
-            </View>
-          ))}
+                        ) : null}
+                        <TouchableOpacity
+                          onPress={this.updateActionFilterSelection.bind(
+                            this,
+                            i,
+                            k,
+                            targetIndex
+                          )}
+                        >
+                          <View style={OptionButtonBaseStyle}>
+                            <Text style={OptionButtonTextStyle}>
+                              {action.title}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+                    )
+                  })
+                  : null}
+              </View>
+            ))}
+          </KeyboardAwareScrollView>
         </View>
       )
     }
@@ -334,7 +336,7 @@ export default class StoryBuilderView extends React.Component<
               <Button
                 title={this.state.hasMadeChanges ? "Save and Exit" : "Exit"}
                 color={colors.white}
-                onPress={() => this.updateStory(false)}
+                onPress={() => this.state.hasMadeChanges ? this.updateStory(false) : appStore.leaveStoryBuilder()}
               />
             </View>
             <View style={{ flex: 1 }}>
