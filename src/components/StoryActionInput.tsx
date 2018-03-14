@@ -13,7 +13,6 @@ import {
 } from "react-native"
 import * as React from "react"
 
-import commonStyles from "../styles/commonStyles"
 import colors from "../styles/colors"
 import { Story } from "../types/Story"
 

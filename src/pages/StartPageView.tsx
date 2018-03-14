@@ -22,7 +22,7 @@ import {
 import Swipeout from "react-native-swipeout"
 import { observer } from "mobx-react"
 
-import commonStyles from "../styles/commonStyles"
+import { containerStyle } from "../styles/commonStyles"
 import HeroButton, { LightHeroButton, NewsItem } from "../components/HeroButton"
 import colors from "../styles/colors"
 
@@ -66,20 +66,6 @@ StartpageState
       showJoinGameModal: false,
       roomCodeInput: ""
     }
-  }
-
-  componentWillMount() {
-    this._loadUsername()
-  }
-
-  _loadUsername() {
-    AsyncStorage.getItem(usernameStorageKey)
-      .then(value => {
-        if (value !== null) {
-          appStore.updatePlayerName(value)
-        }
-      })
-      .catch(error => console.warn(error))
   }
 
   _updateUsername() {
@@ -144,7 +130,7 @@ StartpageState
   render() {
     if (!appStore.storiesLoaded) {
       return (
-        <View style={[commonStyles.container, styles.partyContainer]}>
+        <View style={containerStyle}>
           <Text style={styles.promptButton}>Loading...</Text>
         </View>
       )
@@ -157,7 +143,7 @@ StartpageState
 
     const selectStoryModal = (
       <Modal visible={this.state.showSelectStoryModal}>
-        <View style={[commonStyles.container, styles.partyContainer]}>
+        <View style={containerStyle}>
           <StoryListItem
             style={{ marginTop: 15 }}
             story={selectedStory}
@@ -198,7 +184,7 @@ StartpageState
 
     const joinGameModal = (
       <Modal visible={this.state.showJoinGameModal}>
-        <View style={[commonStyles.container, styles.partyContainer]}>
+        <View style={containerStyle}>
           <TextInput
             placeholder="Enter your name"
             value={appStore.playerName}
@@ -230,7 +216,7 @@ StartpageState
     )
 
     return (
-      <View style={[commonStyles.container, styles.partyContainer]}>
+      <View style={containerStyle}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         {selectStoryModal}
         {joinGameModal}
@@ -245,7 +231,6 @@ StartpageState
             </Text>
           </TouchableOpacity>
           <HeroButton
-            style={commonStyles.heroButtonMargins}
             title="Join a Room"
             onPress={() => this.setState({ showJoinGameModal: true })}
           />
@@ -332,11 +317,6 @@ const styles: { [key: string]: ViewStyle | TextStyle | ImageStyle } = {
     fontSize: 24,
     color: colors.white,
     textAlign: "left"
-  },
-  partyContainer: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "flex-start"
   },
   playersWhoSelectedOption: {
     fontSize: 18,

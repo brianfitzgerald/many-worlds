@@ -10,7 +10,7 @@ import {
   ScrollViewStatic,
   Button
 } from "react-native"
-import commonStyles from "../styles/commonStyles"
+import { containerStyle } from "../styles/commonStyles"
 import HeroButton from "../components/HeroButton"
 import colors from "../styles/colors"
 
@@ -77,7 +77,7 @@ export default class RoomSetupView extends React.Component<
   render() {
     if (!appStore.currentStory) {
       return (
-        <View style={[commonStyles.container, styles.partyContainer]}>
+        <View style={containerStyle}>
           <Text style={styles.promptButton}>Loading...</Text>
         </View>
       )
@@ -89,7 +89,7 @@ export default class RoomSetupView extends React.Component<
     )
 
     return (
-      <View style={[commonStyles.container, styles.partyContainer]}>
+      <View style={containerStyle}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <Button
           title="Cancel"

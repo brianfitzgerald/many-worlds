@@ -16,7 +16,7 @@ import {
 } from "react-native"
 import Swipeout from "react-native-swipeout"
 
-import commonStyles from "../styles/commonStyles"
+import { containerStyle, titleInput } from "../styles/commonStyles"
 import HeroButton, { LightHeroButton } from "../components/HeroButton"
 import colors from "../styles/colors"
 
@@ -259,7 +259,7 @@ export default class StoryBuilderView extends React.Component<
         (a, i) => i !== targetIndex
       )
       return (
-        <View style={[commonStyles.container, styles.partyContainer]}>
+        <View style={containerStyle}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <View style={styles.topBar}>
             <Button
@@ -298,7 +298,7 @@ export default class StoryBuilderView extends React.Component<
                       <View>
                         {isInFilter ? (
                           <Text style={FilterLabelStyle}>
-                            {isInFilter.filterBooleanValue ? "True" : "False"}
+                            {isInFilter.filterBooleanValue ? "Selected" : "Not Selected"}
                           </Text>
                         ) : null}
                         <TouchableOpacity
@@ -328,7 +328,7 @@ export default class StoryBuilderView extends React.Component<
 
     const hasMadeChanges = this.state.hasMadeChanges
     return (
-      <View style={[commonStyles.container, styles.partyContainer]}>
+      <View style={containerStyle}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <KeyboardAwareScrollView>
           <View style={styles.topBar}>
@@ -362,7 +362,7 @@ export default class StoryBuilderView extends React.Component<
               value={this.state.story.title || ""}
               onChange={value => this.setTitle(value.nativeEvent.text)}
               placeholderTextColor={colors.grey}
-              style={styles.titleInput}
+              style={titleInput}
             />
             <TextInput
               placeholder="Enter a description for your story"
@@ -450,12 +450,6 @@ const styles = StyleSheet.create({
     minWidth: 200,
     flexDirection: "row",
     justifyContent: "space-between"
-  },
-  titleInput: {
-    height: 50,
-    fontSize: 36,
-    color: colors.white,
-    justifyContent: "flex-start"
   },
   nameInput: {
     height: 30,

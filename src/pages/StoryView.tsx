@@ -10,7 +10,7 @@ import {
   ScrollViewStatic,
   TouchableOpacity
 } from "react-native"
-import commonStyles from "../styles/commonStyles"
+import { containerStyle } from "../styles/commonStyles"
 import HeroButton from "../components/HeroButton"
 import colors from "../styles/colors"
 
@@ -248,7 +248,7 @@ export default class StoryView extends React.Component<
 
     if (!appStore.currentStory) {
       return (
-        <View style={[commonStyles.container, styles.partyContainer]}>
+        <View style={containerStyle}>
           <Text style={styles.roomCode}>Loading</Text>
         </View>
       )
@@ -256,7 +256,7 @@ export default class StoryView extends React.Component<
 
     if (this.state.roomState.status === "pregame") {
       return (
-        <View style={[commonStyles.container, styles.partyContainer]}>
+        <View style={containerStyle}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           {this.state.roomState.connectedPlayers.map((player) => {
             <Text style={styles.promptText}>{player.name}: {player.ready}</Text>
@@ -286,7 +286,7 @@ export default class StoryView extends React.Component<
       }
 
       return (
-        <View style={[commonStyles.container, styles.partyContainer]}>
+        <View style={containerStyle}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
           <Text style={[styles.titleText]}>The End</Text>
           {finalContent}
@@ -307,7 +307,7 @@ export default class StoryView extends React.Component<
     )
 
     return (
-      <View style={[commonStyles.container, styles.partyContainer]} >
+      <View style={containerStyle} >
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <View style={styles.header}>
           <TouchableOpacity onPress={this._leaveRoom}>
