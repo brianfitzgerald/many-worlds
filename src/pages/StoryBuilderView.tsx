@@ -16,7 +16,7 @@ import {
 } from "react-native"
 import Swipeout from "react-native-swipeout"
 
-import commonStyles, { containerStyle, titleInput } from "../styles/commonStyles"
+import { containerStyle, titleInput } from "../styles/commonStyles"
 import HeroButton, { LightHeroButton } from "../components/HeroButton"
 import colors from "../styles/colors"
 

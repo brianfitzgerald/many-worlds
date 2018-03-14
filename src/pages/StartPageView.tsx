@@ -22,7 +22,7 @@ import {
 import Swipeout from "react-native-swipeout"
 import { observer } from "mobx-react"
 
-import commonStyles, { containerStyle } from "../styles/commonStyles"
+import { containerStyle } from "../styles/commonStyles"
 import HeroButton, { LightHeroButton, NewsItem } from "../components/HeroButton"
 import colors from "../styles/colors"
 
@@ -231,7 +231,6 @@ StartpageState
             </Text>
           </TouchableOpacity>
           <HeroButton
-            style={commonStyles.heroButtonMargins}
             title="Join a Room"
             onPress={() => this.setState({ showJoinGameModal: true })}
           />

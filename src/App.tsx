@@ -13,7 +13,7 @@ import {
 
 import StoryView from "./pages/StoryView"
 
-import commonStyles, { containerStyle, titleInput } from "./styles/commonStyles"
+import { containerStyle, titleInput } from "./styles/commonStyles"
 
 import { Player } from "./types/Player"
 import { Story } from "./types/Story"

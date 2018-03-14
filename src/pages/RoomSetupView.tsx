@@ -10,7 +10,7 @@ import {
   ScrollViewStatic,
   Button
 } from "react-native"
-import commonStyles, { containerStyle } from "../styles/commonStyles"
+import { containerStyle } from "../styles/commonStyles"
 import HeroButton from "../components/HeroButton"
 import colors from "../styles/colors"
 
