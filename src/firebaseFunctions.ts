@@ -29,21 +29,12 @@ export const joinRoom = (roomCode: string, username: string) =>
         return
       }
 
-      if (username === "") {
-        AlertIOS.prompt("What is your name?", undefined, (nameInput: string) => {
-          username = nameInput
-          appStore.updatePlayerName(nameInput)
-          AsyncStorage.setItem(usernameStorageKey, nameInput)
-        })
-        return
-      }
-
       const newPlayer = playerDefaultState
       newPlayer.name = username
 
       const id = uuidv4()
       newPlayer.id = id
-      appStore.selfID = id
+      appStore.playerID = id
 
       const newRoomState = currentRoomState
       newRoomState.connectedPlayers.push(newPlayer)
@@ -70,7 +61,7 @@ export const createRoom = (username: string, story: Story) =>
 
     const id = uuidv4()
     newPlayer.id = id
-    appStore.selfID = id
+    appStore.playerID = id
 
     roomDefaultState.connectedPlayers.push(newPlayer)
     roomDefaultState.storyState = story.defaultState
@@ -89,7 +80,7 @@ export function updateRoomState(roomCode: string, newState: RoomState) {
 }
 
 export const getSelf = (players: Player[]): Player | undefined => {
-  const self = players.find((p) => p.id === appStore.selfID)
+  const self = players.find((p) => p.id === appStore.playerID)
   if (self) {
     return self
   }

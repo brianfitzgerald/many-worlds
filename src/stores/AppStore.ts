@@ -10,7 +10,8 @@ export type NavigationLocation =
 
 export default class AppStore {
   @observable public playerName: string = ""
-  @observable public selfID: string = ""
+  @observable public playerID: string = ""
+  @observable public firstTime: boolean = true
   @observable public roomCode: string = ""
   @observable public currentStory?: Story
   @observable public singleplayer: boolean = false
@@ -21,6 +22,13 @@ export default class AppStore {
   @observable public storiesLoaded: boolean = false
 
   public testMode: boolean = false
+
+  @action
+  updateInitialValues(playerName: string, id: string, firstTime: boolean) {
+    this.playerName = playerName
+    this.playerID = id
+    this.firstTime = firstTime
+  }
 
   @action
   getStories() {
@@ -43,6 +51,7 @@ export default class AppStore {
   @action
   closeModal() {
     this.navigationLocation = "start"
+    this.firstTime = false
     this.currentStory = undefined
   }
 

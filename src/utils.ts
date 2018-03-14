@@ -1,4 +1,6 @@
-export const usernameStorageKey = "username_entry"
+export const usernameStorageKey = "username"
+export const idKey = "id"
+export const isFirstTimeKey = "first"
 
 export function uuidv4() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
