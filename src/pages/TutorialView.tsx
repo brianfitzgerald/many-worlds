@@ -31,7 +31,34 @@ const tutorialStory: Story = {
     author: "Brian Fitzgerald",
     published: false,
     description: "The tutorial for the game",
-    actions: [],
+    actions: [
+        {
+            prompt: 'A large frog blocks your path. "Tell me, adventurer, what is your name?" he asks.',
+            options: []
+        },
+        {
+            prompt: 'The frog grumbles approvingly. "Tell me, adventurer, what is your favorite breakfast food?" he asks.',
+            options: [
+                {
+                    title: 'bananas'
+                },
+                {
+                    title: 'eggs'
+                },
+                {
+                    title: 'pancakes'
+                }
+            ]
+        },
+        {
+            prompt: 'As soon as you eat the first bite, you suddenly leave your body, and you seem to be floating above the scene. You can see all possible paths, all possible decisions you could make, floating all around you.',
+            options: [
+                {
+                    title: "Weird"
+                }
+            ]
+        },
+    ],
     defaultState: {}
 }
 
@@ -71,10 +98,16 @@ export default class TutorialView extends React.Component<
         let content = null
         const name = appStore.playerName
 
+        console.log(this.state.step)
+
         switch (this.state.step) {
             case 0:
+                console.log('first')
                 content = (
                     <View style={containerStyle}>
+                        <Text style={styles.currentPromptText}>
+                            {tutorialStory.actions[0].prompt}
+                        </Text>
                         <TextInput
                             placeholder="Enter your name"
                             value={name}
@@ -87,18 +120,19 @@ export default class TutorialView extends React.Component<
                         />
                         <Button
                             color={colors.white}
-                            title="Start"
-                            onPress={() => this._incrementStep()}
+                            title="Submit"
+                            onPress={this._incrementStep.bind(this)}
                         />
                     </View>
 
                 )
+                break
             case 1:
                 const options = ["bananas", "eggs", "pancakes"]
                 content = (
                     <View>
                         <Text style={styles.currentPromptText}>
-                            A large frog blocks you path. "Tell me, adventurer, what is your favorite breakfast food?" he asks.
+                            {tutorialStory.actions[1].prompt}
                         </Text>
                         {options.map((option, i) =>
                             <HeroButton
@@ -110,6 +144,7 @@ export default class TutorialView extends React.Component<
                         )}
                     </View>
                 )
+                break
             case 2:
                 content = (
                     <View>
@@ -124,6 +159,7 @@ export default class TutorialView extends React.Component<
                         />
                     </View>
                 )
+                break
             case 3:
                 content = (
                     <View>
@@ -138,6 +174,7 @@ export default class TutorialView extends React.Component<
                         />
                     </View>
                 )
+                break
             case 4:
                 content = (
                     <View>
@@ -150,7 +187,8 @@ export default class TutorialView extends React.Component<
                                 <StoryActionInput
                                     value={action.prompt}
                                     onChange={() => { }}
-                                    hasFilter={action.filter !== undefined}
+                                    hasFilter={false}
+                                    suppressFilterIcon={true}
                                     onFilterPressed={() => { }}
                                     inputType="prompt"
                                 />
@@ -165,15 +203,16 @@ export default class TutorialView extends React.Component<
                                         />
                                     ))
                                     : null}
-                                <LightHeroButton
-                                    title="Add an option"
-                                    onPress={() => { }}
-                                    style={{ minWidth: 100, alignSelf: "flex-end" }}
-                                />
                             </View>
                         ))}
+                        <HeroButton
+                            title="Weird"
+                            onPress={this._incrementStep.bind(this)}
+                            style={styles.promptButton}
+                        />
                     </View>
                 )
+                break
 
         }
 
