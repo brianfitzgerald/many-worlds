@@ -26,30 +26,7 @@ import StartPageView from "./pages/StartPageView"
 import { appStore } from "./stores/AppStore"
 import { observer } from "mobx-react"
 import { usernameStorageKey, idKey, isFirstTimeKey, uuidv4 } from "./utils";
-
-const FirstLaunchView: React.SFC<{name: string}> = ({name}) => (
-  <View style={containerStyle}>
-    <TextInput
-      placeholder="Enter your name"
-      value={name}
-      onChange={value => {
-        console.log(value.nativeEvent.text)
-        appStore.updatePlayerName(value.nativeEvent.text)
-      }}
-      placeholderTextColor={colors.grey}
-      style={titleInput}
-    />
-    <Button
-      color={colors.white}
-      title="Start"
-      onPress={() => {
-        appStore.closeModal()
-        AsyncStorage.setItem(isFirstTimeKey, 'false')
-      }}
-    />
-</View>
-
-)
+import TutorialView from "./pages/TutorialView";
 
 @observer
 export default class App extends React.Component {
@@ -66,13 +43,13 @@ export default class App extends React.Component {
       }
       const firstTime = values[2][1] === 'true' || values[2][1] === null
       appStore.updateInitialValues(name, id, firstTime)
-    }).catch(error => console.warn(error))    
+    }).catch(error => console.warn(error))
   }
 
   render() {
 
     if (appStore.firstTime) {
-      return <FirstLaunchView name={appStore.playerName} />
+      return <TutorialView />
     }
 
     switch (appStore.navigationLocation) {
@@ -82,7 +59,7 @@ export default class App extends React.Component {
         return <StoryBuilderView />
       case "party":
         return <StoryView />
-      case "start":
+      case "startPage":
         return <StartPageView />
       default:
         return <StartPageView />

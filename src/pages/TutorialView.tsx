@@ -8,14 +8,17 @@ import {
     View,
     ScrollViewProps,
     ScrollViewStatic,
-    Button
+    Button,
+    TextInput,
+    AsyncStorage
 } from "react-native"
-import { containerStyle, storyStyles as styles } from "../styles/commonStyles";
+import { containerStyle, storyStyles as styles, titleInput } from "../styles/commonStyles";
 import colors from "../styles/colors";
 import { appStore } from "../stores/AppStore";
 import HeroButton, { LightHeroButton } from "../components/HeroButton";
 import { Story } from "../types/Story";
 import StoryActionInput from "../components/StoryActionInput";
+import { isFirstTimeKey } from "../utils";
 
 type TutorialViewState = {
     step: number
@@ -58,12 +61,39 @@ export default class TutorialView extends React.Component<
         })
     }
 
+    _finishTutorial() {
+        appStore.closeModal()
+        AsyncStorage.setItem(isFirstTimeKey, 'false')
+    }
+
     render() {
 
         let content = null
+        const name = appStore.playerName
 
         switch (this.state.step) {
             case 0:
+                content = (
+                    <View style={containerStyle}>
+                        <TextInput
+                            placeholder="Enter your name"
+                            value={name}
+                            onChange={value => {
+                                console.log(value.nativeEvent.text)
+                                appStore.updatePlayerName(value.nativeEvent.text)
+                            }}
+                            placeholderTextColor={colors.grey}
+                            style={titleInput}
+                        />
+                        <Button
+                            color={colors.white}
+                            title="Start"
+                            onPress={() => this._incrementStep()}
+                        />
+                    </View>
+
+                )
+            case 1:
                 const options = ["bananas", "eggs", "pancakes"]
                 content = (
                     <View>
@@ -80,7 +110,7 @@ export default class TutorialView extends React.Component<
                         )}
                     </View>
                 )
-            case 1:
+            case 2:
                 content = (
                     <View>
                         <Text style={styles.currentPromptText}>
@@ -94,7 +124,7 @@ export default class TutorialView extends React.Component<
                         />
                     </View>
                 )
-            case 2:
+            case 3:
                 content = (
                     <View>
                         <Text style={styles.currentPromptText}>
@@ -108,7 +138,7 @@ export default class TutorialView extends React.Component<
                         />
                     </View>
                 )
-            case 3:
+            case 4:
                 content = (
                     <View>
                         <Text style={styles.currentPromptText}>
@@ -149,8 +179,9 @@ export default class TutorialView extends React.Component<
 
         return (
             <View style={containerStyle}>
+                <StatusBar backgroundColor={colors.black} barStyle="light-content" />
                 <ScrollView>
-                    <StatusBar backgroundColor={colors.black} barStyle="light-content" />
+                    {content}
                 </ScrollView>
             </View>
         )

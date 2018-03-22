@@ -6,7 +6,8 @@ export type NavigationLocation =
   | "roomSetup"
   | "storyBuilder"
   | "party"
-  | "start"
+  | "startPage"
+  | "tutorial"
 
 export default class AppStore {
   @observable public playerName: string = ""
@@ -50,7 +51,7 @@ export default class AppStore {
 
   @action
   closeModal() {
-    this.navigationLocation = "start"
+    this.navigationLocation = "startPage"
     this.firstTime = false
     this.currentStory = undefined
   }
@@ -69,7 +70,7 @@ export default class AppStore {
     if (this.testMode) {
       this.navigationLocation = "storyBuilder"
     } else {
-      this.navigationLocation = "start"
+      this.navigationLocation = "startPage"
       this.currentStory = undefined
     }
   }
@@ -100,7 +101,7 @@ export default class AppStore {
 
   @action
   leaveStoryBuilder() {
-    this.navigationLocation = "start"
+    this.navigationLocation = "startPage"
     this.testMode = false
   }
 }
