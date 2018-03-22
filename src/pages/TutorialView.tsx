@@ -51,6 +51,12 @@ const tutorialStory: Story = {
             ]
         },
         {
+            prompt: `The frog returns, carrying a large plate of {state.favoriteFood}. "Hope you're hungry", he says.`,
+            options: [{
+                title: "Go on"
+            }]
+        },
+        {
             prompt: 'As soon as you eat the first bite, you suddenly leave your body, and you seem to be floating above the scene. You can see all possible paths, all possible decisions you could make, floating all around you.',
             options: [
                 {
@@ -195,6 +201,7 @@ export default class TutorialView extends React.Component<
                                 {action.options
                                     ? action.options.map((action, k) => (
                                         <StoryActionInput
+                                            key={i}
                                             value={action.title}
                                             hasFilter={action.filter !== undefined}
                                             onChange={() => { }}
@@ -213,6 +220,22 @@ export default class TutorialView extends React.Component<
                     </View>
                 )
                 break
+            case 5:
+                content = (
+                    <View>
+                        <Text style={styles.currentPromptText}>
+                            Many Worlds is 2 things: a place to play stories, as well as a place to write your own.
+                            I sincerely hope you enjoy doing both.
+                        </Text>
+                        <HeroButton
+                            title="Start"
+                            onPress={this._finishTutorial.bind(this)}
+                            style={styles.promptButton}
+                        />
+                    </View>
+                )
+                break
+
 
         }
 
