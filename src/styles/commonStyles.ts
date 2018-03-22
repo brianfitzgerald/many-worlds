@@ -20,3 +20,55 @@ export const titleInput: TextStyle = {
   color: colors.white,
   justifyContent: "flex-start"
 }
+
+export const storyStyles = StyleSheet.create({
+  promptText: {
+    fontSize: 24,
+    color: colors.grey
+  },
+  currentPromptText: {
+    fontSize: 24,
+    color: colors.white,
+  },
+  partyContainer: {
+    flex: 1,
+    flexDirection: "column"
+  },
+  playersWhoSelectedOption: {
+    fontSize: 18,
+    color: "white"
+  },
+  titleText: {
+    fontSize: 48,
+    color: colors.white,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 15
+  },
+  promptButton: {
+    width: "100%",
+    marginBottom: 12,
+    marginTop: 4,
+    paddingLeft: 5,
+    paddingRight: 5
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingBottom: 10,
+    paddingTop: 6,
+    height: 50
+  },
+  timer: {
+    flex: 2,
+    color: colors.white,
+    textAlign: "right",
+    fontSize: 18
+  },
+  roomCode: {
+    flex: 1,
+    color: colors.white,
+    textAlign: "center",
+    fontSize: 20
+  }
+})
