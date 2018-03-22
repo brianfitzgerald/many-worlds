@@ -23,6 +23,7 @@ import { isFirstTimeKey } from "../utils";
 type TutorialViewState = {
     step: number
     favoriteFood: string
+    nameInput: string
 }
 
 const tutorialStory: Story = {
@@ -77,7 +78,8 @@ export default class TutorialView extends React.Component<
 
         this.state = {
             step: 0,
-            favoriteFood: ''
+            favoriteFood: '',
+            nameInput: ''
         }
     }
 
@@ -96,15 +98,17 @@ export default class TutorialView extends React.Component<
 
     _finishTutorial() {
         appStore.closeModal()
+        appStore.updatePlayerName(this.state.nameInput)
         AsyncStorage.setItem(isFirstTimeKey, 'false')
     }
 
     render() {
 
         let content = null
-        const name = appStore.playerName
+        const name = this.state.nameInput
 
         console.log(this.state.step)
+        console.log(name)
 
         switch (this.state.step) {
             case 0:
@@ -118,8 +122,7 @@ export default class TutorialView extends React.Component<
                             placeholder="Enter your name"
                             value={name}
                             onChange={value => {
-                                console.log(value.nativeEvent.text)
-                                appStore.updatePlayerName(value.nativeEvent.text)
+                                this.setState({ nameInput: value.nativeEvent.text })
                             }}
                             placeholderTextColor={colors.grey}
                             style={titleInput}
