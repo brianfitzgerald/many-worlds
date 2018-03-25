@@ -261,7 +261,7 @@ export default class StoryBuilderView extends React.Component<
       return (
         <View style={containerStyle}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
-          <View style={styles.topBar}>
+          <View style={topBarStyle}>
             <Button
               title="Done"
               color={colors.white}
@@ -326,20 +326,39 @@ export default class StoryBuilderView extends React.Component<
       )
     }
 
-    const hasMadeChanges = this.state.hasMadeChanges
+    const hasMadeChanges = this.state.hasMadeChanges || (this.state.story.id !== '' && this.state.story.title !== '')
+
     return (
       <View style={containerStyle}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <KeyboardAwareScrollView>
-          <View style={styles.topBar}>
-            <View style={{ flex: 2 }}>
+          <View style={topBarStyle}>
+            <View style={topButtonStyle}>
               <Button
                 title={this.state.hasMadeChanges ? "Save and Exit" : "Exit"}
                 color={colors.white}
                 onPress={() => this.state.hasMadeChanges ? this.updateStory(false) : appStore.leaveStoryBuilder()}
               />
             </View>
-            <View style={{ flex: 1 }}>
+            <View style={topButtonStyle}>
+              {hasMadeChanges ? (
+                <Button
+                  title="Test"
+                  color={colors.white}
+                  onPress={this.testStory.bind(this)}
+                />)
+                : null}
+            </View>
+          </View>
+          <View style={topBarStyle}>
+            <View style={topButtonStyle}>
+              <Button
+                title="Show Tutorial"
+                color={colors.white}
+                onPress={() => alert("Sorry, we're hard at work at filming this. Come back soon!")}
+              />
+            </View>
+            <View style={topButtonStyle}>
               {hasMadeChanges ? (
                 <Button
                   title="Publish"
@@ -347,13 +366,6 @@ export default class StoryBuilderView extends React.Component<
                   onPress={() => this.updateStory(true)}
                 />
               ) : null}
-            </View>
-            <View style={{ flex: 1 }}>
-              <Button
-                title="Test"
-                color={colors.white}
-                onPress={this.testStory.bind(this)}
-              />
             </View>
           </View>
           <View style={{ flexDirection: "column" }}>
@@ -441,41 +453,25 @@ const FilterLabelStyle: TextStyle = {
   color: colors.blue
 }
 
+const topBarStyle: ViewStyle = {
+  minWidth: 200,
+  flexDirection: "row",
+  alignItems: "flex-start",
+  justifyContent: "space-between"
+}
+
+const topButtonStyle: ViewStyle = {
+  flex: 1
+}
+
 const styles = StyleSheet.create({
   promptText: {
     fontSize: 24,
     color: colors.grey
-  },
-  topBar: {
-    minWidth: 200,
-    flexDirection: "row",
-    justifyContent: "space-between"
   },
   nameInput: {
     height: 30,
     fontSize: 18,
     color: colors.white
   },
-  currentPromptText: {
-    fontSize: 24,
-    color: colors.white,
-    textAlign: "left"
-  },
-  partyContainer: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "flex-start"
-  },
-  playersWhoSelectedOption: {
-    fontSize: 18,
-    color: "white"
-  },
-  promptButton: {
-    color: "white",
-    fontSize: 32,
-    width: "100%",
-    textAlign: "center",
-    marginBottom: 12,
-    marginTop: 4
-  }
 })
