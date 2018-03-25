@@ -181,23 +181,26 @@ export default class StoryBuilderView extends React.Component<
     )
 
     if (builtStory.actions.length === 0) {
-      alert("Add an action to your story.")
+      alert("Add an action to your story first.")
       return
     }
 
     if (builtStory.title === "") {
-      alert("Add a title to your story.")
+      alert("Your story needs a title.")
       return
     }
 
     if (builtStory.description === "") {
-      alert("Add a description to your story.")
+      alert("You need to add a description to your story.")
       return
     }
 
     if (this.state.hasMadeChanges) {
       updateStory(builtStory, false)
         .then(() => {
+          if (publish) {
+            alert("Congratulations! Your story has been published.")
+          }
           if (exit) {
             appStore.leaveStoryBuilder()
           }
