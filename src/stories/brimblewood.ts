@@ -151,7 +151,7 @@ const story: Story = {
       ]
     },
     {
-      prompt: "Dawn of the second day.",
+      prompt: "Tired from all the adventuring, your party falls asleep.",
       options: [
         {
           title: "->"

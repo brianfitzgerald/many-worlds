@@ -141,7 +141,7 @@ StartpageState
       )
     }
 
-    const featuredStories = appStore.featuredStories.filter((story) => story.published)
+    const featuredStories = appStore.featuredStories
     const myStories = appStore.myStories
 
     const selectedStory = this.state.selectedStory || emptyStory
