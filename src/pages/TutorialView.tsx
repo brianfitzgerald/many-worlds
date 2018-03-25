@@ -84,6 +84,10 @@ export default class TutorialView extends React.Component<
     }
 
     _incrementStep() {
+        if (this.state.nameInput === '') {
+            alert("Don't be rude, tell the frog your name.")
+            return
+        }
         this.setState({
             step: this.state.step + 1
         })
@@ -97,6 +101,10 @@ export default class TutorialView extends React.Component<
     }
 
     _finishTutorial() {
+        if (this.state.nameInput === '') {
+            alert("Please set name.")
+            return
+        }
         appStore.closeModal()
         appStore.updatePlayerName(this.state.nameInput)
         AsyncStorage.setItem(isFirstTimeKey, 'false')
@@ -114,7 +122,7 @@ export default class TutorialView extends React.Component<
             case 0:
                 console.log('first')
                 content = (
-                    <View style={containerStyle}>
+                    <View style={{ ...containerStyle }}>
                         <Text style={styles.currentPromptText}>
                             {tutorialStory.actions[0].prompt}
                         </Text>
@@ -125,12 +133,16 @@ export default class TutorialView extends React.Component<
                                 this.setState({ nameInput: value.nativeEvent.text })
                             }}
                             placeholderTextColor={colors.grey}
-                            style={titleInput}
+                            style={{ ...titleInput, marginTop: 5, marginBottom: 15 }}
+                        />
+                        <HeroButton
+                            title="Submit"
+                            onPress={this._incrementStep.bind(this)}
                         />
                         <Button
                             color={colors.white}
-                            title="Submit"
-                            onPress={this._incrementStep.bind(this)}
+                            title="Submit and skip the rest of the intro"
+                            onPress={this._finishTutorial.bind(this)}
                         />
                     </View>
 
@@ -227,8 +239,9 @@ export default class TutorialView extends React.Component<
                 content = (
                     <View>
                         <Text style={styles.currentPromptText}>
-                            Many Worlds is 2 things: a place to play stories, as well as a place to write your own.
-                            I sincerely hope you enjoy doing both.
+                            Now you've played through your first story, and you have seen what a story looks like.
+                            Well done! On the next screen, you'll see a list of stories to play, either with friends
+                            or by yourself. And if you want to make your own stories, you can do that do.
                         </Text>
                         <HeroButton
                             title="Start"

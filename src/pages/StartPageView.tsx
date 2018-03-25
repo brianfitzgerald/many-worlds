@@ -17,7 +17,8 @@ import {
   AsyncStorage,
   AlertIOS,
   AlertAndroid,
-  TouchableOpacity
+  TouchableOpacity,
+  Linking
 } from "react-native"
 import Swipeout from "react-native-swipeout"
 import { observer } from "mobx-react"
@@ -125,6 +126,10 @@ StartpageState
     deleteStory(story).then(() => {
       appStore.getStories()
     })
+  }
+
+  _openFeedback() {
+    Linking.openURL('mailto:brianfitzgerald242@gmail.com')
   }
 
   render() {
@@ -261,6 +266,7 @@ StartpageState
                 story={story}
                 selected={false}
                 style={styles.StoryListItemStyle}
+                ownedByUser={true}
                 onPress={this.selectStory.bind(this, story)}
               />
             </Swipeout>
@@ -272,6 +278,7 @@ StartpageState
           />
           <Text style={styles.header}>News</Text>
           {NewsItems.map((item, key) => <NewsItem {...item} key={key} />)}
+          <HeroButton style={{ marginTop: 15 }} title="Submit Feedback" onPress={this._openFeedback} />
         </ScrollView>
       </View>
     )
