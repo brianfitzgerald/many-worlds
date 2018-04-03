@@ -29,7 +29,7 @@ import {
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState, getSelf } from "../firebaseFunctions"
 import { appStore } from "../stores/AppStore"
-import StoryListItem from "../components/StoryListItem";
+import StoryListItem from "../components/StoryListItem"
 
 type StoryViewProps = {
   testMode?: boolean
@@ -42,10 +42,7 @@ type StoryViewState = {
 
 const TIMER_AMOUNT = 15
 
-export default class StoryView extends React.Component<
-  StoryViewProps,
-  StoryViewState
-  > {
+export default class StoryView extends React.Component<StoryViewProps, StoryViewState> {
   private intervalRef: NodeJS.Timer | undefined
   private timeoutRef: NodeJS.Timer | undefined
 
@@ -95,15 +92,9 @@ export default class StoryView extends React.Component<
     const matchID = appStore.roomCode
     this.firebaseListenerRef = dbInstance.ref(`/rooms/${matchID}/`)
     this.firebaseListenerRef.on("value", snap => {
-      const updatedRoomState: FirebaseRoomState = snap
-        ? (snap.val() as RoomState)
-        : roomDefaultState
+      const updatedRoomState: FirebaseRoomState = snap ? (snap.val() as RoomState) : roomDefaultState
 
-      if (
-        appStore.currentStory &&
-        updatedRoomState.currentStoryIndex ===
-        appStore.currentStory.actions.length
-      ) {
+      if (appStore.currentStory && updatedRoomState.currentStoryIndex === appStore.currentStory.actions.length) {
         return
       }
 
@@ -127,10 +118,7 @@ export default class StoryView extends React.Component<
 
     const scrollRef = this.refs.scrollView as ScrollViewStatic
 
-    const currentAction = getActionByIndex(
-      story,
-      this.state.roomState.currentStoryIndex
-    )
+    const currentAction = getActionByIndex(story, this.state.roomState.currentStoryIndex)
 
     if (!currentAction.options) {
       return
@@ -139,17 +127,8 @@ export default class StoryView extends React.Component<
     const option = currentAction.options[optionIndex]
 
     const currentStoryIndex = this.state.roomState.currentStoryIndex
-    const nextStoryIndex = getNextActionIndex(
-      story,
-      this.state.roomState.storyState,
-      currentStoryIndex
-    )
-    const newState = doAction(
-      this.state.roomState,
-      story,
-      currentStoryIndex,
-      option
-    )
+    const nextStoryIndex = getNextActionIndex(story, this.state.roomState.storyState, currentStoryIndex)
+    const newState = doAction(this.state.roomState, story, currentStoryIndex, option)
 
     newState.currentStoryIndex = nextStoryIndex
 
@@ -170,31 +149,22 @@ export default class StoryView extends React.Component<
   }
 
   _chooseAction(optionIndex: number) {
-
     if (appStore.singleplayer) {
       this._executeAction(optionIndex)
       return
     }
 
-    const numPlayersWhoConcur = getPlayersWhoSelectedOption(
-      optionIndex,
-      this.state.roomState
-    )
+    const numPlayersWhoConcur = getPlayersWhoSelectedOption(optionIndex, this.state.roomState)
 
-    if (
-      numPlayersWhoConcur.length ===
-      this.state.roomState.connectedPlayers.length
-    ) {
+    if (numPlayersWhoConcur.length === this.state.roomState.connectedPlayers.length) {
       this._executeAction(optionIndex)
     } else {
-      const newConnectedPlayersState = this.state.roomState.connectedPlayers.map(
-        p => {
-          if (p.name === appStore.playerName) {
-            p.selectedChoiceIndex = optionIndex
-          }
-          return p
+      const newConnectedPlayersState = this.state.roomState.connectedPlayers.map(p => {
+        if (p.name === appStore.playerName) {
+          p.selectedChoiceIndex = optionIndex
         }
-      )
+        return p
+      })
 
       const newRoomState = this.state.roomState
       newRoomState.connectedPlayers = newConnectedPlayersState
@@ -225,7 +195,7 @@ export default class StoryView extends React.Component<
     if (self) {
       self.ready = true
     }
-    if (newRoomState.connectedPlayers.filter((p) => !p.ready).length < 1) {
+    if (newRoomState.connectedPlayers.filter(p => !p.ready).length < 1) {
       newRoomState.status = "in_game"
     }
     updateRoomState(appStore.roomCode, newRoomState)
@@ -245,7 +215,6 @@ export default class StoryView extends React.Component<
   }
 
   render() {
-
     if (!appStore.currentStory) {
       return (
         <View style={containerStyle}>
@@ -258,20 +227,19 @@ export default class StoryView extends React.Component<
       return (
         <View style={containerStyle}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
-          {this.state.roomState.connectedPlayers.map((player) => {
-            <Text style={styles.promptText}>{player.name}: {player.ready}</Text>
+          {this.state.roomState.connectedPlayers.map(player => {
+            ;<Text style={styles.promptText}>
+              {player.name}: {player.ready}
+            </Text>
           })}
           <HeroButton title="Ready Up" onPress={() => this._readyUp()} />
         </View>
       )
     }
 
-    const isAtStoryEnd =
-      this.state.roomState.currentStoryIndex >=
-      appStore.currentStory.actions.length
+    const isAtStoryEnd = this.state.roomState.currentStoryIndex >= appStore.currentStory.actions.length
 
     if (isAtStoryEnd) {
-
       const moreStories = appStore.featuredStories.slice(0, 2)
 
       let finalContent = null
@@ -280,7 +248,9 @@ export default class StoryView extends React.Component<
         finalContent = (
           <View>
             <Text style={styles.currentPromptText}>Here are some more stories:</Text>
-            {moreStories.map((story, i) => <StoryListItem key={i} story={story} onPress={this._selectAnotherStory.bind(this, story)} />)}
+            {moreStories.map((story, i) => (
+              <StoryListItem key={i} story={story} onPress={this._selectAnotherStory.bind(this, story)} />
+            ))}
           </View>
         )
       }
@@ -296,18 +266,13 @@ export default class StoryView extends React.Component<
     }
 
     const timer = appStore.singleplayer ? null : (
-      <Text style={styles.timer}>
-        {this.state.currentTimer} Seconds Left
-      </Text>
+      <Text style={styles.timer}>{this.state.currentTimer} Seconds Left</Text>
     )
 
-    const currentAction = getActionByIndex(
-      appStore.currentStory,
-      this.state.roomState.currentStoryIndex
-    )
+    const currentAction = getActionByIndex(appStore.currentStory, this.state.roomState.currentStoryIndex)
 
     return (
-      <View style={containerStyle} >
+      <View style={containerStyle}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <View style={styles.header}>
           <TouchableOpacity onPress={this._leaveRoom}>
@@ -318,7 +283,10 @@ export default class StoryView extends React.Component<
         </View>
         <ScrollView ref="scrollView">
           {this.state.roomState.history.map((p, i) => {
-            const style = p.type === "response" && i === this.state.roomState.history.length - 1 ? styles.currentPromptText : styles.promptText
+            const style =
+              p.type === "response" && i === this.state.roomState.history.length - 1
+                ? styles.currentPromptText
+                : styles.promptText
             return (
               <Text key={i} style={style}>
                 {p.body}
@@ -328,19 +296,14 @@ export default class StoryView extends React.Component<
           <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
         </ScrollView>
         <View>
-          {getViableOptions(
-            currentAction.options,
-            this.state.roomState.storyState
-          ).map((a, i) => (
+          {getViableOptions(currentAction.options, this.state.roomState.storyState).map((a, i) => (
             <View key={i}>
-              {getPlayersWhoSelectedOption(i, this.state.roomState).map(
-                (p, i) => (
-                  <Text key={i} style={styles.playersWhoSelectedOption}>
-                    {p.name}
-                    {i > 0 ? ", " : ""}
-                  </Text>
-                )
-              )}
+              {getPlayersWhoSelectedOption(i, this.state.roomState).map((p, i) => (
+                <Text key={i} style={styles.playersWhoSelectedOption}>
+                  {p.name}
+                  {i > 0 ? ", " : ""}
+                </Text>
+              ))}
               <HeroButton
                 key={i}
                 title={a.title}
