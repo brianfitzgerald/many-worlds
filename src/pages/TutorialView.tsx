@@ -10,7 +10,8 @@ import {
   ScrollViewStatic,
   Button,
   TextInput,
-  AsyncStorage
+  AsyncStorage,
+  Switch
 } from "react-native"
 import { containerStyle, storyStyles as styles, titleInput } from "../styles/commonStyles"
 import colors from "../styles/colors"
@@ -19,12 +20,7 @@ import HeroButton, { LightHeroButton } from "../components/HeroButton"
 import { Story } from "../types/Story"
 import StoryActionInput from "../components/StoryActionInput"
 import { isFirstTimeKey } from "../utils"
-
-type TutorialViewState = {
-  step: number
-  favoriteFood: string
-  nameInput: string
-}
+import eula from "../eula"
 
 const tutorialStory: Story = {
   id: "1",
@@ -72,6 +68,13 @@ const tutorialStory: Story = {
   defaultState: {}
 }
 
+type TutorialViewState = {
+  step: number
+  favoriteFood: string
+  nameInput: string
+  eulaAgreedTo: boolean
+}
+
 export default class TutorialView extends React.Component<{}, TutorialViewState> {
   constructor(props: {}) {
     super(props)
@@ -79,7 +82,8 @@ export default class TutorialView extends React.Component<{}, TutorialViewState>
     this.state = {
       step: 0,
       favoriteFood: "",
-      nameInput: ""
+      nameInput: "",
+      eulaAgreedTo: false
     }
   }
 
@@ -131,6 +135,9 @@ export default class TutorialView extends React.Component<{}, TutorialViewState>
               placeholderTextColor={colors.grey}
               style={{ ...titleInput, marginTop: 5, marginBottom: 15 }}
             />
+            <Text>{eula}</Text>
+            <Text>I agree to this EULA.</Text>
+            <Switch value={this.state.eulaAgreedTo} onValueChange={() => this.setState({ eulaAgreedTo: true })} />
             <HeroButton title="Submit" onPress={this._incrementStep.bind(this)} />
             <Button
               color={colors.white}
