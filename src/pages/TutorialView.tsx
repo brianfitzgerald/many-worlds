@@ -88,6 +88,10 @@ export default class TutorialView extends React.Component<{}, TutorialViewState>
   }
 
   _incrementStep() {
+    if (!this.state.eulaAgreedTo) {
+      alert("Please agree to the EULA.")
+      return
+    }
     if (this.state.nameInput === "") {
       alert("Don't be rude, tell the frog your name.")
       return
@@ -105,6 +109,10 @@ export default class TutorialView extends React.Component<{}, TutorialViewState>
   }
 
   _finishTutorial() {
+    if (!this.state.eulaAgreedTo) {
+      alert("Please agree to the EULA.")
+      return
+    }
     if (this.state.nameInput === "") {
       alert("Please set name.")
       return
@@ -135,9 +143,15 @@ export default class TutorialView extends React.Component<{}, TutorialViewState>
               placeholderTextColor={colors.grey}
               style={{ ...titleInput, marginTop: 5, marginBottom: 15 }}
             />
-            <Text>{eula}</Text>
-            <Text>I agree to this EULA.</Text>
-            <Switch value={this.state.eulaAgreedTo} onValueChange={() => this.setState({ eulaAgreedTo: true })} />
+            <Text style={{ color: "white", flex: 1 }}>{eula(this.state.nameInput)}</Text>
+            <View style={{ flexDirection: "row", paddingTop: 15, paddingBottom: 15 }}>
+              <Switch
+                style={{ flex: 1, alignSelf: "flex-end" }}
+                value={this.state.eulaAgreedTo}
+                onValueChange={() => this.setState({ eulaAgreedTo: !this.state.eulaAgreedTo })}
+              />
+              <Text style={{ color: "white", flex: 2, fontSize: 16 }}>I agree to this EULA.</Text>
+            </View>
             <HeroButton title="Submit" onPress={this._incrementStep.bind(this)} />
             <Button
               color={colors.white}
