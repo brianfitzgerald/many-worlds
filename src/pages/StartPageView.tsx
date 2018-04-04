@@ -32,11 +32,7 @@ import { joinRoom, createRoom, roomDefaultState } from "../firebaseFunctions"
 import { dbInstance } from "../firebaseRef"
 import { Story, StoryOption, StoryAction, emptyStory } from "../types/Story"
 import { Player } from "../types/Player"
-import {
-  getNextActionIndex,
-  doAction,
-  getActionByIndex
-} from "../actions/Story"
+import { getNextActionIndex, doAction, getActionByIndex } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import StoryListItem from "../components/StoryListItem"
 import { getFeaturedStories, getMyStories, getStory, deleteStory } from "../actions/StoryDB"
@@ -55,10 +51,7 @@ type StartpageState = {
 }
 
 @observer
-export default class StartPageView extends React.Component<
-StartPageProps,
-StartpageState
-> {
+export default class StartPageView extends React.Component<StartPageProps, StartpageState> {
   constructor(props: StartPageProps) {
     super(props)
     this.state = {
@@ -74,9 +67,7 @@ StartpageState
   }
 
   componentDidMount() {
-
     appStore.getStories()
-
   }
 
   beginEditing(story: Story) {
@@ -129,7 +120,7 @@ StartpageState
   }
 
   _openFeedback() {
-    Linking.openURL('mailto:brianfitzgerald242@gmail.com')
+    Linking.openURL("mailto:brianfitzgerald242@gmail.com")
   }
 
   render() {
@@ -149,12 +140,7 @@ StartpageState
     const selectStoryModal = (
       <Modal visible={this.state.showSelectStoryModal}>
         <View style={containerStyle}>
-          <StoryListItem
-            style={{ marginTop: 15 }}
-            story={selectedStory}
-            selected={false}
-            onPress={() => { }}
-          />
+          <StoryListItem style={{ marginTop: 15 }} story={selectedStory} selected={false} onPress={() => {}} />
           <Button
             color={colors.white}
             title="Play this story with friends"
@@ -166,6 +152,20 @@ StartpageState
             onPress={() =>
               this.state.selectedStory ? appStore.enterSingleplayer(this.state.selectedStory) : undefined
             }
+          />
+          <Button
+            color={colors.white}
+            title="Report this story"
+            onPress={() => {
+              alert(`${selectedStory.title} has been reported.`)
+            }}
+          />
+          <Button
+            color={colors.white}
+            title="Block the author of this story"
+            onPress={() => {
+              alert(`${selectedStory.author} has been blocked.`)
+            }}
           />
           {selectedStory.author === appStore.playerName ? (
             <Button
@@ -185,7 +185,7 @@ StartpageState
       </Modal>
     )
 
-    const validRoomCodeAndName = this.state.roomCodeInput !== '' && appStore.playerName !== ''
+    const validRoomCodeAndName = this.state.roomCodeInput !== "" && appStore.playerName !== ""
 
     const joinGameModal = (
       <Modal visible={this.state.showJoinGameModal}>
@@ -207,7 +207,7 @@ StartpageState
           <Button
             color={validRoomCodeAndName ? colors.white : colors.grey}
             title="Join Room"
-            onPress={validRoomCodeAndName ? () => this._joinGamePressed(this.state.roomCodeInput) : () => { }}
+            onPress={validRoomCodeAndName ? () => this._joinGamePressed(this.state.roomCodeInput) : () => {}}
           />
           <Button
             color={colors.white}
@@ -229,16 +229,9 @@ StartpageState
           <Text style={styles.appTitle}>Many Worlds</Text>
           <TouchableOpacity onPress={() => this._updateName()}>
             <Text style={styles.header}>Your name: {appStore.playerName}</Text>
-            <Text
-              style={{ color: colors.white, marginTop: -5, marginBottom: 10 }}
-            >
-              (tap to change)
-            </Text>
+            <Text style={{ color: colors.white, marginTop: -5, marginBottom: 10 }}>(tap to change)</Text>
           </TouchableOpacity>
-          <HeroButton
-            title="Join a Room"
-            onPress={() => this.setState({ showJoinGameModal: true })}
-          />
+          <HeroButton title="Join a Room" onPress={() => this.setState({ showJoinGameModal: true })} />
           <Text style={styles.header}>Play a Story</Text>
           {featuredStories.map((story: Story, i) => (
             <StoryListItem
@@ -271,11 +264,7 @@ StartpageState
               />
             </Swipeout>
           ))}
-          <HeroButton
-            style={{ marginBottom: 5 }}
-            title="Create a Story"
-            onPress={() => appStore.enterStoryBuilder()}
-          />
+          <HeroButton style={{ marginBottom: 5 }} title="Create a Story" onPress={() => appStore.enterStoryBuilder()} />
           <Text style={styles.header}>News</Text>
           {NewsItems.map((item, key) => <NewsItem {...item} key={key} />)}
           <HeroButton style={{ marginTop: 15 }} title="Submit Feedback" onPress={this._openFeedback} />
