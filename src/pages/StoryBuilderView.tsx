@@ -21,19 +21,9 @@ import HeroButton, { LightHeroButton } from "../components/HeroButton"
 import colors from "../styles/colors"
 
 import { dbInstance } from "../firebaseRef"
-import {
-  Story,
-  StoryOption,
-  StoryAction,
-  StoryState,
-  emptyStory
-} from "../types/Story"
+import { Story, StoryOption, StoryAction, StoryState, emptyStory } from "../types/Story"
 import { Player } from "../types/Player"
-import {
-  getNextActionIndex,
-  doAction,
-  getActionByIndex
-} from "../actions/Story"
+import { getNextActionIndex, doAction, getActionByIndex } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState } from "../firebaseFunctions"
 import StoryListItem from "../components/StoryListItem"
@@ -46,9 +36,8 @@ import StoryActionInput, {
 } from "../components/StoryActionInput"
 import { appStore } from "../stores/AppStore"
 import { buildStory } from "../actions/storyBuilder"
-import { uuidv4 } from "../utils";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
+import { uuidv4 } from "../utils"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 type StoryBuilderProps = {}
 
@@ -67,10 +56,7 @@ export type FilterPair = {
   filterBooleanValue: boolean
 }
 
-export default class StoryBuilderView extends React.Component<
-  StoryBuilderProps,
-  StoryBuilderState
-  > {
+export default class StoryBuilderView extends React.Component<StoryBuilderProps, StoryBuilderState> {
   constructor(props: StoryBuilderProps) {
     super(props)
 
@@ -166,38 +152,37 @@ export default class StoryBuilderView extends React.Component<
   }
 
   updateStory(publish: boolean, exit: boolean = true) {
-
     const formattedStory = this.state.story
 
     formattedStory.author = appStore.playerName
-    if (formattedStory.id === '') {
+    if (formattedStory.id === "") {
       formattedStory.id = uuidv4()
     }
     formattedStory.published = publish
 
-    const builtStory = buildStory(
-      this.state.story,
-      this.state.filterPairs
-    )
+    const builtStory = buildStory(this.state.story, this.state.filterPairs)
 
     if (builtStory.actions.length === 0) {
-      alert("Add an action to your story.")
+      alert("Add an action to your story first.")
       return
     }
 
     if (builtStory.title === "") {
-      alert("Add a title to your story.")
+      alert("Your story needs a title.")
       return
     }
 
     if (builtStory.description === "") {
-      alert("Add a description to your story.")
+      alert("You need to add a description to your story.")
       return
     }
 
     if (this.state.hasMadeChanges) {
       updateStory(builtStory, false)
         .then(() => {
+          if (publish) {
+            alert("Congratulations! Your story has been published.")
+          }
           if (exit) {
             appStore.leaveStoryBuilder()
           }
@@ -214,17 +199,10 @@ export default class StoryBuilderView extends React.Component<
     appStore.enterSingleplayer(this.state.story, true)
   }
 
-  updateActionFilterSelection(
-    actionIndex: number,
-    optionIndex: number,
-    targetIndex: number
-  ) {
+  updateActionFilterSelection(actionIndex: number, optionIndex: number, targetIndex: number) {
     const newFilterState = this.state.filterPairs
     const existingFilterIndex = newFilterState.findIndex(
-      f =>
-        f.optionIndex === optionIndex &&
-        f.actionIndex === actionIndex &&
-        f.targetIndex === targetIndex
+      f => f.optionIndex === optionIndex && f.actionIndex === actionIndex && f.targetIndex === targetIndex
     )
 
     if (existingFilterIndex === -1) {
@@ -236,15 +214,11 @@ export default class StoryBuilderView extends React.Component<
       }
       newFilterState.push(newFilter)
     } else if (existingFilterIndex !== -1) {
-      const currentValue =
-        newFilterState[existingFilterIndex].filterBooleanValue
+      const currentValue = newFilterState[existingFilterIndex].filterBooleanValue
       if (currentValue === false) {
         newFilterState.splice(existingFilterIndex, 1)
       } else {
-        newFilterState[
-          existingFilterIndex
-        ].filterBooleanValue = !newFilterState[existingFilterIndex]
-          .filterBooleanValue
+        newFilterState[existingFilterIndex].filterBooleanValue = !newFilterState[existingFilterIndex].filterBooleanValue
       }
     }
     this.setState({ filterPairs: newFilterState })
@@ -255,34 +229,23 @@ export default class StoryBuilderView extends React.Component<
       const targetIndex = this.state.filterModeTargetIndex
       const target = this.state.story.actions[targetIndex]
       const newFilter = this.state.filterPairs
-      const validActionsToFilterBy = this.state.story.actions.filter(
-        (a, i) => i !== targetIndex
-      )
+      const validActionsToFilterBy = this.state.story.actions.filter((a, i) => i !== targetIndex)
       return (
         <View style={containerStyle}>
           <StatusBar backgroundColor={colors.black} barStyle="light-content" />
-          <View style={styles.topBar}>
-            <Button
-              title="Done"
-              color={colors.white}
-              onPress={this.leaveFilterMode.bind(this)}
-            />
+          <View style={topBarStyle}>
+            <Button title="Done" color={colors.white} onPress={this.leaveFilterMode.bind(this)} />
           </View>
           <Text style={{ color: colors.white, textAlign: "left" }}>Target</Text>
           <StoryActionInput
             value={target.prompt}
             onChange={this.updateActionPrompt.bind(this, targetIndex)}
-            hasFilter={
-              target.filter !== undefined &&
-              Object.keys(target.filter).length > 0
-            }
+            hasFilter={target.filter !== undefined && Object.keys(target.filter).length > 0}
             suppressFilterIcon={true}
             onFilterPressed={this.enterFilterMode.bind(this, targetIndex)}
             inputType="prompt"
           />
-          <Text style={{ color: colors.white, textAlign: "left" }}>
-            Filtering Options
-          </Text>
+          <Text style={{ color: colors.white, textAlign: "left" }}>Filtering Options</Text>
           <KeyboardAwareScrollView>
             {validActionsToFilterBy.map((action, i) => (
               <View key={i}>
@@ -291,33 +254,22 @@ export default class StoryBuilderView extends React.Component<
                 </View>
                 {action.options
                   ? action.options.map((action, k) => {
-                    const isInFilter = newFilter.find(
-                      f => f.optionIndex === k && f.actionIndex === i
-                    )
-                    return (
-                      <View>
-                        {isInFilter ? (
-                          <Text style={FilterLabelStyle}>
-                            {isInFilter.filterBooleanValue ? "Selected" : "Not Selected"}
-                          </Text>
-                        ) : null}
-                        <TouchableOpacity
-                          onPress={this.updateActionFilterSelection.bind(
-                            this,
-                            i,
-                            k,
-                            targetIndex
-                          )}
-                        >
-                          <View style={OptionButtonBaseStyle}>
-                            <Text style={OptionButtonTextStyle}>
-                              {action.title}
+                      const isInFilter = newFilter.find(f => f.optionIndex === k && f.actionIndex === i)
+                      return (
+                        <View>
+                          {isInFilter ? (
+                            <Text style={FilterLabelStyle}>
+                              {isInFilter.filterBooleanValue ? "Selected" : "Not Selected"}
                             </Text>
-                          </View>
-                        </TouchableOpacity>
-                      </View>
-                    )
-                  })
+                          ) : null}
+                          <TouchableOpacity onPress={this.updateActionFilterSelection.bind(this, i, k, targetIndex)}>
+                            <View style={OptionButtonBaseStyle}>
+                              <Text style={OptionButtonTextStyle}>{action.title}</Text>
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                      )
+                    })
                   : null}
               </View>
             ))}
@@ -326,34 +278,36 @@ export default class StoryBuilderView extends React.Component<
       )
     }
 
-    const hasMadeChanges = this.state.hasMadeChanges
+    const hasMadeChanges = this.state.hasMadeChanges || (this.state.story.id !== "" && this.state.story.title !== "")
+
     return (
       <View style={containerStyle}>
         <StatusBar backgroundColor={colors.black} barStyle="light-content" />
         <KeyboardAwareScrollView>
-          <View style={styles.topBar}>
-            <View style={{ flex: 2 }}>
+          <View style={topBarStyle}>
+            <View style={topButtonStyle}>
               <Button
                 title={this.state.hasMadeChanges ? "Save and Exit" : "Exit"}
                 color={colors.white}
-                onPress={() => this.state.hasMadeChanges ? this.updateStory(false) : appStore.leaveStoryBuilder()}
+                onPress={() => (this.state.hasMadeChanges ? this.updateStory(false) : appStore.leaveStoryBuilder())}
               />
             </View>
-            <View style={{ flex: 1 }}>
-              {hasMadeChanges ? (
-                <Button
-                  title="Publish"
-                  color={colors.white}
-                  onPress={() => this.updateStory(true)}
-                />
-              ) : null}
+            <View style={topButtonStyle}>
+              {hasMadeChanges ? <Button title="Test" color={colors.white} onPress={this.testStory.bind(this)} /> : null}
             </View>
-            <View style={{ flex: 1 }}>
+          </View>
+          <View style={topBarStyle}>
+            <View style={topButtonStyle}>
               <Button
-                title="Test"
+                title="Show Tutorial"
                 color={colors.white}
-                onPress={this.testStory.bind(this)}
+                onPress={() => alert("Sorry, we're hard at work at filming this. Come back soon!")}
               />
+            </View>
+            <View style={topButtonStyle}>
+              {hasMadeChanges ? (
+                <Button title="Publish" color={colors.white} onPress={() => this.updateStory(true)} />
+              ) : null}
             </View>
           </View>
           <View style={{ flexDirection: "column" }}>
@@ -393,26 +347,26 @@ export default class StoryBuilderView extends React.Component<
                 </Swipeout>
                 {action.options
                   ? action.options.map((action, k) => (
-                    <Swipeout
-                      key={k}
-                      backgroundColor={colors.black}
-                      right={[
-                        {
-                          text: "Remove",
-                          onPress: this.removeActionOption.bind(this, i, k),
-                          backgroundColor: "#FE3A2F"
-                        }
-                      ]}
-                    >
-                      <StoryActionInput
-                        value={action.title}
-                        hasFilter={action.filter !== undefined}
-                        onChange={this.updateActionOption.bind(this, i, k)}
-                        suppressFilterIcon={true}
-                        inputType="option"
-                      />
-                    </Swipeout>
-                  ))
+                      <Swipeout
+                        key={k}
+                        backgroundColor={colors.black}
+                        right={[
+                          {
+                            text: "Remove",
+                            onPress: this.removeActionOption.bind(this, i, k),
+                            backgroundColor: "#FE3A2F"
+                          }
+                        ]}
+                      >
+                        <StoryActionInput
+                          value={action.title}
+                          hasFilter={action.filter !== undefined}
+                          onChange={this.updateActionOption.bind(this, i, k)}
+                          suppressFilterIcon={true}
+                          inputType="option"
+                        />
+                      </Swipeout>
+                    ))
                   : null}
                 <LightHeroButton
                   title="Add an option"
@@ -424,11 +378,7 @@ export default class StoryBuilderView extends React.Component<
           </View>
         </KeyboardAwareScrollView>
         <LightHeroButton
-          title={
-            this.state.story.actions.length > 0
-              ? "Add another action"
-              : "Add your first action"
-          }
+          title={this.state.story.actions.length > 0 ? "Add another action" : "Add your first action"}
           onPress={this.addAction.bind(this)}
           style={{ minWidth: 350, marginTop: 15 }}
         />
@@ -441,41 +391,25 @@ const FilterLabelStyle: TextStyle = {
   color: colors.blue
 }
 
+const topBarStyle: ViewStyle = {
+  minWidth: 200,
+  flexDirection: "row",
+  alignItems: "flex-start",
+  justifyContent: "space-between"
+}
+
+const topButtonStyle: ViewStyle = {
+  flex: 1
+}
+
 const styles = StyleSheet.create({
   promptText: {
     fontSize: 24,
     color: colors.grey
   },
-  topBar: {
-    minWidth: 200,
-    flexDirection: "row",
-    justifyContent: "space-between"
-  },
   nameInput: {
     height: 30,
     fontSize: 18,
     color: colors.white
-  },
-  currentPromptText: {
-    fontSize: 24,
-    color: colors.white,
-    textAlign: "left"
-  },
-  partyContainer: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "flex-start"
-  },
-  playersWhoSelectedOption: {
-    fontSize: 18,
-    color: "white"
-  },
-  promptButton: {
-    color: "white",
-    fontSize: 32,
-    width: "100%",
-    textAlign: "center",
-    marginBottom: 12,
-    marginTop: 4
   }
 })
