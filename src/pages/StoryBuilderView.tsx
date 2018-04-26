@@ -162,6 +162,13 @@ export default class StoryBuilderView extends React.Component<StoryBuilderProps,
 
     const builtStory = buildStory(this.state.story, this.state.filterPairs)
 
+    builtStory.actions.forEach(action => {
+      if (action.options.length < 1) {
+        alert("Make sure every action has at least one option.")
+        return
+      }
+    })
+
     if (builtStory.actions.length === 0) {
       alert("Add an action to your story first.")
       return

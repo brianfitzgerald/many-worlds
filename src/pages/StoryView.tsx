@@ -10,6 +10,7 @@ import {
   ScrollViewStatic,
   TouchableOpacity
 } from "react-native"
+import * as mobx from "mobx"
 import { containerStyle, storyStyles as styles } from "../styles/commonStyles"
 import HeroButton from "../components/HeroButton"
 import colors from "../styles/colors"
@@ -215,6 +216,9 @@ export default class StoryView extends React.Component<StoryViewProps, StoryView
   }
 
   render() {
+    if (appStore.currentStory !== undefined) {
+      console.log(mobx.toJS(appStore.currentStory))
+    }
     if (!appStore.currentStory) {
       return (
         <View style={containerStyle}>
@@ -270,6 +274,8 @@ export default class StoryView extends React.Component<StoryViewProps, StoryView
     )
 
     const currentAction = getActionByIndex(appStore.currentStory, this.state.roomState.currentStoryIndex)
+
+    console.log(currentAction.options, this.state.roomState.storyState)
 
     return (
       <View style={containerStyle}>
