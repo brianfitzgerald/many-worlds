@@ -38,7 +38,6 @@ export function getViableOptions(options: StoryOption[] | undefined, currentStat
   if (!options) {
     return []
   }
-  console.log(mobx.toJS(options))
   const viableOptions = options.filter(o => validateFilter(o.filter, currentState))
   return viableOptions
 }

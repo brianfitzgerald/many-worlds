@@ -25,7 +25,8 @@ import {
   validateFilter,
   getViableOptions,
   getCurrentBestSelection,
-  getPlayersWhoSelectedOption
+  getPlayersWhoSelectedOption,
+  next
 } from "../actions/Story"
 import { RoomState, FirebaseRoomState } from "../types/Network"
 import { roomDefaultState, updateRoomState, getSelf } from "../firebaseFunctions"
@@ -121,11 +122,7 @@ export default class StoryView extends React.Component<StoryViewProps, StoryView
 
     const currentAction = getActionByIndex(story, this.state.roomState.currentStoryIndex)
 
-    if (!currentAction.options) {
-      return
-    }
-
-    const option = currentAction.options[optionIndex]
+    const option = currentAction.options ? currentAction.options[optionIndex] : { title: "->" }
 
     const currentStoryIndex = this.state.roomState.currentStoryIndex
     const nextStoryIndex = getNextActionIndex(story, this.state.roomState.storyState, currentStoryIndex)
@@ -150,7 +147,9 @@ export default class StoryView extends React.Component<StoryViewProps, StoryView
   }
 
   _chooseAction(optionIndex: number) {
+    console.log(appStore.singleplayer)
     if (appStore.singleplayer) {
+      console.log("execute")
       this._executeAction(optionIndex)
       return
     }
@@ -241,6 +240,8 @@ export default class StoryView extends React.Component<StoryViewProps, StoryView
       )
     }
 
+    const currentAction = getActionByIndex(appStore.currentStory, this.state.roomState.currentStoryIndex)
+
     const isAtStoryEnd = this.state.roomState.currentStoryIndex >= appStore.currentStory.actions.length
 
     if (isAtStoryEnd) {
@@ -273,9 +274,17 @@ export default class StoryView extends React.Component<StoryViewProps, StoryView
       <Text style={styles.timer}>{this.state.currentTimer} Seconds Left</Text>
     )
 
-    const currentAction = getActionByIndex(appStore.currentStory, this.state.roomState.currentStoryIndex)
+    let options: StoryOption[]
 
-    console.log(currentAction.options, this.state.roomState.storyState)
+    if (!currentAction || !currentAction.options) {
+      options = [
+        {
+          title: "->"
+        }
+      ]
+    } else {
+      options = getViableOptions(currentAction.options, this.state.roomState.storyState)
+    }
 
     return (
       <View style={containerStyle}>
@@ -302,7 +311,7 @@ export default class StoryView extends React.Component<StoryViewProps, StoryView
           <Text style={styles.currentPromptText}>{currentAction.prompt}</Text>
         </ScrollView>
         <View>
-          {getViableOptions(currentAction.options, this.state.roomState.storyState).map((a, i) => (
+          {options.map((a, i) => (
             <View key={i}>
               {getPlayersWhoSelectedOption(i, this.state.roomState).map((p, i) => (
                 <Text key={i} style={styles.playersWhoSelectedOption}>
